@@ -85,7 +85,6 @@ class BaseprecoController extends AbstractRestfulController
         return null;
     }
 
-
     public function listarprodutosAction()
     {
         $data = array();
@@ -122,8 +121,10 @@ class BaseprecoController extends AbstractRestfulController
             //         and i.cod_item||c.descricao $filtroProduto
             //         order by cod_item asc";
             
-            $sql = 'select distinct cod_produto cod_item, descricao 
-            from SK_PRODUTO_TABELA_TMP';
+            $sql = "select distinct cod_produto cod_item, descricao 
+            from SK_PRODUTO_TABELA_TMP
+            where 1 =1 
+            and cod_produto $filtroProduto";
 
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -151,7 +152,117 @@ class BaseprecoController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
-    
+
+    public function listartabelaprecoAction()
+    {
+        $data = array();
+        
+        try {
+
+            $pEmp    = $this->params()->fromQuery('emp',null);
+            $pCod    = $this->params()->fromQuery('codTabPreco',null);
+            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+
+            if(!$pCod){
+                throw new \Exception('Parâmetros não informados.');
+            }
+
+            $em = $this->getEntityManager();
+
+            if(!$tipoSql){
+                $filtroProduto = "like upper('".$pCod."%')";
+            }else{
+                $produtos =  implode(",",json_decode($pCod));
+                $filtroProduto = "in ($produtos)";
+            }
+
+            $sql = "select distinct nvl(COD_TAB_PRECO,'') COD_TAB_PRECO, NOME_TAB_PRECO descricao
+            from SK_PRODUTO_TABELA_TMP
+            where 1 =1 
+            and COD_TAB_PRECO $filtroProduto";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('cod_tab_preco', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+    public function listaridprodutoAction()
+    {
+        $data = array();
+        
+        try {
+
+            $pEmp    = $this->params()->fromQuery('emp',null);
+            $pCod    = $this->params()->fromQuery('idProduto',null);
+            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+
+            if(!$pCod){
+                throw new \Exception('Parâmetros não informados.');
+            }
+
+            $em = $this->getEntityManager();
+
+            if(!$tipoSql){
+                $filtroProduto = "like upper('".$pCod."%')";
+            }else{
+                $produtos =  implode(",",json_decode($pCod));
+                $filtroProduto = "in ($produtos)";
+            }
+
+            $sql = "select distinct nvl(COD_PRODUTO,'') ID_PRODUTO, DESCRICAO
+            from SK_PRODUTO_TABELA_TMP
+            where 1 =1 
+            and nvl(COD_PRODUTO,'') $filtroProduto";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('id_produto', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
     public function listarmarcaAction()
     {
         $data = array();
@@ -264,6 +375,8 @@ class BaseprecoController extends AbstractRestfulController
         $notMarca       = $this->params()->fromQuery('notMarca',null);
         $marcas         = $this->params()->fromQuery('idMarcas',null);
         $produtos       = $this->params()->fromQuery('produtos',null);
+        $codTabPreco    = $this->params()->fromQuery('codTabPreco',null);
+        $idProduto      = $this->params()->fromQuery('idProduto',null);
         $grupoDesconto  = $this->params()->fromQuery('grupoDesconto',null);
 
         $checkEstoque           = $this->params()->fromQuery('checkEstoque',null);
@@ -272,6 +385,7 @@ class BaseprecoController extends AbstractRestfulController
         $checktipoprecificacao  = $this->params()->fromQuery('checktipoprecificacao',null);
         $checkgrupodesconto     = $this->params()->fromQuery('checkgrupodesconto',null);
         $checktabelapreco       = $this->params()->fromQuery('checktabelapreco',null);
+        $checkcustounitario     = $this->params()->fromQuery('checkcustounitario',null);
 
         $inicio     = $this->params()->fromQuery('start',null);
         $final      = $this->params()->fromQuery('limit',null);
@@ -288,6 +402,12 @@ class BaseprecoController extends AbstractRestfulController
         if($produtos){
             $produtos = implode("','",json_decode($produtos));
         }
+        if($codTabPreco){
+            $codTabPreco = implode(",",json_decode($codTabPreco));
+        }
+        if($idProduto){
+            $idProduto = implode(",",json_decode($idProduto));
+        }
         if($grupoDesconto){
             $grupoDesconto = implode("','",json_decode($grupoDesconto));
         }
@@ -302,6 +422,12 @@ class BaseprecoController extends AbstractRestfulController
         }
         if($produtos){
             $andSql .= " and COD_ITEM_NBS in ('$produtos')";
+        }
+        if($codTabPreco){
+            $andSql .= " and nvl(COD_TAB_PRECO,'') in ($codTabPreco)";
+        }
+        if($idProduto){
+            $andSql .= " and nvl(COD_PRODUTO,'') in ($idProduto)";
         }
         if($grupoDesconto){
             $andSql .= " and GRUPO_DESCONTO in ('$grupoDesconto')";
@@ -355,6 +481,14 @@ class BaseprecoController extends AbstractRestfulController
                 break;
             case 'Sem':
                 $andSql .= " and trim(NOME_TAB_PRECO) is null";
+                break;
+        }
+        switch ($checkcustounitario) {
+            case 'Com':
+                $andSql .= " and trim(CUSTO_MEDIO) is not null";
+                break;
+            case 'Sem':
+                $andSql .= " and trim(CUSTO_MEDIO) is null";
                 break;
         }
 

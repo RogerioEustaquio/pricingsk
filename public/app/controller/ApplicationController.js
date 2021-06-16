@@ -13,7 +13,7 @@ Ext.define('App.controller.ApplicationController', {
 
     routes: {
         'home': { action: 'homeAction' },
-        'basepreco': { action: 'basepreco' }
+        'basepreco': { action: 'baseprecoAction' }
     },
 
     controllerEvent: function(){

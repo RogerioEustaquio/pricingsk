@@ -4,7 +4,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
     itemId: 'bprecofiltro',
     title: 'Filtro',
     region: 'west',
-    width: 280,
+    width: 290,
     hidden: true,
     scrollable: true,
     layout: 'vbox',
@@ -113,7 +113,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 fields: [{ name: 'coditem' }, { name: 'descricao' }],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/fii/listarprodutos',
+                    url: BASEURL + '/api/basepreco/listarprodutos',
                     reader: { type: 'json', root: 'data' },
                     extraParams: { tipoSql: 0}
                 }
@@ -146,6 +146,104 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
                 getInnerTpl: function() {
                     return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
+        });
+
+        var elTagTabPreco = Ext.create('Ext.form.field.Tag',{
+            name: 'eltagtabpreco',
+            itemId: 'eltagtabpreco',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 2,
+            store: Ext.data.Store({
+                fields: [{ name: 'codTabPreco' },{ name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/basepreco/listartabelapreco',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'codTabPreco',
+            queryMode: 'remote',
+            displayField: 'codTabPreco',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',		                            
+                '{codTabPreco}',
+                '</tpl>'), 
+            valueField: 'codTabPreco',
+            // emptyText: 'Produto',
+            fieldLabel: 'Código Table Preço',
+            emptyText: 'Código Table Preço',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 1',
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+
+            listeners: {
+                
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.codTabPreco]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
+        });
+
+        var elTagIdProduto = Ext.create('Ext.form.field.Tag',{
+            name: 'eltagidproduto',
+            itemId: 'eltagidproduto',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 2,
+            store: Ext.data.Store({
+                fields: [{ name: 'idProduto' },{ name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/basepreco/listaridproduto',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'idProduto',
+            queryMode: 'remote',
+            displayField: 'idProduto',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',		                            
+                '{idProduto}',
+                '</tpl>'), 
+            valueField: 'idProduto',
+            // emptyText: 'Produto',
+            fieldLabel: 'Código Produto',
+            emptyText: 'Código Produto',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 1',
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+
+            listeners: {
+                
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.idProduto]} {[ values.descricao]} {[ values.marca]}';
                 }
             }
         });
@@ -214,7 +312,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: '',
             fieldLabel: 'Estoque',
             labelWidth: 110,
-            margin: '10 1 1 1',
+            margin: '10 1 1 0',
             filterPickList: true,
             disabled: false
         });
@@ -243,7 +341,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: '',
             fieldLabel: 'Preço',
             labelWidth: 110,
-            margin: '1 1 1 1',
+            margin: '1 1 1 0',
             filterPickList: true,
             disabled: false
         });
@@ -272,7 +370,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: '',
             fieldLabel: 'Tabela Preço',
             labelWidth: 110,
-            margin: '1 1 1 1',
+            margin: '1 1 1 0',
             filterPickList: true,
             disabled: false
         });
@@ -301,7 +399,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: '',
             fieldLabel: 'Margem',
             labelWidth: 110,
-            margin: '1 1 1 1',
+            margin: '1 1 1 0',
             filterPickList: true,
             disabled: false
         });
@@ -330,7 +428,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: '',
             fieldLabel: 'Tipo Precificação',
             labelWidth: 110,
-            margin: '1 1 1 1',
+            margin: '1 1 1 0',
             filterPickList: true,
             disabled: false
         });
@@ -359,11 +457,39 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: '',
             fieldLabel: 'Grupo Desconto',
             labelWidth: 110,
-            margin: '1 1 10 1',
+            margin: '1 1 1 0',
             filterPickList: true,
             disabled: false
         });
-     
+
+        var elCustoUnitario = Ext.create('Ext.form.field.ComboBox',{
+            name: 'elcustounitario',
+            itemId: 'elcustounitario',
+            multiSelect: false,
+            // labelAlign: 'top',
+            width: 230,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'elcustounitario', type: 'string' },
+                    { name: 'name', type: 'string' }
+                ],
+                
+                data : [
+                    {"elcustounitario":"", "name":""},
+                    {"elcustounitario":"Com", "name":"Com"},
+                    {"elcustounitario":"Sem", "name":"Sem"}
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'elcustounitario',
+            emptyText: '',
+            fieldLabel: 'Custo Unitário',
+            labelWidth: 110,
+            margin: '1 1 10 0',
+            filterPickList: true,
+            disabled: false
+        });
 
         Ext.applyIf(me, {
 
@@ -419,7 +545,40 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                             }
                         }
                     ]
-                },,
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagTabPreco,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },{
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagIdProduto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
                 {
                     xtype: 'panel',
                     layout: 'hbox',
@@ -546,7 +705,24 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                                     }
                                 }
                             ]
-                        },
+                        },,
+                        {
+                            xtype: 'panel',
+                            layout: 'hbox',
+                            border: false,
+                            items:[
+                                elCustoUnitario,
+                                {
+                                    xtype: 'button',
+                                    iconCls: 'fa fa-file',
+                                    tooltip: 'Limpar',
+                                    margin: '1 1 1 1',
+                                    handler: function(form) {
+                                        form.up('panel').down('combobox').setValue(null);
+                                    }
+                                }
+                            ]
+                        }
                     ]
                 },
                 {
@@ -566,6 +742,8 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                                 form.up('toolbar').up('panel').down('button[name=notMarca]').value = 0;
                                 form.up('toolbar').up('panel').down('tagfield[name=elMarca]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=elProduto]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=eltagtabpreco]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=eltagidproduto]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=eltaggrupodesconto]').setValue(null);
                                 form.up('toolbar').up('panel').down('fieldset').setCollapsed(true);
                             }
