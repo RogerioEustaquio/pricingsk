@@ -2,14 +2,14 @@
 namespace Api\Controller;
 
 use Zend\View\Model\JsonModel;
-use Core\Mvc\Controller\AbstractRestfulController;
 use Zend\Http\Client;
-use Core\Ad\adLDAPFactory;
 use Zend\Json\Json;
 use Zend\Db\ResultSet\HydratingResultSet;
+use Core\Ad\adLDAPFactory;
 use Core\Stdlib\StdClass;
 use Core\Hydrator\ObjectProperty;
 use Core\Hydrator\Strategy\ValueStrategy;
+use Core\Mvc\Controller\AbstractRestfulController;
 
 class BaseprecoController extends AbstractRestfulController
 {
@@ -458,6 +458,12 @@ class BaseprecoController extends AbstractRestfulController
             case 'Sem':
                 $andSql .= " and nvl(MARGEM,0) = 0";
                 break;
+            case '>10':
+                $andSql .= " and nvl(MARGEM,0) > 10";
+                break;
+            case '>5':
+                $andSql .= " and nvl(MARGEM,0) > 5";
+                break;
         }
         switch ($checktipoprecificacao) {
             case 'Com':
@@ -490,6 +496,9 @@ class BaseprecoController extends AbstractRestfulController
             case 'Sem':
                 $andSql .= " and trim(CUSTO_MEDIO) is null";
                 break;
+            case 'c<p':
+                $andSql .= " and nvl(CUSTO_MEDIO,0) < nvl(PRECO,0)";
+                break;
         }
 
         $sql = " select COD_EMPRESA,
@@ -521,6 +530,11 @@ class BaseprecoController extends AbstractRestfulController
                  where 1 = 1
                  $andSql
                  ";
+
+        $session = $this->getSession();
+        $session['exportbasepreco'] = "$sql";
+
+        $this->setSession($session);
 
         $sql1 = "select count(*) as totalCount from ($sql)";
         // $stmt = $conn->prepare($sql1);
@@ -558,33 +572,154 @@ class BaseprecoController extends AbstractRestfulController
             $data[] = $hydrator->extract($row);
         }
 
-        // $data[] = [ 'idEmpresa'=> 2,
-        //             'filial'=> 'M1',
-        //             'idTabPreco'=> 2001,
-        //             'nmTabPreco'=> 'MARITUBA-PA-BASE',
-        //             'dtVigor'=> '26/05/2021',
-        //             'preco'=> 46.78,
-        //             'idProduto'=> 43425,
-        //             'nmProduto'=> 'ABAFADOR RUIDOS 0043425',
-        //             'marca'=> 'CUMMINS',
-        //             'codItem'=> '2T2103487.0',
-        //             'mb'=> 42.36,
-        //             'tpPrecificacao'=> 'Margem x Custo Médio',
-        //             'grupoDesc'=> 'MWM1',
-        //             'estoque'=> 9,
-        //             'custoMedioUnit'=> 26.9622,
-        //             'vlEstoque'=> 242.6598,
-        //             'custo'=> 26.9622,
-        //             'pisCofins'=> 9.25,
-        //             'icms'=> 17,
-        // ];
-
         $this->setCallbackData($data);
 
         $objReturn = $this->getCallbackModel();
 
         $objReturn->total = $resultCount[0]['TOTALCOUNT'];
 
+        return $objReturn;
+    }
+
+    public function gerarexcelAction()
+    {
+        $data = array();
+        
+        try {
+
+            $session = $this->getSession();
+
+            if($session['exportbasepreco']){
+
+                ini_set('memory_limit', '2048M');
+
+                $em = $this->getEntityManager();
+                $conn = $em->getConnection();
+
+                $sql = $session['exportbasepreco'] ;
+                
+                $conn = $em->getConnection();
+                $stmt = $conn->prepare($sql);
+                
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+
+                $hydrator = new ObjectProperty;
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $data = array();
+                foreach ($resultSet as $row) {
+                    $data[] = $hydrator->extract($row);
+                }
+
+                $sm = $this->getEvent()->getApplication()->getServiceManager();
+                $excelService = $sm->get('ExcelService');
+                $arqFile = '.\data\exportbasepreco_'.$session['info']['usuarioSistema'].'.xlsx';
+                fopen($arqFile,'w'); // Paramentro $phpExcel somente retorno
+
+                $phpExcel = $excelService->createPHPExcelObject($arqFile);
+                // $phpExcel->getActiveSheet()->setCellValue('A'.'1', 'FABRICANTE')
+                //                            ->setCellValue('B'.'1', 'CODEMP')
+                //                            ->setCellValue('C'.'1', 'CODTAB')
+                //                            ->setCellValue('D'.'1', 'CODPROD')
+                //                            ->setCellValue('E'.'1', 'DTVIGOR')
+                //                            ->setCellValue('F'.'1', 'TIPO')
+                //                            ->setCellValue('G'.'1', 'VLRUNIT')
+                //                            ->setCellValue('H'.'1', 'MARGEM')
+                //                            ->setCellValue('I'.'1', 'DESPESA_VARIAVEL')
+                //                            ->setCellValue('J'.'1', 'TIPO_PRECIFICACAO')
+                //                            ->setCellValue('K'.'1', 'NOMEPROMO')
+                //                            ->setCellValue('L'.'1', 'DTINICIODESC')
+                //                            ->setCellValue('M'.'1', 'DTFINDESC')
+                //                            ->setCellValue('N'.'1', 'TIPODESC')
+                //                         ;
+                $phpExcel->getActiveSheet()->setCellValue('A'.'1', 'COD_EMPRESA')
+                                        ->setCellValue('B'.'1', 'NOME_EMPRESA')
+                                        ->setCellValue('C'.'1', 'COD_TAB_PRECO')
+                                        ->setCellValue('D'.'1', 'NOME_TAB_PRECO')
+                                        ->setCellValue('E'.'1', 'DT_VIGOR')
+                                        ->setCellValue('F'.'1', 'PRECO')
+                                        ->setCellValue('G'.'1', 'TIPO')
+                                        ->setCellValue('H'.'1', 'COD_PRODUTO')
+                                        ->setCellValue('I'.'1', 'DESCRICAO')
+                                        ->setCellValue('J'.'1', 'MARCA')
+                                        ->setCellValue('K'.'1', 'COD_FORNECEDOR')
+                                        ->setCellValue('L'.'1', 'NOME_FORNECEDOR')
+                                        ->setCellValue('M'.'1', 'COD_ITEM_NBS')
+                                        ->setCellValue('N'.'1', 'PARTNUMBER')
+                                        ->setCellValue('O'.'1', 'MARGEM')
+                                        ->setCellValue('P'.'1', 'DESP_VARIAVEL')
+                                        ->setCellValue('Q'.'1', 'TIPO_PRECIFICACAO')
+                                        ->setCellValue('R'.'1', 'NIVEL_MARGEM')
+                                        ->setCellValue('S'.'1', 'GRUPO_DESCONTO')
+                                        ->setCellValue('T'.'1', 'ESTOQUE')
+                                        ->setCellValue('U'.'1', 'CUSTO_MEDIO')
+                                        ->setCellValue('V'.'1', 'VALOR_ESTOQUE')
+                                        ->setCellValue('W'.'1', 'CUSTO_OPE')
+                                        ->setCellValue('X'.'1', 'PIS_COFINS')
+                                        ->setCellValue('Y'.'1', 'ICMS')
+                ;
+                $ix=2;
+                for ($i=0; $i < count($data); $i++) {
+                    
+                    $codEmpresa     = $data[$i]['codEmpresa'];
+                    $nomeEmpresa    = $data[$i]['nomeEmpresa'];
+                    $codTabPreco    = $data[$i]['codTabPreco'];
+
+                    $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
+                                               ->setCellValue('B'.$ix, $nomeEmpresa)
+                                               ->setCellValue('C'.$ix, $codTabPreco)
+                                               ->setCellValue('D'.$ix, $data[$i]['nomeTabPreco'])
+                                               ->setCellValue('E'.$ix, $data[$i]['dtVigor'])
+                                               ->setCellValue('F'.$ix, $data[$i]['preco'])
+                                               ->setCellValue('G'.$ix, $data[$i]['tipo'])
+                                               ->setCellValue('H'.$ix, $data[$i]['codProduto'])
+                                               ->setCellValue('I'.$ix, $data[$i]['descricao'])
+                                               ->setCellValue('J'.$ix, $data[$i]['marca'])
+                                               ->setCellValue('K'.$ix, $data[$i]['codFornecedor'])
+                                               ->setCellValue('L'.$ix, $data[$i]['nomeFornecedor'])
+                                               ->setCellValue('M'.$ix, $data[$i]['codItemNbs'])
+                                               ->setCellValue('N'.$ix, $data[$i]['partnumber'])
+                                               ->setCellValue('O'.$ix, $data[$i]['mb'])
+                                               ->setCellValue('P'.$ix, $data[$i]['despVariavel'])
+                                               ->setCellValue('Q'.$ix, $data[$i]['tipoPrecificacao'])
+                                               ->setCellValue('R'.$ix, $data[$i]['nivelMargem'])
+                                               ->setCellValue('S'.$ix, $data[$i]['grupoDesconto'])
+                                               ->setCellValue('T'.$ix, $data[$i]['estoque'])
+                                               ->setCellValue('U'.$ix, $data[$i]['custoMedio'])
+                                               ->setCellValue('V'.$ix, $data[$i]['valorEstoque'])
+                                               ->setCellValue('W'.$ix, $data[$i]['custoOpe'])
+                                               ->setCellValue('X'.$ix, $data[$i]['pisCofins'])
+                                               ->setCellValue('Y'.$ix, $data[$i]['icms'])
+                                            ;
+                    $ix++;
+                }
+
+                $objWriter = $sm->get('ExcelService')->createWriter($phpExcel, 'Excel5');
+
+                $response = $excelService->createHttpResponse($objWriter, 200, [
+                    'Pragma' => 'public',
+                    'Cache-control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Cache-control' => 'private',
+                    'Expires' => '0000-00-00',
+                    'Content-Type' => 'application/vnd.ms-excel; charset=utf-8',
+                    'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Base Preço.xls',
+                ]);
+
+                return $response;
+
+            }
+
+            $this->setCallbackData($data);
+
+            $objReturn = $this->getCallbackModel();
+            
+        } catch (\Exception $e) {
+            $objReturn = $this->setCallbackError($e->getMessage());
+        }
+        
         return $objReturn;
     }
 }

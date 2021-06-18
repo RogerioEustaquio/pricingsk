@@ -43,7 +43,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: 'Empresa',
             fieldLabel: 'Empresas',
             labelWidth: 60,
-            margin: '1 1 1 1',
+            margin: '1 1 1 8',
             // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
@@ -89,7 +89,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: 'Marca',
             fieldLabel: 'Marcas',
             // labelWidth: 60,
-            margin: '1 1 1 1',
+            margin: '1 1 1 8',
             // padding: 1,
             // plugins:'dragdroptag',
             filterPickList: true,
@@ -131,7 +131,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: 'Código Item NBS',
             // matchFieldWidth: false,
             // padding: 1,
-            margin: '1 1 1 1',
+            margin: '1 1 1 8',
             // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
@@ -180,7 +180,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: 'Código Table Preço',
             // matchFieldWidth: false,
             // padding: 1,
-            margin: '1 1 1 1',
+            margin: '1 1 1 8',
             // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
@@ -229,7 +229,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: 'Código Produto',
             // matchFieldWidth: false,
             // padding: 1,
-            margin: '1 1 1 1',
+            margin: '1 1 1 8',
             // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
@@ -275,7 +275,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             emptyText: 'Grupo Desconto',
             fieldLabel: 'Grupo Desconto',
             // labelWidth: 60,
-            margin: '1 1 1 1',
+            margin: '1 1 1 8',
             // padding: 1,
             // plugins:'dragdroptag',
             filterPickList: true,
@@ -390,7 +390,9 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 data : [
                     {"elmargem":"", "name":""},
                     {"elmargem":"Com", "name":"Com"},
-                    {"elmargem":"Sem", "name":"Sem"}
+                    {"elmargem":"Sem", "name":"Sem"},
+                    {"elmargem":">10", "name":"MB > 10"},
+                    {"elmargem":">5", "name":"MB > 5"}
                 ]
             }),
             queryMode: 'local',
@@ -477,7 +479,8 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 data : [
                     {"elcustounitario":"", "name":""},
                     {"elcustounitario":"Com", "name":"Com"},
-                    {"elcustounitario":"Sem", "name":"Sem"}
+                    {"elcustounitario":"Sem", "name":"Sem"},
+                    {"elcustounitario":"c<p", "name":"Custo < Preço"}
                 ]
             }),
             queryMode: 'local',

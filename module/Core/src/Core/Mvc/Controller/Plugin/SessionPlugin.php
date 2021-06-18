@@ -34,6 +34,16 @@ class SessionPlugin extends AbstractPlugin {
         return $session;
     }
 
+    public function setSessionRoot($session) {
+
+        if(session_status() !== PHP_SESSION_ACTIVE){
+            session_start();
+        }
+        $_SESSION = $session;
+        session_write_close();
+        return $session;
+    }
+
     public function getResources() {
         
         if(session_status() !== PHP_SESSION_ACTIVE){

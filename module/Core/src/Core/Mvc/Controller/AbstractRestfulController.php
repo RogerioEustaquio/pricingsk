@@ -71,4 +71,8 @@ class AbstractRestfulController extends AbstractController
     protected function getSession(){
         return $this->plugin('SessionPlugin')->getSession();
     }
+
+    protected function setSession($session){
+        return $this->plugin('SessionPlugin')->setSessionRoot($session);
+    }
 }
