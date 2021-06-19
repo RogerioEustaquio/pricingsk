@@ -608,6 +608,7 @@ class BaseprecoController extends AbstractRestfulController
                 $hydrator->addStrategy('preco', new ValueStrategy);
                 $hydrator->addStrategy('estoque', new ValueStrategy);
                 $hydrator->addStrategy('mb', new ValueStrategy);
+                $hydrator->addStrategy('despVariavel', new ValueStrategy);
                 $hydrator->addStrategy('custo_medio', new ValueStrategy);
                 $hydrator->addStrategy('valor_estoque', new ValueStrategy);
                 $hydrator->addStrategy('custo_ope', new ValueStrategy);
@@ -678,6 +679,7 @@ class BaseprecoController extends AbstractRestfulController
 
                     $preco          = $data[$i]['preco'] >0 ? $data[$i]['preco'] : null ;
                     $mb             = $data[$i]['mb'] >0 ? $data[$i]['mb'] : null ;
+                    $despVariavel   = $data[$i]['despVariavel'] >0 ? $data[$i]['despVariavel'] : null ;
                     $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
                     $valorEstoque   = $data[$i]['valorEstoque'] >0 ? $data[$i]['valorEstoque'] : null ;
                     $custoOpe       = $data[$i]['custoOpe'] >0 ? $data[$i]['custoOpe'] : null ;
@@ -699,7 +701,7 @@ class BaseprecoController extends AbstractRestfulController
                                                ->setCellValue('M'.$ix, $data[$i]['codItemNbs'])
                                                ->setCellValue('N'.$ix, $data[$i]['partnumber'])
                                                ->setCellValue('O'.$ix, $mb)
-                                               ->setCellValue('P'.$ix, $data[$i]['despVariavel'])
+                                               ->setCellValue('P'.$ix, $despVariavel)
                                                ->setCellValue('Q'.$ix, $data[$i]['tipoPrecificacao'])
                                                ->setCellValue('R'.$ix, $data[$i]['nivelMargem'])
                                                ->setCellValue('S'.$ix, $data[$i]['grupoDesconto'])
