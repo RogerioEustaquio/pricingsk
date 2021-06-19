@@ -605,6 +605,14 @@ class BaseprecoController extends AbstractRestfulController
                 $results = $stmt->fetchAll();
 
                 $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('preco', new ValueStrategy);
+                $hydrator->addStrategy('estoque', new ValueStrategy);
+                $hydrator->addStrategy('mb', new ValueStrategy);
+                $hydrator->addStrategy('custo_medio', new ValueStrategy);
+                $hydrator->addStrategy('valor_estoque', new ValueStrategy);
+                $hydrator->addStrategy('custo_ope', new ValueStrategy);
+                $hydrator->addStrategy('pis_cofins', new ValueStrategy);
+                $hydrator->addStrategy('icms', new ValueStrategy);
                 $stdClass = new StdClass;
                 $resultSet = new HydratingResultSet($hydrator, $stdClass);
                 $resultSet->initialize($results);
@@ -668,12 +676,20 @@ class BaseprecoController extends AbstractRestfulController
                     $nomeEmpresa    = $data[$i]['nomeEmpresa'];
                     $codTabPreco    = $data[$i]['codTabPreco'];
 
+                    $preco          = $data[$i]['preco'] >0 ? $data[$i]['preco'] : null ;
+                    $mb             = $data[$i]['mb'] >0 ? $data[$i]['mb'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
+                    $valorEstoque   = $data[$i]['valorEstoque'] >0 ? $data[$i]['valorEstoque'] : null ;
+                    $custoOpe       = $data[$i]['custoOpe'] >0 ? $data[$i]['custoOpe'] : null ;
+                    $pisCofins      = $data[$i]['pisCofins'] >0 ? $data[$i]['pisCofins'] : null ;
+                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
+
                     $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
                                                ->setCellValue('B'.$ix, $nomeEmpresa)
                                                ->setCellValue('C'.$ix, $codTabPreco)
                                                ->setCellValue('D'.$ix, $data[$i]['nomeTabPreco'])
                                                ->setCellValue('E'.$ix, $data[$i]['dtVigor'])
-                                               ->setCellValue('F'.$ix, $data[$i]['preco'])
+                                               ->setCellValue('F'.$ix, $preco)
                                                ->setCellValue('G'.$ix, $data[$i]['tipo'])
                                                ->setCellValue('H'.$ix, $data[$i]['codProduto'])
                                                ->setCellValue('I'.$ix, $data[$i]['descricao'])
@@ -682,17 +698,17 @@ class BaseprecoController extends AbstractRestfulController
                                                ->setCellValue('L'.$ix, $data[$i]['nomeFornecedor'])
                                                ->setCellValue('M'.$ix, $data[$i]['codItemNbs'])
                                                ->setCellValue('N'.$ix, $data[$i]['partnumber'])
-                                               ->setCellValue('O'.$ix, $data[$i]['mb'])
+                                               ->setCellValue('O'.$ix, $mb)
                                                ->setCellValue('P'.$ix, $data[$i]['despVariavel'])
                                                ->setCellValue('Q'.$ix, $data[$i]['tipoPrecificacao'])
                                                ->setCellValue('R'.$ix, $data[$i]['nivelMargem'])
                                                ->setCellValue('S'.$ix, $data[$i]['grupoDesconto'])
                                                ->setCellValue('T'.$ix, $data[$i]['estoque'])
-                                               ->setCellValue('U'.$ix, $data[$i]['custoMedio'])
-                                               ->setCellValue('V'.$ix, $data[$i]['valorEstoque'])
-                                               ->setCellValue('W'.$ix, $data[$i]['custoOpe'])
-                                               ->setCellValue('X'.$ix, $data[$i]['pisCofins'])
-                                               ->setCellValue('Y'.$ix, $data[$i]['icms'])
+                                               ->setCellValue('U'.$ix, $custoMedio)
+                                               ->setCellValue('V'.$ix, $valorEstoque)
+                                               ->setCellValue('W'.$ix, $custoOpe)
+                                               ->setCellValue('X'.$ix, $pisCofins)
+                                               ->setCellValue('Y'.$ix, $icms)
                                             ;
                     $ix++;
                 }
