@@ -156,7 +156,8 @@ Ext.define('App.view.basepreco.BprecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        return utilFormat.Value2(v,0);
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
                     },
                 },
                 {
@@ -165,7 +166,8 @@ Ext.define('App.view.basepreco.BprecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        return utilFormat.Value2(v,2);
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
                     },
                 },
                 {
@@ -174,7 +176,8 @@ Ext.define('App.view.basepreco.BprecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        return utilFormat.Value2(v,2);
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
                     },
                 },
                 {
@@ -183,7 +186,8 @@ Ext.define('App.view.basepreco.BprecoGrid', {
                     width: 150,
                     align: 'right',
                     renderer: function (v) {
-                        return utilFormat.Value2(v,2);
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
                     },
                 },
                 {

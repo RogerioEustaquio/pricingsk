@@ -92,7 +92,7 @@ Ext.define('App.view.basepreco.Toolbar',{
                         var dados = this.dado;
 
                         var input = "<input type='hidden' name='dados' value='"+dados+"'></input>";
-                        input +=  " <input type='hidden' name='nome' value='fndesccomercial'></input>";
+                        input +=  " <input type='hidden' name='nome' value='baseprecoexport'></input>";
                         input +=  " <input type='hidden' name='total' value='"+this.total+"'></input>";
 
                         var html = "<html><body><form id='forml' method='POST' action='"+link+"'> " +input+" </form></body></html>"
