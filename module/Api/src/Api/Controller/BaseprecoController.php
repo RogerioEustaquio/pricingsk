@@ -670,8 +670,6 @@ class BaseprecoController extends AbstractRestfulController
                     $i++;
                 }
 
-                $sm = $this->getEvent()->getApplication()->getServiceManager();
-                $excelService = $sm->get('ExcelService');
                 $arqFile = '.\data\exportbasepreco_'.$session['info']['usuarioSistema'].'.csv';
                 $arquivo = fopen($arqFile,'w'); 
 
