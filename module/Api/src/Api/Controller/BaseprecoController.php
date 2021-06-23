@@ -301,7 +301,7 @@ class BaseprecoController extends AbstractRestfulController
             // ";
 
             $sql = 'select distinct marca as id_marca, marca 
-            from SK_PRODUTO_TABELA_TMP';
+            from SK_PRODUTO_TABELA_TMP order by marca';
             
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -643,38 +643,37 @@ class BaseprecoController extends AbstractRestfulController
                     $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
 
                     $output  .= $codEmpresa.';'.
-                                     $nomeEmpresa.';'.
-                                     $codTabPreco.';'.
-                                     $data[$i]['nomeTabPreco'].';'.
-                                     $data[$i]['dtVigor'].';'.
-                                     $preco.';'.
-                                     $data[$i]['tipo'].';'.
-                                     $data[$i]['codProduto'].';'.
-                                     $data[$i]['descricao'].';'.
-                                     $data[$i]['marca'].';'.
-                                     $data[$i]['codFornecedor'].';'.
-                                     $data[$i]['nomeFornecedor'].';'.
-                                     $data[$i]['codItemNbs'].';'.
-                                     (string) $data[$i]['partnumber'].';'.
-                                     $mb.';'.
-                                     $despVariavel.';'.
-                                     $data[$i]['tipoPrecificacao'].';'.
-                                     $data[$i]['nivelMargem'].';'.
-                                     $data[$i]['grupoDesconto'].';'.
-                                     $data[$i]['estoque'].';'.
-                                     $custoMedio.';'.
-                                     $valorEstoque.';'.
-                                     $custoOpe.';'.
-                                     $pisCofins.';'.
-                                     $icms."\n";
+                                $nomeEmpresa.';'.
+                                $codTabPreco.';'.
+                                $data[$i]['nomeTabPreco'].';'.
+                                $data[$i]['dtVigor'].';'.
+                                $preco.';'.
+                                $data[$i]['tipo'].';'.
+                                $data[$i]['codProduto'].';'.
+                                $data[$i]['descricao'].';'.
+                                $data[$i]['marca'].';'.
+                                $data[$i]['codFornecedor'].';'.
+                                $data[$i]['nomeFornecedor'].';'.
+                                $data[$i]['codItemNbs'].';'.
+                                (string) $data[$i]['partnumber'].';'.
+                                $mb.';'.
+                                $despVariavel.';'.
+                                $data[$i]['tipoPrecificacao'].';'.
+                                $data[$i]['nivelMargem'].';'.
+                                $data[$i]['grupoDesconto'].';'.
+                                $data[$i]['estoque'].';'.
+                                $custoMedio.';'.
+                                $valorEstoque.';'.
+                                $custoOpe.';'.
+                                $pisCofins.';'.
+                                $icms."\n";
                     $i++;
                 }
 
-                $arqFile = '.\data\exportbasepreco_'.$session['info']['usuarioSistema'].'.csv';
-                $arquivo = fopen($arqFile,'w'); 
-
-                fwrite($arquivo, $output);
-                fclose($arquivo);
+                // $arqFile = '.\data\exportbasepreco_'.$session['info']['usuarioSistema'].'.csv';
+                // $arquivo = fopen($arqFile,'w'); 
+                // fwrite($arquivo, $output);
+                // fclose($arquivo);
 
                 $response = new \Zend\Http\Response();
                 $response->setContent($output);
