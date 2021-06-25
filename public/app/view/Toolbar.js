@@ -20,6 +20,20 @@ Ext.define('App.view.Toolbar', {
                     handler: function(){
                         window.document.location= BASEURL +'/#basepreco';
                     }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Produto',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#produto';
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Estoque',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#estoque';
+                    }
                 }
             ]
         });

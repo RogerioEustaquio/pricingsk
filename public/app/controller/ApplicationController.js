@@ -4,7 +4,9 @@ Ext.define('App.controller.ApplicationController', {
     requires: [
         'App.view.Toolbar',
         'App.view.home.HomePanel',
-        'App.view.basepreco.BaseprecoPanel'
+        'App.view.basepreco.BaseprecoPanel',
+        'App.view.produto.ProdutoPanel',
+        'App.view.estoque.EstoquePanel'
     ],
 
     control: {
@@ -13,7 +15,9 @@ Ext.define('App.controller.ApplicationController', {
 
     routes: {
         'home': { action: 'homeAction' },
-        'basepreco': { action: 'baseprecoAction' }
+        'basepreco': { action: 'baseprecoAction' },
+        'produto': { action: 'produtoAction' },
+        'estoque': { action: 'estoqueAction' }
     },
 
     controllerEvent: function(){
@@ -53,6 +57,16 @@ Ext.define('App.controller.ApplicationController', {
 
     baseprecoAction: function(){
         this.goActionMasterTab('basepreco', true)
+    },
+
+    produtoAction: function(){
+        // this.goActionMasterTab('home', true)
+        this.goActionMasterTab('produto', true)
+    },
+
+    estoqueAction: function(){
+        // this.goActionMasterTab('home', true)
+        this.goActionMasterTab('estoque', true)
     },
 
     configViewport: function(){

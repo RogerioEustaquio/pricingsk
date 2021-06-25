@@ -121,10 +121,10 @@ class BaseprecoController extends AbstractRestfulController
             //         and i.cod_item||c.descricao $filtroProduto
             //         order by cod_item asc";
             
-            $sql = "select distinct cod_produto cod_item, descricao 
+            $sql = "select distinct COD_ITEM_NBS cod_item, descricao 
             from SK_PRODUTO_TABELA_TMP
             where 1 =1 
-            and cod_produto $filtroProduto";
+            and COD_ITEM_NBS $filtroProduto";
 
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
