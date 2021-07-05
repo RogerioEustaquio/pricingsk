@@ -34,6 +34,20 @@ Ext.define('App.view.Toolbar', {
                     handler: function(){
                         window.document.location= BASEURL +'/#estoque';
                     }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Config. Marca Empresa',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#configmarcaempresa';
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Grupo Desconto',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#grupodesconto';
+                    }
                 }
             ]
         });

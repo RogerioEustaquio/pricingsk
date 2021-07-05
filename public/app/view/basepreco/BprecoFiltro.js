@@ -565,7 +565,8 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                             }
                         }
                     ]
-                },{
+                },
+                {
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,

@@ -6,7 +6,9 @@ Ext.define('App.controller.ApplicationController', {
         'App.view.home.HomePanel',
         'App.view.basepreco.BaseprecoPanel',
         'App.view.produto.ProdutoPanel',
-        'App.view.estoque.EstoquePanel'
+        'App.view.estoque.EstoquePanel',
+        'App.view.configmarcaempresa.ConfigmarcaempresaPanel',
+        'App.view.grupodesconto.GrupodescontoPanel',
     ],
 
     control: {
@@ -17,7 +19,9 @@ Ext.define('App.controller.ApplicationController', {
         'home': { action: 'homeAction' },
         'basepreco': { action: 'baseprecoAction' },
         'produto': { action: 'produtoAction' },
-        'estoque': { action: 'estoqueAction' }
+        'estoque': { action: 'estoqueAction' },
+        'configmarcaempresa': { action: 'configmarcaempresaAction' },
+        'grupodesconto': { action: 'grupodescontoAction' }
     },
 
     controllerEvent: function(){
@@ -67,6 +71,16 @@ Ext.define('App.controller.ApplicationController', {
     estoqueAction: function(){
         // this.goActionMasterTab('home', true)
         this.goActionMasterTab('estoque', true)
+    },
+
+    configmarcaempresaAction: function(){
+        // this.goActionMasterTab('home', true)
+        this.goActionMasterTab('configmarcaempresa', true)
+    },
+
+    grupodescontoAction: function(){
+        // this.goActionMasterTab('home', true)
+        this.goActionMasterTab('grupodesconto', true)
     },
 
     configViewport: function(){
