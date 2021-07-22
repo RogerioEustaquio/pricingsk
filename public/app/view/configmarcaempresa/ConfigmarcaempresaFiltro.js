@@ -135,11 +135,9 @@ Ext.define('App.view.configmarcaempresa.ConfigmarcaempresaFiltro',{
             // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
-
             listeners: {
                 
             },
-            
             // allowBlank: false,
             listConfig: {
                 loadingText: 'Carregando...',
@@ -221,6 +219,7 @@ Ext.define('App.view.configmarcaempresa.ConfigmarcaempresaFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    hidden: true,
                     items:[
                         elTagIdProduto,
                         {

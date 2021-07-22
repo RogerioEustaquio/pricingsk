@@ -80,8 +80,8 @@ Ext.define('App.view.grupodesconto.GrupodescontoFiltro',{
                 '</tpl>'), 
             valueField: 'codTabPreco',
             // emptyText: 'Produto',
-            fieldLabel: 'Código Table Preço',
-            emptyText: 'Código Table Preço',
+            fieldLabel: 'Código Tabela Preço',
+            emptyText: 'Código Tabela Preço',
             // matchFieldWidth: false,
             // padding: 1,
             margin: '1 1 1 8',
@@ -190,14 +190,14 @@ Ext.define('App.view.grupodesconto.GrupodescontoFiltro',{
                         root: 'data'
                     }
                 }
-            }),
+             }),
             width: 230,
             queryParam: 'maximoAlcada',
             queryMode: 'local',
             displayField: 'maximoAlcada',
             valueField: 'maximoAlcada',
-            emptyText: 'Máximo Alcada',
-            fieldLabel: 'Máximo Alcada',
+            emptyText: 'Máximo Alçada',
+            fieldLabel: 'Máximo Alçada',
             labelWidth: 60,
             margin: '1 1 1 8',
             // plugins:'dragdroptag',

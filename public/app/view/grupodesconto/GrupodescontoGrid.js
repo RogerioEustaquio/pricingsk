@@ -30,12 +30,12 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                                 {name:'codGrupoDesconto', type: 'number'},
                                 {name:'descricaoGrupoDesconto', type: 'string'},
                                 {name:'agrupamentoProduto', type: 'number'},
-                                {name:'pVendedor', type: 'number'},
-                                {name:'pCoordenador', type: 'number'},
-                                {name:'pGerente', type: 'number'},
-                                {name:'pGerenteRegional', type: 'number'},
-                                {name:'pDiretor', type: 'number'},
-                                {name:'pDescontoMargem', type: 'number'},
+                                {name:'percVendedor', type: 'number'},
+                                {name:'percCoordenador', type: 'number'},
+                                {name:'percGerente', type: 'number'},
+                                {name:'percGerenteRegional', type: 'number'},
+                                {name:'percDiretor', type: 'number'},
+                                {name:'percDescontoMargem', type: 'number'},
                                 {name:'descontoMaximoAlcada', type: 'number'}
 
                             ]
@@ -61,7 +61,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                     text: 'Cód. Filial',
                     dataIndex: 'codEmpresa',
                     width: 80,
-                    hidden: true
+                    hidden: false
                 },
                 {
                     text: 'Filial',
@@ -73,7 +73,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                     text: 'Cód. Tab. Preço',
                     dataIndex: 'codTabelaPreco',
                     width: 140,
-                    hidden: true
+                    hidden: false
                 },
                 {
                     text: 'Tabela Preço',
@@ -84,8 +84,8 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 {
                     text: 'Cód. Grupo Desconto',
                     dataIndex: 'codGrupoDesconto',
-                    width: 140,
-                    hidden: true
+                    width: 160,
+                    hidden: false
                 },
                 {
                     text: 'Grupo Desconto',
@@ -105,7 +105,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 },
                 {
                     text: '% Vendedor',
-                    dataIndex: 'pVendedor',
+                    dataIndex: 'percVendedor',
                     width: 130,
                     align: 'right',
                     renderer: function (v) {
@@ -115,7 +115,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 },
                 {
                     text: '% Coordenador',
-                    dataIndex: 'pCoordenador',
+                    dataIndex: 'percCoordenador',
                     width: 130,
                     align: 'right',
                     renderer: function (v) {
@@ -125,7 +125,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 },
                 {
                     text: '% Gerente',
-                    dataIndex: 'pGerente',
+                    dataIndex: 'percGerente',
                     width: 130,
                     align: 'right',
                     renderer: function (v) {
@@ -135,7 +135,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 },
                 {
                     text: '% Gerente Regional',
-                    dataIndex: 'pGerenteRegional',
+                    dataIndex: 'percGerenteRegional',
                     width: 150,
                     align: 'right',
                     renderer: function (v) {
@@ -145,7 +145,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 },
                 {
                     text: '% Diretor',
-                    dataIndex: 'pDiretor',
+                    dataIndex: 'percDiretor',
                     width: 130,
                     align: 'right',
                     renderer: function (v) {
@@ -155,7 +155,7 @@ Ext.define('App.view.grupodesconto.GrupodescontoGrid', {
                 },
                 {
                     text: '% Desconto + Margem',
-                    dataIndex: 'pDescontoMargem',
+                    dataIndex: 'percDescontoMargem',
                     width: 180,
                     // align: 'right'
                 },

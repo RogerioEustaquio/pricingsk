@@ -400,7 +400,7 @@ class EstoqueController extends AbstractRestfulController
         }
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
-            $andSql .= " and MARCA $notMarca in ('$marcas')";
+            // $andSql .= " and MARCA $notMarca in ('$marcas')";
         }
         if($idProduto){
             $andSql .= " and nvl(COD_PRODUTO,'') in ($idProduto)";
@@ -417,22 +417,22 @@ class EstoqueController extends AbstractRestfulController
                break;
         }
 
-        $sql = " select COD_EMPRESA,
-                        NOME_EMPRESA,
+        $sql = "select  COD_EMPRESA,
+                        '' NOME_EMPRESA,
                         COD_PRODUTO,
-                        DESCRICAO DESCRICAO_PRODUTO,
-                        MARCA COD_MARCA,
-                        MARCA DESCRICAO_MARCA,
+                        '' DESCRICAO_PRODUTO,
+                        '' COD_MARCA,
+                        '' DESCRICAO_MARCA,
                         ESTOQUE,
                         CUSTO_MEDIO,
-                        VALOR_ESTOQUE VALOR,
-                        CUSTO_OPE CUSTO_OPERACAO,
-                        PIS_COFINS PIS,
-                        PIS_COFINS COFINS,
+                        VALOR,
+                        CUSTO_OPERACAO,
+                        PIS,
+                        COFINS,
                         ICMS,
-                        'A' CURVA,
-                        NOME_FORNECEDOR CLIENTES                       
-                    from SK_PRODUTO_TABELA_TMP 
+                        CURVA,
+                        CLIENTES
+                from vw_skestoque 
                  where 1 = 1
                  $andSql
                  ";

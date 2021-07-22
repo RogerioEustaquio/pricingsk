@@ -239,35 +239,35 @@ class ProdutoController extends AbstractRestfulController
 
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
-            $andSql .= " and MARCA $notMarca in ('$marcas')";
+            $andSql .= " and COD_MARCA $notMarca in ('$marcas')";
         }
         if($produtos){
-            $andSql .= " and COD_ITEM_NBS in ('$produtos')";
+            $andSql .= " and COD_NBS in ('$produtos')";
         }
         if($idProduto){
             $andSql .= " and nvl(COD_PRODUTO,'') in ($idProduto)";
         }
 
         if($dataInicio){
-            $andSql .= " and DT_VIGOR >= '$dataInicio'";
+            $andSql .= " and DT_CADASTRO >= '$dataInicio'";
         }
         if($dataFinal){
-            $andSql .= " and DT_VIGOR <= '$dataFinal'";
+            $andSql .= " and DT_CADASTRO <= '$dataFinal'";
         }
 
-        $sql = " select distinct COD_PRODUTO,
-                        DESCRICAO,
-                        DESCRICAO DESCRICAO_JS,
-                        'YES' ATIVO,
-                        COD_ITEM_NBS,
-                        COD_TAB_PRECO COD_GRUPO,
-                        COD_TAB_PRECO DESCRICAO_GRUPO,
-                        PARTNUMBER,
-                        DT_VIGOR DT_CADASTRO,
-                        MARCA COD_MARCA,
-                        MARCA DESCRICAO_MARCA,
-                        GRUPO_DESCONTO USADO_COMO                 
-                    from SK_PRODUTO_TABELA_TMP 
+        $sql = "select distinct COD_PRODUTO,
+                                DESCRICAO,
+                                DESCRICAO_JS,
+                                ATIVO,
+                                COD_NBS COD_ITEM_NBS,
+                                COD_GRUPO,
+                                '' DESCRICAO_GRUPO,
+                                PARTNUMBER,
+                                DT_CADASTRO,
+                                COD_MARCA,
+                                '' DESCRICAO_MARCA,
+                                USADO_COMO
+                        from vw_skproduto
                  where 1 = 1
                  $andSql ";
 

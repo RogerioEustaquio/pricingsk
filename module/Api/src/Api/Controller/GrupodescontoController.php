@@ -30,13 +30,7 @@ class GrupodescontoController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            // $sql = "select e.apelido emp, e.id_empresa
-            //             from ms.empresa e
-            //         where e.id_empresa not in (26, 27, 28, 11, 20, 102, 101)
-            //         order by e.apelido";
-
-            $sql = 'select distinct nome_empresa emp, cod_empresa id_empresa
-                    from SK_PRODUTO_TABELA_TMP';
+            $sql = 'select distinct NVL(EMP,SUBSTR(NOME,0,9)) EMP, cod_empresa id_empresa from VW_SKEMPRESA ORDER BY EMP';
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
@@ -121,8 +115,7 @@ class GrupodescontoController extends AbstractRestfulController
             //         and i.cod_item||c.descricao $filtroProduto
             //         order by cod_item asc";
             
-            $sql = "select distinct COD_ITEM_NBS cod_item, descricao 
-            from SK_PRODUTO_TABELA_TMP
+            $sql = "select distinct COD_ITEM_NBS cod_item, descricao from vw_skproduto
             where 1 =1 
             and COD_ITEM_NBS $filtroProduto";
 
@@ -176,10 +169,15 @@ class GrupodescontoController extends AbstractRestfulController
                 $filtroProduto = "in ($produtos)";
             }
 
-            $sql = "select distinct nvl(COD_TAB_PRECO,'') COD_TAB_PRECO, NOME_TAB_PRECO descricao
-            from SK_PRODUTO_TABELA_TMP
+            // $sql = "select distinct nvl(COD_TAB_PRECO,'') COD_TAB_PRECO, NOME_TAB_PRECO descricao
+            //     from SK_PRODUTO_TABELA_TMP
+            // where 1 =1 
+            // and COD_TAB_PRECO $filtroProduto";
+
+            $sql = "select distinct COD_TABELA COD_TAB_PRECO, '' DESCRICAO 
+              from vw_sktabela_preco
             where 1 =1 
-            and COD_TAB_PRECO $filtroProduto";
+            and COD_TABELA $filtroProduto";
 
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -231,8 +229,8 @@ class GrupodescontoController extends AbstractRestfulController
                 $filtroProduto = "in ($produtos)";
             }
 
-            $sql = "select distinct nvl(COD_PRODUTO,'') ID_PRODUTO, DESCRICAO
-            from SK_PRODUTO_TABELA_TMP
+            $sql = "select distinct COD_PRODUTO ID_PRODUTO, DESCRICAO
+                     from vw_skproduto
             where 1 =1 
             and nvl(COD_PRODUTO,'') $filtroProduto";
 
@@ -276,32 +274,7 @@ class GrupodescontoController extends AbstractRestfulController
 
             $em = $this->getEntityManager();
             
-            // $sql = "select  g.id_grupo_marca,
-            //                 m.id_marca,
-            //                 m.descricao as marca,
-            //                 count(*) as skus
-            //         from ms.tb_estoque e,
-            //                 ms.tb_item i,
-            //                 ms.tb_categoria c,
-            //                 ms.tb_item_categoria ic,
-            //                 ms.tb_marca m,
-            //                 ms.tb_grupo_marca g,
-            //                 ms.empresa em
-            //         where e.id_item = i.id_item
-            //         and e.id_categoria = c.id_categoria
-            //         and e.id_item = ic.id_item
-            //         and e.id_categoria = ic.id_categoria
-            //         and ic.id_marca = m.id_marca
-            //         and m.id_grupo_marca = g.id_grupo_marca
-            //         and e.id_empresa = em.id_empresa
-            //         --and e.id_curva_abc = 'E'
-            //         and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
-            //         group by g.id_grupo_marca, m.id_marca, m.descricao
-            //         order by skus desc
-            // ";
-
-            $sql = 'select distinct marca as id_marca, marca 
-            from SK_PRODUTO_TABELA_TMP order by marca';
+            $sql = 'select distinct COD_MARCA as ID_MARCA, DESCRICAO_MARCA MARCA from vw_skmarca ORDER BY DESCRICAO_MARCA';
             
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -339,8 +312,9 @@ class GrupodescontoController extends AbstractRestfulController
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
 
-            $sql = "select distinct nvl(grupo_desconto,'') cod_grupo_desconto, nvl(grupo_desconto,'') descricao
-                from SK_PRODUTO_TABELA_TMP";
+            $sql = "select distinct nvl(grupo_desconto,'') cod_grupo_desconto,
+                           nvl(grupo_desconto,'') descricao
+            from SK_PRODUTO_TABELA_TMP";
 
             $stmt = $conn->prepare($sql);
             // $stmt->bindParam(':idEmpresa', $idEmpresa);
@@ -376,11 +350,7 @@ class GrupodescontoController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            $sql = "select 'Vendedor (V)' desconto_margem
-                    from dual
-                    union
-                    select 'Gerente (G)' desconto_margem
-                    from dual";
+            $sql = "select DISTINCT PERC_DESCONTO_MARGEM  DESCONTO_MARGEM from vw_skalcada_desconto";
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
@@ -418,11 +388,7 @@ class GrupodescontoController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            $sql = "select 'Vendedor (V)' maximo_alcada
-                    from dual
-                    union
-                    select 'Gerente (G)' maximo_alcada
-                    from dual";
+            $sql = "select DISTINCT DESCONTO_MAXIMO_ALCADA MAXIMO_ALCADA from vw_skalcada_desconto";
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
@@ -459,7 +425,9 @@ class GrupodescontoController extends AbstractRestfulController
         $marcas         = $this->params()->fromQuery('idMarcas',null);
         $idProduto      = $this->params()->fromQuery('idProduto',null);
         $tabelaPreco    = $this->params()->fromQuery('tabelaPreco',null);
-        $grupoDesconto      = $this->params()->fromQuery('grupoDesconto',null);
+        $grupoDesconto  = $this->params()->fromQuery('grupoDesconto',null);
+        $descontoMargem = $this->params()->fromQuery('descontoMargem',null);
+        $maximoAlcada   = $this->params()->fromQuery('maximoAlcada',null);
 
         $checkEstoque           = $this->params()->fromQuery('checkEstoque',null);
 
@@ -484,11 +452,17 @@ class GrupodescontoController extends AbstractRestfulController
         if($grupoDesconto){
             $grupoDesconto = implode("','",json_decode($grupoDesconto));
         }
+        if($descontoMargem){
+            $descontoMargem = implode("','",json_decode($descontoMargem));
+        }
+        if($maximoAlcada){
+            $maximoAlcada = implode("','",json_decode($maximoAlcada));
+        }
 
         $andSql = '';
-        if($idEmpresas){
-            $andSql = " and COD_EMPRESA in ($idEmpresas)";
-        }
+        // if($idEmpresas){
+        //     $andSql = " and COD_EMPRESA in ($idEmpresas)";
+        // }
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
             $andSql .= " and MARCA $notMarca in ('$marcas')";
@@ -497,12 +471,18 @@ class GrupodescontoController extends AbstractRestfulController
             $andSql .= " and nvl(COD_PRODUTO,'') in ($idProduto)";
         }
         if($tabelaPreco){
-            $andSql .= " and nvl(COD_TAB_PRECO,'') in ($tabelaPreco)";
+            $andSql .= " and nvl(COD_TABELA,'') in ($tabelaPreco)";
         }
         if($grupoDesconto){
-            $andSql .= " and nvl(GRUPO_DESCONTO,'') in ('$grupoDesconto')";
+            $andSql .= " and nvl(DESCRICAO_GRUPO,'') in ('$grupoDesconto')";
         }
-        
+        if($descontoMargem){
+            $andSql .= " and nvl(PERC_DESCONTO_MARGEM,'') in ('$descontoMargem')";
+        }
+        if($maximoAlcada){
+            $andSql .= " and nvl(DESCONTO_MAXIMO_ALCADA,'') in ('$maximoAlcada')";
+        }
+
         switch ($checkEstoque) {
             case 'Com':
                 $andSql .= " and nvl(ESTOQUE,0) > 0";
@@ -514,24 +494,24 @@ class GrupodescontoController extends AbstractRestfulController
                break;
         }
 
-        $sql = " select COD_EMPRESA,
-                        NOME_EMPRESA,
-                        COD_TAB_PRECO COD_TABELA_PRECO,
-                        NOME_TAB_PRECO DESCRICAO_TABELA_PRECO,
-                        GRUPO_DESCONTO COD_GRUPO_DESCONTO,
-                        GRUPO_DESCONTO DESCRICAO_GRUPO_DESCONTO,
-                        'GERAL' AGRUPAMENTO_PRODUTO,
-                        5.49 P_VENDEDOR,
-                        5.49 P_COORDENADOR,
-                        2.1 P_GERENTE,
-                        3.23 P_GERENTE_REGIONAL,
-                        4 P_DIRETOR,
-                        'Vendedor (V)' P_DESCONTO_MARGEM,
-                        'Gerente (G)' DESCONTO_MAXIMO_ALCADA
-                    from SK_PRODUTO_TABELA_TMP 
-                 where 1 = 1
-                 $andSql
-                 ";
+        $sql = "select '' COD_EMPRESA,
+                        '' NOME_EMPRESA,
+                        COD_TABELA COD_TABELA_PRECO,
+                        '' DESCRICAO_TABELA_PRECO,
+                        COD_GRUPO COD_GRUPO_DESCONTO,
+                        DESCRICAO_GRUPO DESCRICAO_GRUPO_DESCONTO,
+                        AGRUPAMENTO_PRODUTO,
+                        PERC_VENDEDOR,
+                        PERC_COORDENADOR,
+                        PERC_GERENTE,
+                        PERC_GERENTE_REGIONAL,
+                        PERC_DIRETOR,
+                        PERC_DESCONTO_MARGEM,
+                        DESCONTO_MAXIMO_ALCADA
+                from vw_skalcada_desconto
+                where 1 = 1
+                $andSql
+                ";
 
         $session = $this->getSession();
         $session['exportgrupodesconto'] = "$sql";
@@ -557,11 +537,11 @@ class GrupodescontoController extends AbstractRestfulController
         $results = $stmt->fetchAll();
 
         $hydrator = new ObjectProperty;
-        $hydrator->addStrategy('p_vendedor', new ValueStrategy);
-        $hydrator->addStrategy('p_coordenador', new ValueStrategy);
-        $hydrator->addStrategy('p_gerente', new ValueStrategy);
-        $hydrator->addStrategy('p_gerente_regional', new ValueStrategy);
-        $hydrator->addStrategy('p_diretor', new ValueStrategy);
+        $hydrator->addStrategy('perc_vendedor', new ValueStrategy);
+        $hydrator->addStrategy('perc_coordenador', new ValueStrategy);
+        $hydrator->addStrategy('perc_gerente', new ValueStrategy);
+        $hydrator->addStrategy('perc_gerente_regional', new ValueStrategy);
+        $hydrator->addStrategy('perc_diretor', new ValueStrategy);
         // $hydrator->addStrategy('p_desconto_margem', new ValueStrategy);
         // $hydrator->addStrategy('desconto_maximo_alcada', new ValueStrategy);
         $stdClass = new StdClass;

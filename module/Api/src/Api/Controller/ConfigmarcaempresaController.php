@@ -30,13 +30,7 @@ class ConfigmarcaempresaController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            // $sql = "select e.apelido emp, e.id_empresa
-            //             from ms.empresa e
-            //         where e.id_empresa not in (26, 27, 28, 11, 20, 102, 101)
-            //         order by e.apelido";
-
-            $sql = 'select distinct nome_empresa emp, cod_empresa id_empresa
-                    from SK_PRODUTO_TABELA_TMP';
+            $sql = 'select distinct NVL(EMP,SUBSTR(NOME,0,9)) EMP, cod_empresa id_empresa from VW_SKEMPRESA ORDER BY EMP';
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
@@ -275,33 +269,8 @@ class ConfigmarcaempresaController extends AbstractRestfulController
             $usuario = $session['info'];
 
             $em = $this->getEntityManager();
-            
-            // $sql = "select  g.id_grupo_marca,
-            //                 m.id_marca,
-            //                 m.descricao as marca,
-            //                 count(*) as skus
-            //         from ms.tb_estoque e,
-            //                 ms.tb_item i,
-            //                 ms.tb_categoria c,
-            //                 ms.tb_item_categoria ic,
-            //                 ms.tb_marca m,
-            //                 ms.tb_grupo_marca g,
-            //                 ms.empresa em
-            //         where e.id_item = i.id_item
-            //         and e.id_categoria = c.id_categoria
-            //         and e.id_item = ic.id_item
-            //         and e.id_categoria = ic.id_categoria
-            //         and ic.id_marca = m.id_marca
-            //         and m.id_grupo_marca = g.id_grupo_marca
-            //         and e.id_empresa = em.id_empresa
-            //         --and e.id_curva_abc = 'E'
-            //         and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
-            //         group by g.id_grupo_marca, m.id_marca, m.descricao
-            //         order by skus desc
-            // ";
 
-            $sql = 'select distinct marca as id_marca, marca 
-            from SK_PRODUTO_TABELA_TMP order by marca';
+            $sql = 'select distinct COD_MARCA as ID_MARCA, DESCRICAO_MARCA MARCA from vw_skmarca ORDER BY DESCRICAO_MARCA';
             
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -396,11 +365,11 @@ class ConfigmarcaempresaController extends AbstractRestfulController
 
         $andSql = '';
         if($idEmpresas){
-            $andSql = " and COD_EMPRESA in ($idEmpresas)";
+            $andSql = " and me.COD_EMPRESA in ($idEmpresas)";
         }
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
-            $andSql .= " and MARCA $notMarca in ('$marcas')";
+            $andSql .= " and me.COD_MARCA $notMarca in ('$marcas')";
         }
         if($idProduto){
             $andSql .= " and nvl(COD_PRODUTO,'') in ($idProduto)";
@@ -417,28 +386,31 @@ class ConfigmarcaempresaController extends AbstractRestfulController
                break;
         }
 
-        $sql = " select COD_EMPRESA,
-                        NOME_EMPRESA,
-                        MARCA COD_MARCA,
-                        MARCA DESCRICAO_MARCA,
-                        MARCA COD_PARCEIRO,
-                        MARCA DESCRICAO_PARCEIRO,
-                        5.49 META_MARGEM_MIX,
-                        2.1 MARGEM_PADRAO,
-                        3.23 MARGEM_FX_0,
-                        4 MARGEM_FX_1_5,
-                        52.2 MARGEM_FX_6_10,
-                        6 MARGEM_FX_11_25,
-                        7 MARGEM_FX_26_50,
-                        8 MARGEM_FX_51_100,
-                        9 MARGEM_FX_101_250,
-                        10.67 MARGEM_FX_251_500,
-                        11 MARGEM_FX_501_1000,
-                        12 MARGEM_FX_1001_5000,
-                        13.50 MARGEM_FX_5001_10000,
-                        14.9 MARGEM_FX_10001_x
-                    from SK_PRODUTO_TABELA_TMP 
-                 where 1 = 1
+        $sql = " select me.COD_EMPRESA,
+                        nvl(e.emp,substr(e.nome,0,9)) as NOME_EMPRESA,
+                        me.COD_MARCA,
+                        m.DESCRICAO_MARCA,
+                        me.COD_PARCEIRO,
+                        '' DESCRICAO_PARCEIRO,
+                        me.META_MARGEM_MIX,
+                        me.MARGEM_PADRAO,
+                        me.MARGEM_FX_0,
+                        me.MARGEM_FX_1_5,
+                        me.MARGEM_FX_6_10,
+                        me.MARGEM_FX_11_25,
+                        me.MARGEM_FX_26_50,
+                        me.MARGEM_FX_51_100,
+                        me.MARGEM_FX_101_250,
+                        me.MARGEM_FX_251_500,
+                        me.MARGEM_FX_501_1000,
+                        me.MARGEM_FX_1001_5000,
+                        me.MARGEM_FX_5001_10000,
+                        me.MARGEM_FX_10001_x
+                    from VW_SKMARCA_EMPRESA me,
+                         vw_skmarca m,
+                         vw_skempresa e
+                 where me.cod_marca = m.cod_marca
+                 and me.cod_empresa = e.cod_empresa
                  $andSql
                  ";
 
