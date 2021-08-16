@@ -1,7 +1,7 @@
-Ext.define('App.view.estoque.EstoqueFiltro',{
+Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
     extend: 'Ext.panel.Panel',
-    xtype: 'estoquefiltro',
-    itemId: 'estoquefiltro',
+    xtype: 'analisegraficafiltro',
+    itemId: 'analisegraficafiltro',
     title: 'Filtro',
     region: 'west',
     width: 290,
@@ -26,7 +26,7 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                 ],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/estoque/listarEmpresas',
+                    url: BASEURL + '/api/analisegrafico/listarEmpresas',
                     timeout: 120000,
                     reader: {
                         type: 'json',
@@ -53,53 +53,21 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                 elTagEmpresa.setDisabled(false);
             }
         );
-        
-        var btnNotMarca = Ext.create('Ext.Button', {
-            name: 'notmarca',
-            itemId: 'notmarca',
-            hidden: true
-        });
 
-        var elTagMarca = Ext.create('Ext.form.field.Tag',{
-            name: 'elMarca',
-            itemId: 'elMarca',
-            multiSelect: true,
+        var fielData = Ext.create('Ext.form.field.Date',{
+            name: 'data',
+            itemId: 'data',
             labelAlign: 'top',
-            width: 230,
-            store: Ext.data.Store({
-                fields: [
-                    { name: 'marca', type: 'string' },
-                    { name: 'idMarca', type: 'string' }
-                ],
-                proxy: {
-                    type: 'ajax',
-                    url: BASEURL + '/api/estoque/listarmarca',
-                    timeout: 120000,
-                    reader: {
-                        type: 'json',
-                        root: 'data'
-                    }
-                }
-            }),
-            queryParam: 'marca',
-            queryMode: 'local',
-            displayField: 'marca',
-            valueField: 'idMarca',
-            emptyText: 'Marca',
-            fieldLabel: 'Marcas',
-            // labelWidth: 60,
+            fieldLabel: 'Mês de Referência',
             margin: '1 1 1 8',
-            // padding: 1,
-            // plugins:'dragdroptag',
-            filterPickList: true,
-            publishes: 'value',
-            disabled: true
+            padding: 1,
+            width: 230,
+            labelWidth: 60,
+            format: 'm/Y',
+            altFormats: 'dmY',
+            emptyText: '__/__/____',
+            // value: sysdate
         });
-        elTagMarca.store.load(
-            function(){
-                elTagMarca.setDisabled(false);
-            }
-        );
 
         var elTagIdProduto = Ext.create('Ext.form.field.Tag',{
             name: 'eltagidproduto',
@@ -113,7 +81,7 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                 fields: [{ name: 'idProduto' },{ name: 'descricao' }],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/estoque/listaridproduto',
+                    url: BASEURL + '/api/analisegrafico/listaridproduto',
                     reader: { type: 'json', root: 'data' },
                     extraParams: { tipoSql: 0}
                 }
@@ -127,8 +95,8 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                 '</tpl>'), 
             valueField: 'idProduto',
             // emptyText: 'Produto',
-            fieldLabel: 'Código Produto',
-            emptyText: 'Código Produto',
+            fieldLabel: 'Código Produto Sankhya',
+            emptyText: 'Código Produto Sankhya',
             // matchFieldWidth: false,
             // padding: 1,
             margin: '1 1 1 8',
@@ -161,7 +129,7 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                 fields: [{ name: 'coditem' }, { name: 'descricao' }],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/estoque/listarprodutos',
+                    url: BASEURL + '/api/analisegrafico/listarprodutos',
                     reader: { type: 'json', root: 'data' },
                     extraParams: { tipoSql: 0}
                 }
@@ -172,11 +140,11 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
             displayTpl: Ext.create('Ext.XTemplate',
                 '<tpl for=".">',		                            
                 '{codItem} {descricao} {marca}',
-                '</tpl>'),
+                '</tpl>'), 
             valueField: 'codItem',
             // emptyText: 'Produto',
-            fieldLabel: 'Produtos',
-            emptyText: 'Código Item NBS',
+            fieldLabel: 'Código Produto NBS',
+            emptyText: 'Código Produto NBS',
             // matchFieldWidth: false,
             // padding: 1,
             margin: '1 1 1 8',
@@ -198,16 +166,20 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
             }
         });
 
-        var elTagGrupoDesconto = Ext.create('Ext.form.field.Tag',{
-            name: 'eltaggrupodesconto',
-            itemId: 'eltaggrupodesconto',
-            labelAlign: 'top',
+        var elTagMarca = Ext.create('Ext.form.field.Tag',{
+            name: 'elMarca',
+            itemId: 'elMarca',
             multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
             store: Ext.data.Store({
-                fields: [{ name: 'codGrupoDesconto' },{ name: 'descricao' }],
+                fields: [
+                    { name: 'marca', type: 'string' },
+                    { name: 'idMarca', type: 'string' }
+                ],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/estoque/listargrupodescontos',
+                    url: BASEURL + '/api/analisegrafico/listarmarca',
                     timeout: 120000,
                     reader: {
                         type: 'json',
@@ -215,86 +187,25 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                     }
                 }
             }),
-            width: 230,
-            queryParam: 'codGrupoDesconto',
+            queryParam: 'marca',
             queryMode: 'local',
-            displayField: 'codGrupoDesconto',
-            valueField: 'codGrupoDesconto',
-            emptyText: 'Grupo Desconto',
-            fieldLabel: 'Grupo Desconto',
-            labelWidth: 60,
+            displayField: 'marca',
+            valueField: 'idMarca',
+            emptyText: 'Marca',
+            fieldLabel: 'Marcas',
+            // labelWidth: 60,
             margin: '1 1 1 8',
+            // padding: 1,
             // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
-            disabled:true
+            disabled: true
         });
-        elTagGrupoDesconto.store.load(
+        elTagMarca.store.load(
             function(){
-                elTagGrupoDesconto.setDisabled(false);
+                elTagMarca.setDisabled(false);
             }
         );
-
-        var elEstoque = Ext.create('Ext.form.field.ComboBox',{
-            name: 'elestoque',
-            itemId: 'elestoque',
-            multiSelect: false,
-            // labelAlign: 'top',
-            width: 230,
-            store: Ext.data.Store({
-                fields: [
-                    { name: 'elestoque', type: 'string' },
-                    { name: 'name', type: 'string' }
-                ],
-                
-                data : [
-                    {"elestoque":"", "name":""},
-                    {"elestoque":"Com", "name":"Com"},
-                    {"elestoque":"Sem", "name":"Sem"}
-                ]
-            }),
-            queryMode: 'local',
-            displayField: 'name',
-            valueField: 'elestoque',
-            emptyText: '',
-            fieldLabel: 'Estoque',
-            labelWidth: 110,
-            margin: '10 1 1 0',
-            filterPickList: true,
-            disabled: false
-        });
-
-        var elMbAlvo = Ext.create('Ext.form.field.ComboBox',{
-            name: 'elmbalvo',
-            itemId: 'elmbalvo',
-            multiSelect: false,
-            // labelAlign: 'top',
-            width: 230,
-            store: Ext.data.Store({
-                fields: [
-                    { name: 'elmbalvo', type: 'string' },
-                    { name: 'name', type: 'string' }
-                ],
-                
-                data : [
-                    {"elmbalvo":"", "name":""},
-                    {"elmbalvo":">", "name":">"},
-                    {"elmbalvo":"<", "name":"<"},
-                    {"elmbalvo":"=", "name":"="},
-                    {"elmbalvo":"<=", "name":"<="},
-                    {"elmbalvo":">=", "name":">="}
-                ]
-            }),
-            queryMode: 'local',
-            displayField: 'name',
-            valueField: 'elmbalvo',
-            emptyText: '',
-            fieldLabel: 'Margem Alvo',
-            labelWidth: 110,
-            margin: '10 1 10 0',
-            filterPickList: true,
-            disabled: false
-        });
 
         Ext.applyIf(me, {
 
@@ -303,6 +214,7 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    hidden: false,
                     items:[
                         elTagEmpresa,
                         {
@@ -321,8 +233,24 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                     layout: 'hbox',
                     border: false,
                     items:[
-                        btnNotMarca,
-                        elTagMarca,
+                        fielData,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('datefield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagProduto,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
@@ -356,7 +284,7 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                     layout: 'hbox',
                     border: false,
                     items:[
-                        elTagProduto,
+                        elTagMarca,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
@@ -365,67 +293,6 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                             handler: function(form) {
                                 form.up('panel').down('tagfield').setValue(null);
                             }
-                        }
-                    ]
-                },
-                {
-                    xtype: 'panel',
-                    layout: 'hbox',
-                    border: false,
-                    items:[
-                        elTagGrupoDesconto,
-                        {
-                            xtype: 'button',
-                            iconCls: 'fa fa-file',
-                            tooltip: 'Limpar',
-                            margin: '26 1 1 1',
-                            handler: function(form) {
-                                form.up('panel').down('tagfield').setValue(null);
-                            }
-                        }
-                    ]
-                },
-                {
-                xtype:'fieldset',
-                title: 'Com/Sem Parâmetro', // title or checkboxToggle creates fieldset header
-                // columnWidth: 0.5,
-                checkboxToggle: true,
-                collapsed: true, // fieldset initially collapsed
-                layout:'anchor',
-                items :[
-                        {
-                            xtype: 'panel',
-                            layout: 'hbox',
-                            border: false,
-                            items:[
-                                elEstoque,
-                                {
-                                    xtype: 'button',
-                                    iconCls: 'fa fa-file',
-                                    tooltip: 'Limpar',
-                                    margin: '10 1 1 1',
-                                    handler: function(form) {
-                                        form.up('panel').down('combobox').setValue(null);
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            xtype: 'panel',
-                            layout: 'hbox',
-                            border: false,
-                            items:[
-                                elMbAlvo,
-                                {
-                                    xtype: 'button',
-                                    iconCls: 'fa fa-file',
-                                    tooltip: 'Limpar',
-                                    margin: '10 1 1 1',
-                                    handler: function(form) {
-                                        form.up('panel').down('combobox').setValue(null);
-                                    }
-                                }
-                            ]
                         }
                     ]
                 },
@@ -441,12 +308,12 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
                             text: 'Limpar Filtros',
                             tooltip: 'Limpar Filtros',
                             handler: function(form) {
-                               
                                 form.up('toolbar').up('panel').down('tagfield[name=elEmp]').setValue(null);
+                                form.up('toolbar').up('panel').down('datefield[name=data]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=eltagidproduto]').setValue(null);
-                                form.up('toolbar').up('panel').down('button[name=notmarca]').value = 0;
+                                form.up('toolbar').up('panel').down('tagfield[name=elProduto]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=elMarca]').setValue(null);
-                                form.up('toolbar').up('panel').down('fieldset').setCollapsed(true);
+                                
                             }
                         }
                     ]
@@ -461,17 +328,14 @@ Ext.define('App.view.estoque.EstoqueFiltro',{
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
 
-        if(me.up('container').down('#bprecofiltro').hidden){
-            me.up('container').down('#bprecofiltro').setHidden(false);
+        console.log(me.up('container').down('#analisegraficafiltro'));
+
+        if(me.up('container').down('#analisegraficafiltro').hidden){
+            me.up('container').down('#analisegraficafiltro').setHidden(false);
         }else{
-            me.up('container').down('#bprecofiltro').setHidden(true);
+            me.up('container').down('#analisegraficafiltro').setHidden(true);
         }
-
-    },
-
-    onBtnConsultar: function(btn){
-        var me = this.up('toolbar');
-
+        
     }
 
 });

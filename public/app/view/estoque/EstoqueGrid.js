@@ -33,6 +33,11 @@ Ext.define('App.view.estoque.EstoqueGrid', {
                                 {name:'custoMedio', type: 'number'},
                                 {name:'valor', type: 'number'},
                                 {name:'custoOperacao', type: 'number'},
+                                {name:'grupoDesconto', type: 'number'},
+                                {name:'geral', type: 'number'},
+                                {name:'mbAlvo', type: 'number'},
+                                {name:'tipoPrecificacao', type: 'number'},
+                                {name:'mbXCustoMedio', type: 'number'},
                                 {name:'pis', type: 'number'},
                                 {name:'cofins', type: 'number'},
                                 {name:'icms', type: 'number'},
@@ -119,7 +124,7 @@ Ext.define('App.view.estoque.EstoqueGrid', {
                     width: 80,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     },
                 },
@@ -132,6 +137,31 @@ Ext.define('App.view.estoque.EstoqueGrid', {
                         v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     },
+                },
+                {
+                    text: 'Grupo Desconto',
+                    dataIndex: 'grupoDesconto',
+                    width: 130
+                },
+                {
+                    text: 'Geral',
+                    dataIndex: 'geral',
+                    width: 80
+                },
+                {
+                    text: 'MB Alvo',
+                    dataIndex: 'mbAlvo',
+                    width: 80
+                },
+                {
+                    text: 'Tipo Precificação',
+                    dataIndex: 'tipoPrecificacao',
+                    width: 140
+                },
+                {
+                    text: 'MB X Custo Médio',
+                    dataIndex: 'mbXCustoMedio',
+                    width: 130
                 },
                 {
                     text: 'PIS',

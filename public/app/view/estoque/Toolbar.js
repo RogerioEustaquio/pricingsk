@@ -133,10 +133,12 @@ Ext.define('App.view.estoque.Toolbar',{
         var notMarca        = me.up('container').down('#estoquefiltro').down('#notmarca').value;
         var idMarcas       = me.up('container').down('#estoquefiltro').down('#elMarca').getValue();
         var idProduto   = me.up('container').down('#estoquefiltro').down('#eltagidproduto').getValue();
+        var grupoDesconto   = me.up('container').down('#estoquefiltro').down('#eltaggrupodesconto').getValue();
 
         var fieldset =  me.up('container').down('#estoquefiltro').down('fieldset').collapsed  ? '' : 1;
 
-        var checkEstoque    = fieldset ? me.up('container').down('#estoquefiltro').down('#elestoque').getValue() : '';
+        var checkEstoque   = fieldset ? me.up('container').down('#estoquefiltro').down('#elestoque').getValue() : '';
+        var checkMbAlvo    = fieldset ? me.up('container').down('#estoquefiltro').down('#elmbalvo').getValue() : '';
 
         var grid = me.up('container').down('#panelcenter').down('grid');
         var params = {
@@ -144,7 +146,9 @@ Ext.define('App.view.estoque.Toolbar',{
             notMarca: notMarca,
             idMarcas: Ext.encode(idMarcas),
             idProduto: Ext.encode(idProduto),
-            checkEstoque: checkEstoque
+            grupoDesconto: Ext.encode(grupoDesconto),
+            checkEstoque: checkEstoque,
+            checkMbAlvo: checkMbAlvo
         };
     
         grid.getStore().getProxy().setExtraParams(params);

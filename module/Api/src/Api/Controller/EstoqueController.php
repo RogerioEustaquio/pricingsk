@@ -263,6 +263,55 @@ class EstoqueController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
+    public function listargrupodescontosAction()
+    {
+        $data = array();
+        
+        try {
+
+            // $idEmpresa      = $this->params()->fromQuery('idEmpresa',null);
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql = "select distinct nvl(grupo_desconto,'') cod_grupo_desconto,
+                        nvl(grupo_desconto,'') descricao
+                from SK_PRODUTO_TABELA_TMP
+            where grupo_desconto is not null
+            order by 1";
+            
+            // $sql = " select distinct nvl(cod_grupo,'') cod_grupo_desconto,
+            //             nvl(cod_grupo,'') descricao
+            //     from vw_skalcada_desconto
+            // where cod_grupo is not null
+            // order by 1 ";
+
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindParam(':idEmpresa', $idEmpresa);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('grupo_desconto', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            $this->setMessage("Solicitação enviada com sucesso.");
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
     public function listarmarcaAction()
     {
         $data = array();
@@ -368,7 +417,6 @@ class EstoqueController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-
     public function listarestoqueAction(){
 
         $idEmpresas     = $this->params()->fromQuery('idEmpresas',null);
@@ -431,10 +479,13 @@ class EstoqueController extends AbstractRestfulController
                         COFINS,
                         ICMS,
                         CURVA,
-                        CLIENTES
+                        CLIENTES,
+                        '' GRUPO_DESCONTO,
+                        '' GERAL
                 from vw_skestoque 
                  where 1 = 1
                  $andSql
+                 and rownum < 100
                  ";
 
         $session = $this->getSession();

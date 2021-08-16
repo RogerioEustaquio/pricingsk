@@ -2,6 +2,7 @@ Ext.define('App.view.home.HomePanel', {
     extend: 'Ext.container.Container',
     xtype: 'homepanel',
     itemId: 'homepanel',
+    title: 'Home',
     requires: [
         'App.view.home.PanelIndicadores'
     ],
@@ -14,7 +15,7 @@ Ext.define('App.view.home.HomePanel', {
             layout: 'fit',
             items: [
                 {
-                    xtype: 'panelindicadores'
+                    // xtype: 'panelindicadores'
                 }
             ]
         });

@@ -313,8 +313,16 @@ class GrupodescontoController extends AbstractRestfulController
             $conn = $em->getConnection();
 
             $sql = "select distinct nvl(grupo_desconto,'') cod_grupo_desconto,
-                           nvl(grupo_desconto,'') descricao
-            from SK_PRODUTO_TABELA_TMP";
+                        nvl(grupo_desconto,'') descricao
+                from SK_PRODUTO_TABELA_TMP
+            where grupo_desconto is not null
+            order by 1";
+            
+            // $sql = " select distinct nvl(cod_grupo,'') cod_grupo_desconto,
+            //             nvl(cod_grupo,'') descricao
+            //     from vw_skalcada_desconto
+            // where cod_grupo is not null
+            // order by 1 ";
 
             $stmt = $conn->prepare($sql);
             // $stmt->bindParam(':idEmpresa', $idEmpresa);

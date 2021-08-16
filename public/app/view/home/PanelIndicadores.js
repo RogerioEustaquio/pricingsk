@@ -35,7 +35,7 @@ Ext.define('App.view.home.PanelIndicadores',{
             items: [
                 {
                     // html: 'Cell B content',
-
+                    xtype: 'panel',
                     title: 'Base Preços',
                     items: [ { xtype: 'basepreco', region: 'center', flex: 1, margin: '0 0 0 0' }],
                     tools: [

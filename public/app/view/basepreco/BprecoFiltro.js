@@ -27,7 +27,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 ],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/basepreco/listarEmpresas',
+                    url: BASEURL + '/api/analisegrafico/listarEmpresas',
                     timeout: 120000,
                     reader: {
                         type: 'json',

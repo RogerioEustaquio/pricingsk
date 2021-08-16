@@ -16,6 +16,13 @@ Ext.define('App.view.Toolbar', {
             items: [
                 {
                     xtype: 'button',
+                    text: 'Home',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#home';
+                    }
+                },
+                {
+                    xtype: 'button',
                     text: 'Base Preço',
                     handler: function(){
                         window.document.location= BASEURL +'/#basepreco';
@@ -47,6 +54,13 @@ Ext.define('App.view.Toolbar', {
                     text: 'Grupo Desconto',
                     handler: function(){
                         window.document.location= BASEURL +'/#grupodesconto';
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Análise Gráfica',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#analisegrafica';
                     }
                 }
             ]
