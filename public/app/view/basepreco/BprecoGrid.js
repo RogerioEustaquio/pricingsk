@@ -84,7 +84,7 @@ Ext.define('App.view.basepreco.BprecoGrid', {
                 {
                     text: 'Tabela Preço',
                     dataIndex: 'nomeTabPreco',
-                    width: 120,
+                    width: 130,
                     align: 'right'
                 },
                 {

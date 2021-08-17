@@ -414,20 +414,20 @@ class BaseprecoController extends AbstractRestfulController
 
         $andSql = '';
         if($idEmpresas){
-            $andSql = " and COD_EMPRESA in ($idEmpresas)";
+            $andSqlEmp = " and es.cod_empresa in ($idEmpresas)";
         }
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
-            $andSql .= " and MARCA $notMarca in ('$marcas')";
+            $andSqlMarca = " and descricao_marca $notMarca in ('$marcas')";
         }
         if($produtos){
-            $andSql .= " and COD_ITEM_NBS in ('$produtos')";
+            $andSqlProduto = " and cod_nbs in ('$produtos')";
+        }
+        if($idProduto){
+            $andSqlProduto .= " and nvl(es.cod_produto,'') in ($idProduto)";
         }
         if($codTabPreco){
             $andSql .= " and nvl(COD_TAB_PRECO,'') in ($codTabPreco)";
-        }
-        if($idProduto){
-            $andSql .= " and nvl(COD_PRODUTO,'') in ($idProduto)";
         }
         if($grupoDesconto){
             $andSql .= " and GRUPO_DESCONTO in ('$grupoDesconto')";
@@ -501,35 +501,168 @@ class BaseprecoController extends AbstractRestfulController
                 break;
         }
 
-        $sql = " select COD_EMPRESA,
-                        NOME_EMPRESA,
-                        COD_TAB_PRECO,
-                        NOME_TAB_PRECO,
-                        to_char(DT_VIGOR,'dd/mm/yyyy') dt_vigor,
-                        PRECO,
-                        TIPO,
-                        COD_PRODUTO,
-                        DESCRICAO,
-                        MARCA,
-                        COD_FORNECEDOR,
-                        NOME_FORNECEDOR,
-                        COD_ITEM_NBS,
-                        PARTNUMBER,
-                        MARGEM mb,
-                        DESP_VARIAVEL,
-                        TIPO_PRECIFICACAO,
-                        NIVEL_MARGEM,
-                        GRUPO_DESCONTO,
-                        ESTOQUE,
-                        CUSTO_MEDIO,
-                        VALOR_ESTOQUE,
-                        CUSTO_OPE,
-                        PIS_COFINS,
-                        ICMS                       
-                    from SK_PRODUTO_TABELA_TMP 
-                 where 1 = 1
-                 $andSql
-                 ";
+        // $sql = " select COD_EMPRESA,
+        //                 NOME_EMPRESA,
+        //                 COD_TAB_PRECO,
+        //                 NOME_TAB_PRECO,
+        //                 to_char(DT_VIGOR,'dd/mm/yyyy') dt_vigor,
+        //                 PRECO,
+        //                 TIPO,
+        //                 COD_PRODUTO,
+        //                 DESCRICAO,
+        //                 MARCA,
+        //                 COD_FORNECEDOR,
+        //                 NOME_FORNECEDOR,
+        //                 COD_ITEM_NBS,
+        //                 PARTNUMBER,
+        //                 MARGEM mb,
+        //                 DESP_VARIAVEL,
+        //                 TIPO_PRECIFICACAO,
+        //                 NIVEL_MARGEM,
+        //                 GRUPO_DESCONTO,
+        //                 ESTOQUE,
+        //                 CUSTO_MEDIO,
+        //                 VALOR_ESTOQUE,
+        //                 CUSTO_OPE,
+        //                 PIS_COFINS,
+        //                 ICMS                       
+        //             from SK_PRODUTO_TABELA_TMP 
+        //          where 1 = 1
+        //          $andSql
+        //          ";
+
+        $sql = " select cod_empresa,
+                        empresa nome_empresa,
+                        cod_tabela cod_tab_preco,
+                        trim(nome_tabela_preco) nome_tab_preco,
+                        '' dt_vigor,
+                        preco,
+                        '' tipo,
+                        cod_produto,
+                        descricao,
+                        marca,
+                        '' cod_fornecedor,
+                        '' nome_fornecedor,
+                        cod_nbs COD_ITEM_NBS,
+                        '' PARTNUMBER,
+                        round((preco_liq - custo_medio) / preco_liq *100,2) mb,
+                        '' DESP_VARIAVEL,
+                        '' TIPO_PRECIFICACAO,
+                        '' NIVEL_MARGEM,
+                        grupo_desconto,
+                        estoque,
+                        custo_medio,
+                        '' valor_estoque,
+                        '' custo_oper,
+                        pis + cofins PIS_COFINS,
+                        icms,
+                        fx_custo,
+                        param_margem_minima,
+                        --custo_medio,
+                        valor,
+                        pis,
+                        cofins,
+                        --icms,
+                        --grupo_desconto,
+                        perc_vendedor,
+                        --round((preco_liq - custo_medio) / preco_liq *100,2) margem,
+                        --preco,
+                        preco_min,
+                        preco_liq,
+                        round(((custo_medio/(1-(param_margem_minima/100)))/(1-((nvl(pis,0)+nvl(cofins,0)+nvl(icms,0))/100)))/(1-(perc_vendedor/100)), 2) as preco_ideal
+                        
+                    from (
+                        select a.cod_empresa,
+                               a.empresa,
+                               a.cod_tabela,
+                               pv.nome nome_tabela_preco,
+                               a.cod_produto,
+                               a.descricao,
+                               a.marca,
+                               a.cod_nbs, 
+                               a.estoque,
+                               get_fx_custo(a.custo_medio) as fx_custo,
+                               get_fx_custo_mb(a.custo_medio) as param_margem_minima, 
+                               a.custo_medio, a.valor, a.pis, a.cofins, a.icms,
+                               a.grupo_desconto, ad.perc_vendedor, 
+                               pv.preco, 
+                               pv.preco*(1-(ad.perc_vendedor/100)) as preco_min, -- Preço vendedor desconto
+                               (pv.preco*(1-(ad.perc_vendedor/100)))*(1-((nvl(a.pis,0)+nvl(a.cofins,0)+nvl(a.icms,0))/100)) as preco_liq -- Preço final sem impostos
+                            from (select es.cod_empresa,
+                                         es.empresa,
+                                         bs.cod_tabela,
+                                         es.cod_produto,
+                                         es.descricao,
+                                         es.marca,
+                                         es.cod_nbs,
+                                         es.estoque,
+                                         es.custo_medio,
+                                         es.valor,
+                                         es.pis,
+                                         es.cofins,
+                                         es.icms,
+                                         es.grupo_desconto         
+                                    from (select es.cod_empresa,
+                                                 e.emp as empresa,
+                                                 es.cod_produto,
+                                                 p.descricao,
+                                                 m.descricao_marca as marca,
+                                                 p.partnumber,
+                                                 p.cod_nbs as cod_nbs,
+                                                 es.estoque,
+                                                 es.custo_medio,
+                                                 round(es.estoque*es.custo_medio,2) as valor, 
+                                                 pi.pis,
+                                                 pi.cofins,
+                                                 pi.icms,
+                                                 nvl(pd.grupo_desconto,'GERAL') as grupo_desconto
+                                            from vw_skestoque_base es,
+                                                 vw_skempresa e,
+                                                 vw_skproduto p,
+                                                 vw_skmarca m,
+                                                 vw_skproduto_desconto_grupo pd,
+                                                 vw_skproduto_imposto pi
+                                            where es.cod_empresa = e.cod_empresa
+                                            $andSqlEmp
+                                            $andSqlMarca
+                                            $andSqlProduto
+                                            and es.cod_produto = p.cod_produto
+                                            and p.cod_marca = m.cod_marca
+                                            and es.cod_empresa = pd.cod_empresa(+)
+                                            and es.cod_produto = pd.cod_produto(+)
+                                            and es.cod_empresa = pi.cod_empresa
+                                            and es.cod_produto = pi.cod_produto
+                                    ) es, 
+                                    vw_sktabela_config_base bs
+                            where es.cod_empresa = bs.cod_empresa(+)) a,
+                            vw_skalcada_desconto ad,
+                            vw_sktabela_preco pv
+                        where a.cod_tabela = ad.cod_tabela(+)
+                        and a.grupo_desconto = ad.agrupamento_produto(+)
+                        and a.cod_tabela = pv.cod_tabela(+)
+                        and a.cod_produto = pv.cod_produto(+)
+                        and a.marca not in ('MWM','MWM IESA','MWM OPCIONAL','CASCO BATERIA','CASCO EATON CX.CAMBIO','CASCO OUTROS','CASCO EATON EMB.', 'EMERGENCIAL')
+                        and a.cod_empresa not in (28/*LE*/ ,25/*CD*/ ,27 /*TL*/)
+                        --and a.cod_empresa = 5
+                        order by a.cod_empresa, a.cod_tabela, grupo_desconto
+                    )
+                where 1=1
+                and estoque > 0
+                and nvl(custo_medio,0) > 0
+                --and preco is null
+                --and marca not in ('BATERIAS MOURA','BATERIAS','MOURA-TROCA','ZETTA','ZETTA-TROCA')
+                --and cod_produto not in (397)
+                --and cod_produto = 19887
+                --and marca in ('BATERIAS MOURA','BATERIAS','MOURA-TROCA','ZETTA','ZETTA-TROCA')
+                --and cod_empresa = 24
+                --and marca in('CUMMINS-REMAN')
+                --and cod_empresa = 12
+                --and empresa = 'BH'
+                --and cod_produto in (61958, 61918, 61955, 61957, 16461, 60752)
+                and cod_produto = 397
+                --and cod_produto = 58938
+                --and cod_produto in(7717,38808,40942,7719,49732,19887,50561,40805,40940,38807)
+          ";
 
         $session = $this->getSession();
         $session['exportbasepreco'] = "$sql";
