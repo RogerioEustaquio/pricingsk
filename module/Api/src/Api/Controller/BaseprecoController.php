@@ -413,91 +413,101 @@ class BaseprecoController extends AbstractRestfulController
         }
 
         $andSql = '';
+        $andSqlEmp = "";
         if($idEmpresas){
             $andSqlEmp = " and es.cod_empresa in ($idEmpresas)";
         }
+        $andSqlMarca = "";
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
             $andSqlMarca = " and descricao_marca $notMarca in ('$marcas')";
         }
+        $andSqlProduto ='';
         if($produtos){
             $andSqlProduto = " and cod_nbs in ('$produtos')";
         }
         if($idProduto){
             $andSqlProduto .= " and nvl(es.cod_produto,'') in ($idProduto)";
         }
+        $andSqlPreco = "";
         if($codTabPreco){
-            $andSql .= " and nvl(COD_TAB_PRECO,'') in ($codTabPreco)";
+            $andSqlPreco = " and nvl(bs.cod_tabela,'') in ($codTabPreco)";
         }
+        $andSqlGrupo = "";
         if($grupoDesconto){
-            $andSql .= " and GRUPO_DESCONTO in ('$grupoDesconto')";
+            $andSqlGrupo = " and pd.grupo_desconto in ('$grupoDesconto')";
         }
-        
+        $andSqlCkEstoque = "";
         switch ($checkEstoque) {
             case 'Com':
-                $andSql .= " and nvl(ESTOQUE,0) > 0";
+                $andSqlCkEstoque = " and nvl(es.ESTOQUE,0) > 0";
                 break;
             case 'Sem':
-                $andSql .= " and nvl(ESTOQUE,0) = 0";
+                $andSqlCkEstoque = " and nvl(es.ESTOQUE,0) = 0";
                 break;
             default:
                break;
         }
+        $andSqlCkPreco = "";
         switch ($checkpreco) {
             case 'Com':
-                $andSql .= " and nvl(PRECO,0) > 0";
+                $andSqlCkPreco = " and nvl(PRECO,0) > 0";
                 break;
             case 'Sem':
-                $andSql .= " and nvl(PRECO,0) = 0";
+                $andSqlCkPreco = " and nvl(PRECO,0) = 0";
                 break;
         }
-        switch ($checkmargem) {
-            case 'Com':
-                $andSql .= " and nvl(MARGEM,0) > 0";
-                break;
-            case 'Sem':
-                $andSql .= " and nvl(MARGEM,0) = 0";
-                break;
-            case '>10':
-                $andSql .= " and nvl(MARGEM,0) > 10";
-                break;
-            case '>5':
-                $andSql .= " and nvl(MARGEM,0) > 5";
-                break;
-        }
-        switch ($checktipoprecificacao) {
-            case 'Com':
-                $andSql .= " and trim(TIPO_PRECIFICACAO) is not null";
-                break;
-            case 'Sem':
-                $andSql .= " and trim(TIPO_PRECIFICACAO) is null";
-                break;
-        }
-        switch ($checkgrupodesconto) {
-            case 'Com':
-                $andSql .= " and trim(GRUPO_DESCONTO) is not null";
-                break;
-            case 'Sem':
-                $andSql .= " and trim(GRUPO_DESCONTO) is null";
-                break;
-        }
+        $andSqlCkTbPreco = "";
         switch ($checktabelapreco) {
             case 'Com':
-                $andSql .= " and trim(NOME_TAB_PRECO) is not null";
+                $andSqlCkTbPreco = " and trim(bs.cod_tabela) is not null";
                 break;
             case 'Sem':
-                $andSql .= " and trim(NOME_TAB_PRECO) is null";
+                $andSqlCkTbPreco = " and trim(bs.cod_tabela) is null";
                 break;
         }
-        switch ($checkcustounitario) {
+        $andSqlCkMb = "";
+        switch ($checkmargem) {
             case 'Com':
-                $andSql .= " and trim(CUSTO_MEDIO) is not null";
+                $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) > 0";
                 break;
             case 'Sem':
-                $andSql .= " and trim(CUSTO_MEDIO) is null";
+                $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) = 0";
+                break;
+            case '>10':
+                $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) > 10";
+                break;
+            case '>5':
+                $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) > 5";
+                break;
+        }
+        // switch ($checktipoprecificacao) {
+        //     case 'Com':
+        //         $andSql .= " and trim(TIPO_PRECIFICACAO) is not null";
+        //         break;
+        //     case 'Sem':
+        //         $andSql .= " and trim(TIPO_PRECIFICACAO) is null";
+        //         break;
+        // }
+        $andSqlCkGdesc = "";
+        switch ($checkgrupodesconto) {
+            case 'Com':
+                $andSqlCkGdesc = " and trim(es.grupo_desconto) is not null";
+                break;
+            case 'Sem':
+                $andSqlCkGdesc = " and trim(es.grupo_desconto) is null";
+                break;
+        }
+        $andSqlCkUnitario = "";
+        switch ($checkcustounitario) {
+            case 'Com':
+                $andSqlCkUnitario = " and trim(custo_medio) is not null";
+                break;
+            case 'Sem':
+                $andSqlCkUnitario = " and trim(custo_medio) is null";
                 break;
             case 'c<p':
-                $andSql .= " and nvl(CUSTO_MEDIO,0) < nvl(PRECO,0)";
+                $andSqlCkUnitario = " and nvl(custo_medio,0) < nvl(PRECO,0)";
                 break;
         }
 
@@ -626,6 +636,8 @@ class BaseprecoController extends AbstractRestfulController
                                             $andSqlEmp
                                             $andSqlMarca
                                             $andSqlProduto
+                                            $andSqlGrupo
+                                            $andSqlCkEstoque
                                             and es.cod_produto = p.cod_produto
                                             and p.cod_marca = m.cod_marca
                                             and es.cod_empresa = pd.cod_empresa(+)
@@ -634,13 +646,18 @@ class BaseprecoController extends AbstractRestfulController
                                             and es.cod_produto = pi.cod_produto
                                     ) es, 
                                     vw_sktabela_config_base bs
-                            where es.cod_empresa = bs.cod_empresa(+)) a,
+                            where es.cod_empresa = bs.cod_empresa(+)
+                            $andSqlPreco
+                            $andSqlCkTbPreco
+                            $andSqlCkGdesc) a,
                             vw_skalcada_desconto ad,
                             vw_sktabela_preco pv
                         where a.cod_tabela = ad.cod_tabela(+)
                         and a.grupo_desconto = ad.agrupamento_produto(+)
                         and a.cod_tabela = pv.cod_tabela(+)
                         and a.cod_produto = pv.cod_produto(+)
+                        $andSqlCkPreco
+                        $andSqlCkUnitario
                         and a.marca not in ('MWM','MWM IESA','MWM OPCIONAL','CASCO BATERIA','CASCO EATON CX.CAMBIO','CASCO OUTROS','CASCO EATON EMB.', 'EMERGENCIAL')
                         and a.cod_empresa not in (28/*LE*/ ,25/*CD*/ ,27 /*TL*/)
                         --and a.cod_empresa = 5
@@ -649,6 +666,7 @@ class BaseprecoController extends AbstractRestfulController
                 where 1=1
                 and estoque > 0
                 and nvl(custo_medio,0) > 0
+                $andSqlCkMb
                 --and preco is null
                 --and marca not in ('BATERIAS MOURA','BATERIAS','MOURA-TROCA','ZETTA','ZETTA-TROCA')
                 --and cod_produto not in (397)
@@ -663,6 +681,8 @@ class BaseprecoController extends AbstractRestfulController
                 --and cod_produto = 58938
                 --and cod_produto in(7717,38808,40942,7719,49732,19887,50561,40805,40940,38807)
           ";
+        // print "$sql";
+        // exit;
 
         $session = $this->getSession();
         $session['exportbasepreco'] = "$sql";
