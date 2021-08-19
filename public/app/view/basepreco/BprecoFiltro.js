@@ -127,8 +127,8 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 '</tpl>'), 
             valueField: 'codItem',
             // emptyText: 'Produto',
-            fieldLabel: 'Produtos',
-            emptyText: 'Código Item NBS',
+            fieldLabel: 'Código Produto NBS',
+            emptyText: 'Código Produto NBS',
             // matchFieldWidth: false,
             // padding: 1,
             margin: '1 1 1 8',
@@ -225,8 +225,8 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                 '</tpl>'), 
             valueField: 'idProduto',
             // emptyText: 'Produto',
-            fieldLabel: 'Código Produto',
-            emptyText: 'Código Produto',
+            fieldLabel: 'Código Produto Sankhya',
+            emptyText: 'Código Produto Sankhya',
             // matchFieldWidth: false,
             // padding: 1,
             margin: '1 1 1 8',
@@ -554,7 +554,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                     layout: 'hbox',
                     border: false,
                     items:[
-                        elTagTabPreco,
+                        elTagIdProduto,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
@@ -571,7 +571,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
                     layout: 'hbox',
                     border: false,
                     items:[
-                        elTagIdProduto,
+                        elTagTabPreco,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',

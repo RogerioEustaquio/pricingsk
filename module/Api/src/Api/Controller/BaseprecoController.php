@@ -225,7 +225,7 @@ class BaseprecoController extends AbstractRestfulController
             $em = $this->getEntityManager();
 
             if(!$tipoSql){
-                $filtroProduto = "like upper('".$pCod."%')";
+                $filtroProduto = "in (".$pCod.")";
             }else{
                 $produtos =  implode(",",json_decode($pCod));
                 $filtroProduto = "in ($produtos)";
@@ -677,7 +677,7 @@ class BaseprecoController extends AbstractRestfulController
                 --and cod_empresa = 12
                 --and empresa = 'BH'
                 --and cod_produto in (61958, 61918, 61955, 61957, 16461, 60752)
-                and cod_produto = 397
+                --and cod_produto = 397
                 --and cod_produto = 58938
                 --and cod_produto in(7717,38808,40942,7719,49732,19887,50561,40805,40940,38807)
           ";
