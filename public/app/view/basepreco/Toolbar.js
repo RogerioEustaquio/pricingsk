@@ -83,42 +83,50 @@ Ext.define('App.view.basepreco.Toolbar',{
                 '->',
                 {
                     xtype: 'button',
-                    text: 'Export',
-                    iconCls: 'fa fa-table',
-                    handler: function(){
+                    text: 'Excel',
+                    iconCls: 'fa fa-download',
+                    arrowAlign: 'right',
+                    menu: [
+                        {
+                            text: 'CSV',
+                            handler: function(){
 
-                        var win = open('','forml');
-                        var link = BASEURL + '/api/basepreco/gerarexcel';
-                        var dados = this.dado;
+                                var win = open('','forml');
+                                var link = BASEURL + '/api/basepreco/gerarexcel';
+                                var dados = this.dado;
 
-                        var input = "<input type='hidden' name='dados' value='"+dados+"'></input>";
-                        input +=  " <input type='hidden' name='nome' value='baseprecoexport'></input>";
-                        input +=  " <input type='hidden' name='total' value='"+this.total+"'></input>";
+                                var input = "<input type='hidden' name='dados' value='"+dados+"'></input>";
+                                input +=  " <input type='hidden' name='nome' value='baseprecoexport'></input>";
+                                input +=  " <input type='hidden' name='total' value='"+this.total+"'></input>";
 
-                        var html = "<html><body><form id='forml' method='POST' action='"+link+"'> " +input+" </form></body></html>"
+                                var html = "<html><body><form id='forml' method='POST' action='"+link+"'> " +input+" </form></body></html>"
 
-                        win.document.write(html);
-                        win.document.close();
-                        win.document.getElementById('forml').submit();
+                                win.document.write(html);
+                                win.document.close();
+                                win.document.getElementById('forml').submit();
+                            }
+                        },
+                        {
+                            text: 'XLS',
+                            handler: function(){
 
-                        // Ext.Ajax.request({
-                        //     url: BASEURL +'/api/basepreco/gerarexcel',
-                        //     method: 'POST',
-                        //     // params: params,
-                        //     async: false,
-                        //     timeout: 240000,
-                        //     success: function (response) {
-                        //         var result = Ext.decode(response.responseText);
-                        //         if(result.success){
-                
-                        //             var rsarray = result.data;
+                                var win = open('','forml');
+                                var link = BASEURL + '/api/basepreco/gerarexcel2';
+                                var dados = this.dado;
 
-                        //             console.log(rsarray);
-                
-                        //         }
-                        //     }
-                        // });
-                    }
+                                var input = "<input type='hidden' name='dados' value='"+dados+"'></input>";
+                                input +=  " <input type='hidden' name='nome' value='baseprecoexport'></input>";
+                                input +=  " <input type='hidden' name='total' value='"+this.total+"'></input>";
+
+                                var html = "<html><body><form id='forml' method='POST' action='"+link+"'> " +input+" </form></body></html>"
+
+                                win.document.write(html);
+                                win.document.close();
+                                win.document.getElementById('forml').submit();
+                            }
+                        }
+                    ],
+                    
                 }
             ]
         });
