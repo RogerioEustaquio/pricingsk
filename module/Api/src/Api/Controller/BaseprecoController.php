@@ -30,11 +30,6 @@ class BaseprecoController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            // $sql = "select e.apelido emp, e.id_empresa
-            //             from ms.empresa e
-            //         where e.id_empresa not in (26, 27, 28, 11, 20, 102, 101)
-            //         order by e.apelido";
-
             $sql = 'select distinct nome_empresa emp, cod_empresa id_empresa
                     from SK_PRODUTO_TABELA_TMP';
 
@@ -107,19 +102,6 @@ class BaseprecoController extends AbstractRestfulController
                 $produtos =  implode("','",json_decode($pCod));
                 $filtroProduto = "in ('".$produtos."')";
             }
-            
-            // $sql = "select i.cod_item||c.descricao as cod_item,
-            //                i.descricao,
-            //                m.descricao as marca
-            //             from ms.tb_item_categoria ic,
-            //             ms.tb_marca m,
-            //             ms.tb_item i,
-            //             ms.tb_categoria c
-            //         where ic.id_item = i.id_item
-            //         and ic.id_categoria = c.id_categoria
-            //         and ic.id_marca = m.id_marca
-            //         and i.cod_item||c.descricao $filtroProduto
-            //         order by cod_item asc";
             
             $sql = "select distinct COD_ITEM_NBS cod_item, descricao 
             from SK_PRODUTO_TABELA_TMP
@@ -275,30 +257,6 @@ class BaseprecoController extends AbstractRestfulController
             $usuario = $session['info'];
 
             $em = $this->getEntityManager();
-            
-            // $sql = "select  g.id_grupo_marca,
-            //                 m.id_marca,
-            //                 m.descricao as marca,
-            //                 count(*) as skus
-            //         from ms.tb_estoque e,
-            //                 ms.tb_item i,
-            //                 ms.tb_categoria c,
-            //                 ms.tb_item_categoria ic,
-            //                 ms.tb_marca m,
-            //                 ms.tb_grupo_marca g,
-            //                 ms.empresa em
-            //         where e.id_item = i.id_item
-            //         and e.id_categoria = c.id_categoria
-            //         and e.id_item = ic.id_item
-            //         and e.id_categoria = ic.id_categoria
-            //         and ic.id_marca = m.id_marca
-            //         and m.id_grupo_marca = g.id_grupo_marca
-            //         and e.id_empresa = em.id_empresa
-            //         --and e.id_curva_abc = 'E'
-            //         and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
-            //         group by g.id_grupo_marca, m.id_marca, m.descricao
-            //         order by skus desc
-            // ";
 
             $sql = 'select distinct marca as id_marca, marca 
             from SK_PRODUTO_TABELA_TMP order by marca';
@@ -511,36 +469,6 @@ class BaseprecoController extends AbstractRestfulController
                 break;
         }
 
-        // $sql = " select COD_EMPRESA,
-        //                 NOME_EMPRESA,
-        //                 COD_TAB_PRECO,
-        //                 NOME_TAB_PRECO,
-        //                 to_char(DT_VIGOR,'dd/mm/yyyy') dt_vigor,
-        //                 PRECO,
-        //                 TIPO,
-        //                 COD_PRODUTO,
-        //                 DESCRICAO,
-        //                 MARCA,
-        //                 COD_FORNECEDOR,
-        //                 NOME_FORNECEDOR,
-        //                 COD_ITEM_NBS,
-        //                 PARTNUMBER,
-        //                 MARGEM mb,
-        //                 DESP_VARIAVEL,
-        //                 TIPO_PRECIFICACAO,
-        //                 NIVEL_MARGEM,
-        //                 GRUPO_DESCONTO,
-        //                 ESTOQUE,
-        //                 CUSTO_MEDIO,
-        //                 VALOR_ESTOQUE,
-        //                 CUSTO_OPE,
-        //                 PIS_COFINS,
-        //                 ICMS                       
-        //             from SK_PRODUTO_TABELA_TMP 
-        //          where 1 = 1
-        //          $andSql
-        //          ";
-
         $sql = " select cod_empresa,
                         empresa nome_empresa,
                         cod_tabela cod_tab_preco,
@@ -682,8 +610,6 @@ class BaseprecoController extends AbstractRestfulController
                 --and cod_produto = 58938
                 --and cod_produto in(7717,38808,40942,7719,49732,19887,50561,40805,40940,38807)
           ";
-        // print "$sql";
-        // exit;
 
         $session = $this->getSession();
         $session['exportbasepreco'] = "$sql";
@@ -759,15 +685,6 @@ class BaseprecoController extends AbstractRestfulController
                 $results = $stmt->fetchAll();
 
                 $hydrator = new ObjectProperty;
-                // $hydrator->addStrategy('preco', new ValueStrategy);
-                // $hydrator->addStrategy('estoque', new ValueStrategy);
-                // $hydrator->addStrategy('mb', new ValueStrategy);
-                // $hydrator->addStrategy('despVariavel', new ValueStrategy);
-                // $hydrator->addStrategy('custo_medio', new ValueStrategy);
-                // $hydrator->addStrategy('valor_estoque', new ValueStrategy);
-                // $hydrator->addStrategy('custo_ope', new ValueStrategy);
-                // $hydrator->addStrategy('pis_cofins', new ValueStrategy);
-                // $hydrator->addStrategy('icms', new ValueStrategy);
                 $stdClass = new StdClass;
                 $resultSet = new HydratingResultSet($hydrator, $stdClass);
                 $resultSet->initialize($results);
@@ -823,11 +740,6 @@ class BaseprecoController extends AbstractRestfulController
                                 $icms."\n";
                     $i++;
                 }
-
-                // $arqFile = '.\data\exportbasepreco_'.$session['info']['usuarioSistema'].'.csv';
-                // $arquivo = fopen($arqFile,'w'); 
-                // fwrite($arquivo, $output);
-                // fclose($arquivo);
 
                 $response = new \Zend\Http\Response();
                 $response->setContent($output);
@@ -937,9 +849,6 @@ class BaseprecoController extends AbstractRestfulController
                     $custoOpe       = $data[$i]['custoOpe'] >0 ? $data[$i]['custoOpe'] : null ;
                     $pisCofins      = $data[$i]['pisCofins'] >0 ? $data[$i]['pisCofins'] : null ;
                     $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
-
-                    // var_dump($data[$i]);
-                    // print " $i <br>";
 
                     $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
                                            ->setCellValue('B'.$ix, $nomeEmpresa)

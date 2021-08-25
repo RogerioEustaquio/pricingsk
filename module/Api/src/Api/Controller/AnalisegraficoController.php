@@ -490,7 +490,7 @@ class AnalisegraficoController extends AbstractRestfulController
         $data = array();
         
         try {
-            $idEmpresas     = $this->params()->fromPost('idEmpresas',null);
+            $emp     = $this->params()->fromPost('idEmpresas',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
             $idMarcasG      = $this->params()->fromPost('idMarcasG',null);
             $codProdutos    = $this->params()->fromPost('idProduto',null);
@@ -503,8 +503,8 @@ class AnalisegraficoController extends AbstractRestfulController
             $idRegionais    = $this->params()->fromPost('idRegionais',null);
 
             $indicadoresAdd = json_decode($indicadoresAdd);
-            if($idEmpresas){
-                $idEmpresas =  implode(",",json_decode($idEmpresas));
+            if($emp){
+                $emp =  implode("','",json_decode($emp));
             }
             if($idMarcas){
                 $idMarcas = implode(",",json_decode($idMarcas));
@@ -540,27 +540,27 @@ class AnalisegraficoController extends AbstractRestfulController
             // }
 
             $andSql = '';
-            if($idEmpresas){
-                $andSql = " and e.COD_EMPRESA in ($idEmpresas)";
+            if($emp){
+                $andSql = " and emp in ('$emp')";
             }
 
-            if($idRegionais){
-                $andSql .= " and e.COD_EMPRESA in ($idRegionais)";
-            }
+            // if($idRegionais){
+            //     $andSql .= " and e.COD_EMPRESA in ($idRegionais)";
+            // }
 
             if($idMarcas){
-                $andSql .= " and m.cod_marca in ($idMarcas)";
+                $andSql .= " and cod_marca in ($idMarcas)";
             }
             if($idMarcasG){
-                $andSql .= " and m.cod_marca in ($idMarcasG)";
+                $andSql .= " and cod_marca in ($idMarcasG)";
             }
             
             if($produtos){
-                $andSql .= " and p.cod_nbs in ('$produtos')";
+                $andSql .= " and cod_nbs in ('$produtos')";
             }
 
             if($codProdutos){
-                $andSql .= " and p.cod_produto in ($codProdutos)";
+                $andSql .= " and cod_produto in ($codProdutos)";
             }
 
             // if($tpPessoas){
@@ -578,10 +578,10 @@ class AnalisegraficoController extends AbstractRestfulController
             }
 
             if($data){
-                $andSql .= " and trunc(a.dtentsai, 'MM') >= add_months(trunc($sysdate,'MM'),-11)";
-                $andSql .= " and trunc(a.dtentsai, 'MM') <= add_months(trunc($sysdate,'MM'),0)";
+                $andSql .= " and trunc(data, 'MM') >= add_months(trunc($sysdate,'MM'),-11)";
+                $andSql .= " and trunc(data, 'MM') <= add_months(trunc($sysdate,'MM'),0)";
             }else{
-                $andSql .= " and trunc(a.dtentsai, 'MM') >= add_months(trunc(sysdate,'MM'),-11)";
+                $andSql .= " and trunc(data, 'MM') >= add_months(trunc(sysdate,'MM'),-11)";
             }
             
             // if($idOmvUsers){
@@ -732,23 +732,53 @@ class AnalisegraficoController extends AbstractRestfulController
                 $EstoqueInGiro      = $EstoqueMes[5];
             }
 
-            $sql = "select trunc(a.dtentsai,'MM') as data,
-                            --e.emp, p.cod_marca, m.descricao_marca, p.cod_nbs,
-                            --a.codprod as cod_produto, p.descricao as descricao_produto,
-                            round(sum(a.rol),2) as rol,
-                            round(sum(a.lbreal),2) as lb,
-                            round((case when sum(a.lbreal) > 0 then sum(a.lbreal)/sum(a.rol) end)*100,2) as mb
-                    from sankhya.VW_JS_PRICE_VENDAS_PRINCIPAL@Sk a,
-                            vw_skproduto p,
-                            vw_skmarca m,
-                            VW_SKEMPRESA e
-                    where a.codprod = p.cod_produto
-                    and p.cod_marca = m.COD_MARCA
-                    and a.codemp = e.COD_EMPRESA
-                    $andSql
-                    group by trunc(a.dtentsai,'MM')
-                    order by 1
-                    ";
+            // $sql = "select trunc(a.dtentsai,'MM') as data,
+            //                 --e.emp, p.cod_marca, m.descricao_marca, p.cod_nbs,
+            //                 --a.codprod as cod_produto, p.descricao as descricao_produto,
+            //                 round(sum(a.rol),2) as rol,
+            //                 round(sum(a.lbreal),2) as lb,
+            //                 round((case when sum(a.lbreal) > 0 then sum(a.lbreal)/sum(a.rol) end)*100,2) as mb
+            //         from sankhya.VW_JS_PRICE_VENDAS_PRINCIPAL@Sk a,
+            //                 vw_skproduto p,
+            //                 vw_skmarca m,
+            //                 VW_SKEMPRESA e
+            //         where a.codprod = p.cod_produto
+            //         and p.cod_marca = m.COD_MARCA
+            //         and a.codemp = e.COD_EMPRESA
+            //         $andSql
+            //         group by trunc(a.dtentsai,'MM')
+            //         order by 1
+            //         ";
+
+            $sql = "select a.data,
+                           a.rol,
+                           a.lb,
+                           a.qtde,
+                           a.mb,
+                           du.dias,
+                           round(a.rol/du.dias,2) as rol_dia,
+                           round(a.lb/du.dias,2) as lb_dia,
+                           round(a.qtde/du.dias,0) as qtde_dia
+                    from (select trunc(data, 'MM') as data,
+                                    sum(rol) as rol,
+                                    sum(lb) as lb,
+                                    sum(qtde) as qtde,
+                                    round((sum(lb)/sum(rol))*100,2) as mb
+                            from vm_skvendaitem_master
+                          where 1=1
+                          $andSql
+                          --and data >= add_months(trunc(to_date('24/08/2021'),'MM'),-11)
+                          and data <  trunc(sysdate)
+                          -- and emp
+                          -- and cod_produto
+                          -- and descricao
+                          -- and cod_marca
+                          -- and marca
+                         group by trunc(data, 'MM')) a,
+                         VM_SKDIAS_UTEIS du
+                    where a.data = du.data
+                    order by data";
+
             // print "$sql";
             // exit;
 
@@ -770,7 +800,7 @@ class AnalisegraficoController extends AbstractRestfulController
             // $hydrator->addStrategy('cmv', new ValueStrategy);
             $hydrator->addStrategy('lb', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
-            // $hydrator->addStrategy('qtde', new ValueStrategy);
+            $hydrator->addStrategy('qtde', new ValueStrategy);
             // $hydrator->addStrategy('nf', new ValueStrategy);
             // $hydrator->addStrategy('cc', new ValueStrategy);
             // $hydrator->addStrategy('tkm_cc', new ValueStrategy);
@@ -778,10 +808,10 @@ class AnalisegraficoController extends AbstractRestfulController
             // $hydrator->addStrategy('lb_cc', new ValueStrategy);
             // $hydrator->addStrategy('lb_nf', new ValueStrategy);
             // $hydrator->addStrategy('rob_dia', new ValueStrategy);
-            // $hydrator->addStrategy('rol_dia', new ValueStrategy);
+            $hydrator->addStrategy('rol_dia', new ValueStrategy);
             // $hydrator->addStrategy('cmv_dia', new ValueStrategy);
-            // $hydrator->addStrategy('lb_dia', new ValueStrategy);
-            // $hydrator->addStrategy('qtde_dia', new ValueStrategy);
+            $hydrator->addStrategy('lb_dia', new ValueStrategy);
+            $hydrator->addStrategy('qtde_dia', new ValueStrategy);
             // $hydrator->addStrategy('nf_dia', new ValueStrategy);
             // $hydrator->addStrategy('cc_dia', new ValueStrategy);
             $stdClass = new StdClass;
@@ -828,7 +858,7 @@ class AnalisegraficoController extends AbstractRestfulController
                     // $arrayCmv[$cont]         = (float)$elementos['cmv'];
                     $arrayLb[$cont]          = (float)$elementos['lb'];
                     $arrayMb[$cont]          = (float)$elementos['mb'];
-                    // $arrayQtde[$cont]        = (float)$elementos['qtde'];
+                    $arrayQtde[$cont]        = (float)$elementos['qtde'];
                     // $arrayNf[$cont]          = (float)$elementos['nf'];
                     // $arrayCc[$cont]          = (float)$elementos['cc'];
                     // $arrayTkmcc[$cont]       = (float)$elementos['tkmCc'];
@@ -836,10 +866,10 @@ class AnalisegraficoController extends AbstractRestfulController
                     // $arrayLbcc[$cont]        = (float)$elementos['lbCc'];
                     // $arrayLbnf[$cont]        = (float)$elementos['lbNf'];
                     // $arrayRobdia[$cont]      = (float)$elementos['robDia'];
-                    // $arrayRoldia[$cont]      = (float)$elementos['rolDia'];
+                    $arrayRoldia[$cont]      = (float)$elementos['rolDia'];
                     // $arrayCmvdia[$cont]      = (float)$elementos['cmvDia'];
-                    // $arrayLbdia[$cont]       = (float)$elementos['lbDia'];
-                    // $arrayQtdedia[$cont]     = (float)$elementos['qtdeDia'];
+                    $arrayLbdia[$cont]       = (float)$elementos['lbDia'];
+                    $arrayQtdedia[$cont]     = (float)$elementos['qtdeDia'];
                     // $arrayNfdia[$cont]       = (float)$elementos['nfDia'];
                     // $arrayCcdia[$cont]       = (float)$elementos['ccDia'];
 

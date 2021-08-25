@@ -38,7 +38,7 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
             queryParam: 'emp',
             queryMode: 'local',
             displayField: 'emp',
-            valueField: 'idEmpresa',
+            valueField: 'emp',
             emptyText: 'Empresa',
             fieldLabel: 'Empresas',
             labelWidth: 60,
@@ -249,6 +249,7 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    hidden: false,
                     items:[
                         elTagProduto,
                         {
