@@ -779,9 +779,6 @@ class AnalisegraficoController extends AbstractRestfulController
                     where a.data = du.data
                     order by data";
 
-            // print "$sql";
-            // exit;
-
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
