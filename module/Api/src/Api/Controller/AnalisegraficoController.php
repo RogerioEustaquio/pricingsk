@@ -35,8 +35,10 @@ class AnalisegraficoController extends AbstractRestfulController
             //         where e.id_empresa not in (26, 27, 28, 11, 20, 102, 101)
             //         order by e.apelido";
 
-            $sql = 'select distinct emp, cod_empresa id_empresa
-                    from VW_SKEMPRESA';
+            $sql = "select distinct emp, cod_empresa id_empresa
+                    from VW_SKEMPRESA
+                    where emp not in ('CD','EC','M2','PAR','PLA','SP','TL')
+                    order by emp";
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
@@ -887,134 +889,8 @@ class AnalisegraficoController extends AbstractRestfulController
                         'categories' => $categories,
                         'series' => array(                            
                             array(
-                                'name' => 'Preço Unitário',
-                                'yAxis'=> 0,
-                                // 'color' => 'rgba(165,170,217,1)',
-                                'data' => $arrayPreco,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                ),
-                            ),
-                            array(
-                                'name' => 'Desconto Unitário',
-                                'yAxis'=> 0,
-                                // 'color' => 'rgba(126,86,134,.9)',
-                                'data' => $arrayDesc,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Imposto Unitário',
-                                'yAxis'=> 0,
-                                // 'color' => 'rgba(46, 36, 183, 1)',
-                                'data' => $arrayImposto,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'ROL Unitário',
-                                'yAxis'=> 0,
-                                // 'color' => 'rgba(221, 117, 85, 1)',
-                                'data' => $arrayRolUni,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Custo Unitário',
-                                'yAxis'=> 0,
-                                // 'color' => 'rgba(221, 117, 85, 1)',
-                                'data' => $arrayCusto,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Lucro Unitário',
-                                'yAxis'=> 0,
-                                // 'color' => 'rgba(221, 117, 85, 1)',
-                                'data' => $arrayLucro,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => '% Imposto',
-                                'yAxis'=> 6,
-                                // 'color' => 'rgba(221, 117, 85, 1)',
-                                'data' => $arrayImpostoPc,
-                                'vFormat' => '%',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => '% Desconto',
-                                'yAxis'=> 7,
-                                // 'color' => 'rgba(221, 117, 85, 1)',
-                                'data' => $arrayDescPc,
-                                'vFormat' => '%',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'ROB',
-                                'yAxis'=> 8,
-                                // 'color' => 'rgba(221, 117, 85, 1)',
-                                'data' => $arrayRob,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
                                 'name' => 'ROL',
-                                'yAxis'=> 8,
+                                'yAxis'=> 0,
                                 // 'color' => 'rgba(221, 117, 85, 1)',
                                 'data' => $arrayRol,
                                 'vFormat' => '',
@@ -1027,22 +903,8 @@ class AnalisegraficoController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'CMV',
-                                'yAxis'=> 8,
-                                'color' => $colors[0],
-                                'data' => $arrayCmv,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
                                 'name' => 'LB',
-                                'yAxis'=> 8,
+                                'yAxis'=> 1,
                                 'color' => $colors[1],
                                 'data' => $arrayLb,
                                 'vFormat' => '',
@@ -1056,7 +918,7 @@ class AnalisegraficoController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'MB',
-                                'yAxis'=> 12,
+                                'yAxis'=> 2,
                                 'color' => $colors[2],
                                 'data' => $arrayMb,
                                 'vFormat' => '',
@@ -1070,7 +932,7 @@ class AnalisegraficoController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'Quantidade',
-                                'yAxis'=> 13,
+                                'yAxis'=> 3,
                                 'color' => $colors[3],
                                 'data' => $arrayQtde,
                                 'vFormat' => '',
@@ -1083,106 +945,8 @@ class AnalisegraficoController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Nota',
-                                'yAxis'=> 14,
-                                'color' => $colors[4],
-                                'data' => $arrayNf,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Cliente',
-                                'yAxis'=> 15,
-                                'color' => $colors[5],
-                                'data' => $arrayCc,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'TKM Cliente',
-                                'yAxis'=> 16,
-                                'color' => $colors[6],
-                                'data' => $arrayTkmcc,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'TKM Nota',
-                                'yAxis'=> 17,
-                                'color' => $colors[7],
-                                'data' => $arrayTkmnf,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'LB Cliente',
-                                'yAxis'=> 18,
-                                'color' => $colors[8],
-                                'data' => $arrayLbcc,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'LB Nota',
-                                'yAxis'=> 19,
-                                'color' => $colors[9],
-                                'data' => $arrayLbnf,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'ROB Dia',
-                                'yAxis'=> 20,
-                                'color'=> $colors[10],
-                                'data' => $arrayRobdia,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
                                 'name' => 'ROL Dia',
-                                'yAxis'=> 21,
+                                'yAxis'=> 4,
                                 'color'=> $colors[11],
                                 'data' => $arrayRoldia,
                                 'vFormat' => '',
@@ -1195,22 +959,8 @@ class AnalisegraficoController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'CMV Dia',
-                                'yAxis'=> 22,
-                                'color'=> $colors[12],
-                                'data' => $arrayCmvdia,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
                                 'name' => 'LB Dia',
-                                'yAxis'=> 23,
+                                'yAxis'=> 5,
                                 'color'=> $colors[13],
                                 'data' => $arrayLbdia,
                                 'vFormat' => '',
@@ -1224,123 +974,11 @@ class AnalisegraficoController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'Qtde Dia',
-                                'yAxis'=> 24,
+                                'yAxis'=> 6,
                                 'color'=> $colors[14],
                                 'data' => $arrayQtdedia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Nota Dia',
-                                'yAxis'=> 25,
-                                'color'=> $colors[15],
-                                'data' => $arrayNfdia,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Cliente Dia',
-                                'yAxis'=> 26,
-                                'color'=> $colors[16],
-                                'data' => $arrayCcdia,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Estoque Inicial',
-                                'yAxis'=> 27,
-                                'color'=> $colors[17],
-                                'data' => $EstoqueMesInicial,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Estoque Final',
-                                'yAxis'=> 28,
-                                'color'=> $colors[18],
-                                'data' => $EstoqueMesFinal,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Dias de Estoque',
-                                'yAxis'=> 29,
-                                'color'=> $colors[19],
-                                'data' => $EstoqueDias,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Índice Estoque/ROL',
-                                'yAxis'=> 30,
-                                'color'=> $colors[20],
-                                'data' => $EstoqueInRol,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Índice Estoque/LB',
-                                'yAxis'=> 31,
-                                'color'=> $colors[21],
-                                'data' => $EstoqueInLb,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'Índice Estoque/Giro',
-                                'yAxis'=> 32,
-                                'color'=> $colors[22],
-                                'data' => $EstoqueInGiro,
-                                'vFormat' => '',
-                                'vDecimos' => '2',
                                 'visible' => false,
                                 'showInLegend' => false,
                                 'dataLabels' => array(
