@@ -562,7 +562,7 @@ class AnalisegraficoController extends AbstractRestfulController
             }
 
             if($codProdutos){
-                $andSql .= " and cod_produto in ($codProdutos)";
+                $andSql .= " and codprod in ($codProdutos)";
             }
 
             // if($tpPessoas){
@@ -780,6 +780,9 @@ class AnalisegraficoController extends AbstractRestfulController
                          VM_SKDIAS_UTEIS du
                     where a.data = du.data
                     order by data";
+            
+                    // print "$sql";
+                    // exit;
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
