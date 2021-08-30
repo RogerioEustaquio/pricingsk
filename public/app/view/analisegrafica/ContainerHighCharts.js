@@ -184,7 +184,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                                             var iCont = 0
                                             meChart.series.forEach(function(rowSerie){
                                                 if(rowSerie.visible){
-                                                    const color = Highcharts.getOptions().colors[iColor];
+                                                    const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
 
                                                     rowSerie.update({color:color},false);
                                                     meChart.yAxis[iCont].update(
@@ -377,7 +377,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         title: {
                             text: 'ROL',
                             style: {
-                                color: Highcharts.getOptions().colors[9],
+                                color: colors[0], //Highcharts.getOptions().colors[0],
                                 fontSize: '10px'
                             }
                         },
@@ -390,7 +390,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                                 y: 0,
                                 padding: 0,
                                 style: {
-                                    color: Highcharts.getOptions().colors[9],
+                                    color: colors[0],
                                     fontSize: '10px'
                                 }
                         },
@@ -470,7 +470,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         title: {
                             text: 'ROL Dia',
                             style: {
-                                color: colors[11],
+                                color: colors[4],
                                 fontSize: '10px'
                             }
                         },
@@ -482,7 +482,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[11],
+                                color: colors[4],
                                 fontSize: '10px'
                             }
                         },
@@ -493,7 +493,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         title: {
                             text: 'LB Dia',
                             style: {
-                                color: colors[13],
+                                color: colors[5],
                                 fontSize: '10px'
                             }
                         },
@@ -505,7 +505,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[13],
+                                color: colors[5],
                                 fontSize: '10px'
                             }
                         },
@@ -516,7 +516,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         title: {
                             text: 'Qtde Dia',
                             style: {
-                                color: colors[14],
+                                color: colors[6],
                                 fontSize: '10px'
                             }
                         },
@@ -528,7 +528,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[14],
+                                color: colors[6],
                                 fontSize: '10px'
                             }
                         },
