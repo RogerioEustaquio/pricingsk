@@ -562,7 +562,7 @@ class AnalisegraficoController extends AbstractRestfulController
             }
 
             if($codProdutos){
-                $andSql .= " and codprod in ($codProdutos)";
+                $andSql .= " and cod_produto in ($codProdutos)";
             }
 
             // if($tpPessoas){
