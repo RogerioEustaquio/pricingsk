@@ -534,6 +534,52 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         },
                         opposite: true,
                         visible: false
+                    },
+                    {
+                        title: {
+                            text: 'ROL Fx 101-250',
+                            style: {
+                                color: colors[7],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[7],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'ROL Fx 251-500',
+                            style: {
+                                color: colors[7],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[7],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
                     }
                 ],
                 tooltip: {

@@ -70,7 +70,7 @@ Ext.define('App.view.analisegrafica.Toolbar',{
 
                                     if(me.indicadoresAdd[index].name == "faixaCusto"){
                                         if(me.indicadoresAdd[index].value)
-                                            meWindow.down('checkboxfield[name=estoque]').setValue(true);
+                                            meWindow.down('checkboxfield[name=faixaCusto]').setValue(true);
                                     }
                                 }
                             }
@@ -93,7 +93,7 @@ Ext.define('App.view.analisegrafica.Toolbar',{
                     text: 'Indicadores Adicionais',
                     tooltip: 'Indicadores Adicionais',
                     margin: '1 1 1 4',
-                    hidden: true,
+                    hidden: false,
                     handler: function(){
                         Ext.create('Ext.window.Window',optionWindow).show();
                     }
@@ -138,7 +138,8 @@ Ext.define('App.view.analisegrafica.Toolbar',{
             data: data,
             idProduto:  Ext.encode(idproduto),
             produto:  Ext.encode(produto),
-            marca: Ext.encode(marca)
+            marca: Ext.encode(marca),
+            indicadoresAdd: Ext.encode(me.indicadoresAdd)
         };
 
         var seriesOrig = Array();

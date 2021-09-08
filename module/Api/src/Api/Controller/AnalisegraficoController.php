@@ -487,22 +487,174 @@ class AnalisegraficoController extends AbstractRestfulController
     //     return $objReturn;
     // }
 
+    public function faixacusto($idEmpresas,$data,$codNbs,$codProdutos,$idMarcas)
+    {
+        $data1 = array();
+
+        $andSql = '';
+        // $andSql2 = '';
+        if($idEmpresas){
+            $andSql  = " and emp in ($idEmpresas)";
+        }
+
+        if($idMarcas){
+            $andSql .= " and cod_marca in ($idMarcas)";
+        }
+
+        if($codProdutos){
+            $andSql .= " and cod_produto in ('$codProdutos')";
+        }
+
+        if($data){
+            $andSql .= " and trunc(data, 'MM') >= add_months(trunc(to_date('01/".$data."'),'MM'),-11)";
+            $andSql .= " and trunc(data, 'MM') <= add_months(trunc(to_date('01/".$data."'),'MM'),0)";
+        }else{
+            $andSql .= " and trunc(data, 'MM') >= add_months(trunc(sysdate,'MM'),-11)";
+        }
+
+        if($data){
+            $sysdate = "to_date('01/".$data."')";
+        }else{
+            $sysdate = 'sysdate';
+        }
+
+        try {
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $mesesFaixa = ['null',
+                            'Janeiro',
+                            'Fevereiro',
+                            'Março',
+                            'Abril',
+                            'Maio',
+                            'Junho',
+                            'Julho',
+                            'Agosto',
+                            'Setembro',
+                            'Outubro',
+                            'Novembro',
+                            'Dezembro'];
+
+            $sql = "select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-10) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-9) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-8) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-7) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-6) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-5) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-4) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-3) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-2) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-1) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-0) as id from dual
+                    order by 1
+            ";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data1 = array();
+            $mesSelecao = array();
+            $FaixaCusto  = array();
+            $FaixaCusto2  = array();
+
+            foreach ($resultSet as $row) {
+                $data1 = $hydrator->extract($row);
+                
+                $mesSelecao[] = $mesesFaixa[(float) substr($data1['id'], 3, 2)];
+
+                $FaixaCusto[]    = 0;
+                $FaixaCusto2[]   = 0;
+
+            }
+
+            $sql = "select a.data, a.fx_custo, a.rol, a.lb, a.qtde, a.mb, du.dias,
+                            round(a.rol/du.dias,2) as rol_dia, round(a.lb/du.dias,2) as lb_dia, round(a.qtde/du.dias,0) as qtde_dia
+                    from (select trunc(data, 'MM') as data,
+                                    get_fx_custo(sum(custo)/sum(qtde)) as fx_custo,
+                                    sum(rol) as rol,
+                                    sum(lb) as lb,
+                                    sum(qtde) as qtde,
+                                    round((sum(lb)/sum(rol))*100,2) as mb
+                            from vm_skvendaitem_master
+                            where 1=1
+                               -- and data >= add_months(trunc(to_date('24/08/2021'),'MM'),-11) 
+                               $andSql
+                                and data <  trunc(sysdate)
+                                --and cod_produto = 397
+                                -- and emp
+                                -- and cod_produto
+                                -- and descricao
+                                -- and cod_marca
+                                -- and marca
+                                
+                            group by trunc(data, 'MM')) a,
+                            VM_SKDIAS_UTEIS du
+                    where a.data = du.data
+                    and fx_custo in ('101-250','251-500')
+                    order by data
+                    ";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('data', new ValueStrategy);
+            $hydrator->addStrategy('fx_custo', new ValueStrategy);
+            $hydrator->addStrategy('rol', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data2 = array();
+            $contMes = 0;
+
+            foreach ($resultSet as $row) {
+
+                $elementos = $hydrator->extract($row);
+
+                if($mesSelecao[$contMes] == $mesesFaixa[(float)substr($elementos['data'], 3, 2)] && $contMes<12){
+
+                    $FaixaCusto[$contMes] = (float) $elementos['rol'];
+
+                    if($elementos['fxCusto'] == '251-500'){
+                        $FaixaCusto2[$contMes]    = (float) $elementos['rol'];
+                    }
+                    
+                    $contMes++;
+                }
+                
+            }
+
+        } catch (\Exception $e) {
+            $FaixaCusto  = null;
+        }
+
+        $arrayFaixaCusto[] = $FaixaCusto;
+        $arrayFaixaCusto[] = $FaixaCusto2;
+
+        return $arrayFaixaCusto;
+    }
+
     public function listarfichaitemgraficoAction()
     {
         $data = array();
         
         try {
             $emp     = $this->params()->fromPost('idEmpresas',null);
-            $idMarcas       = $this->params()->fromPost('marca',null);
-            $idMarcasG      = $this->params()->fromPost('idMarcasG',null);
+            $data           = $this->params()->fromPost('data',null);
             $codProdutos    = $this->params()->fromPost('idProduto',null);
             $produtos       = $this->params()->fromPost('produto',null);
-            $tpPessoas      = $this->params()->fromPost('tpPessoas',null);
-            $data           = $this->params()->fromPost('data',null);
-            $idCurvas       = $this->params()->fromPost('idCurvas',null);
-            $idOmvUsers     = $this->params()->fromPost('idOmvUsers',null);
+            $idMarcas       = $this->params()->fromPost('marca',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
-            $idRegionais    = $this->params()->fromPost('idRegionais',null);
 
             $indicadoresAdd = json_decode($indicadoresAdd);
             if($emp){
@@ -511,50 +663,20 @@ class AnalisegraficoController extends AbstractRestfulController
             if($idMarcas){
                 $idMarcas = implode(",",json_decode($idMarcas));
             }
-            if($idMarcasG){
-                $idMarcasG = implode(",",json_decode($idMarcasG));
-            }
             if($produtos){
                 $produtos =  implode("','",json_decode($produtos));
             }
             if($codProdutos){
                 $codProdutos =  implode(",",json_decode($codProdutos));
             }
-            // if($tpPessoas){
-            //     $tpPessoas = implode("','",json_decode($tpPessoas));
-            // }
-            // if($idCurvas){
-            //     $idCurvas = implode("','",json_decode($idCurvas));
-            // }
-            // if($idOmvUsers){
-            //     $idOmvUsers = implode("','",json_decode($idOmvUsers));
-            // }
-
-            // if($idRegionais){
-
-            //     $arrayIdEmps = json_decode($idRegionais);
-            //     $idRegionais = '';
-            //     foreach($arrayIdEmps as $idRow){
-                    
-            //         $arrayLinha = $this->funcregionais($idRow);
-            //         $idRegionais .= implode(",",$arrayLinha);
-            //     }
-            // }
 
             $andSql = '';
             if($emp){
                 $andSql = " and emp in ('$emp')";
             }
 
-            // if($idRegionais){
-            //     $andSql .= " and e.COD_EMPRESA in ($idRegionais)";
-            // }
-
             if($idMarcas){
                 $andSql .= " and cod_marca in ($idMarcas)";
-            }
-            if($idMarcasG){
-                $andSql .= " and cod_marca in ($idMarcasG)";
             }
             
             if($produtos){
@@ -564,14 +686,6 @@ class AnalisegraficoController extends AbstractRestfulController
             if($codProdutos){
                 $andSql .= " and cod_produto in ($codProdutos)";
             }
-
-            // if($tpPessoas){
-            //     $andSql .= " and p.tipo_pessoa in ('$tpPessoas')";
-            // }
-
-            // if($idCurvas){
-            //     $andSql .= " and t.id_curva_abc in ('$idCurvas')";
-            // }
             
             if($data){
                 $sysdate = "to_date('01/".$data."')";
@@ -585,17 +699,7 @@ class AnalisegraficoController extends AbstractRestfulController
             }else{
                 $andSql .= " and trunc(data, 'MM') >= add_months(trunc(sysdate,'MM'),-11)";
             }
-            
-            // if($idOmvUsers){
-            //     $andSql .= " and (vi.id_empresa, vi.id_item, vi.id_categoria) in (
-            //         select id_empresa, id_item, id_categoria
-            //           from js.omv_analise_log a 
-            //          where a.data_aprovacao >= add_months(sysdate, -12) -- Filtro de data também
-            //            and usuario_aprovacao in ('$idOmvUsers') -- Usuários selecioados
-            //       )
-            //       ";
-            // }
-            
+
             $em = $this->getEntityManager();
             
             $meses = [null,
@@ -640,117 +744,48 @@ class AnalisegraficoController extends AbstractRestfulController
             $data1 = array();
             $categories = array();
 
-            $arrayDesc      = array();
-            $arrayPreco     = array();
-            $arrayImposto   = array();
-            $arrayRolUni    = array();
-            $arrayCusto     = array();
-            $arrayImpostoPc = array();
-            $arrayDescPc    = array();
-            $arrayRob       = array();
             $arrayRol       = array();
-            $arrayCmv       = array();
             $arrayLb        = array();
             $arrayMb        = array();
             $arrayQtde      = array();
-            $arrayNf        = array();
-            $arrayCc        = array();
-            $arrayTkmcc     = array();
-            $arrayTkmnf     = array();
-            $arrayLbcc      = array();
-            $arrayLbnf      = array();
-            $arrayRobdia    = array();
             $arrayRoldia    = array();
-            $arrayCmvdia    = array();
             $arrayLbdia     = array();
             $arrayQtdedia   = array();
-            $arrayNfdia     = array();
-            $arrayCcdia     = array();
-            $arrayEtqMesIni = array();
-
-            // $categories[] = 0;
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
                 $categories[] = $meses[(float) substr($data1['id'], 3, 2)];
 
-                $arrayDesc[]        = 0;
-                $arrayPreco[]       = 0;
-                $arrayImposto[]     = 0;
-                $arrayRolUni[]      = 0;
-                $arrayCusto[]       = 0;
-                $arrayLucro[]       = 0;
-                $arrayImpostoPc[]   = 0;
-                $arrayDescPc[]      = 0;
-                $arrayRob[]         = 0;
                 $arrayRol[]         = 0;
-                $arrayCmv[]         = 0;
                 $arrayLb[]          = 0;
                 $arrayMb[]          = 0;
                 $arrayQtde[]        = 0;
-                $arrayNf[]          = 0;
-                $arrayCc[]          = 0;
-                $arrayTkmcc[]       = 0;
-                $arrayTkmnf[]       = 0;
-                $arrayLbcc[]        = 0;
-                $arrayLbnf[]        = 0;
-                $arrayRobdia[]      = 0;
                 $arrayRoldia[]      = 0;
-                $arrayCmvdia[]      = 0;
                 $arrayLbdia[]       = 0;
                 $arrayQtdedia[]     = 0;
-                $arrayNfdia[]       = 0;
-                $arrayCcdia[]       = 0;
-                $arrayEtqMesIni[]   = 0;
 
             }
 
-            $consultaEstoque = false;
-            $EstoqueMesInicial  = array();
-            $EstoqueMesFinal    = array();
-            $EstoqueDias        = array();
-            $EstoqueInRol       = array();
-            $EstoqueInLb        = array();
-            $EstoqueInGiro      = array();
+            $consultaFaixaCusto = false;
+            $FxCusto  = array();
+            $FxCusto2  = array();
 
             if($indicadoresAdd){
 
                 for ($i=0; $i < count($indicadoresAdd); $i++) {
             
                     if($indicadoresAdd[$i]->value){
-                        $consultaEstoque = true;
+                        $consultaFaixaCusto = true;
                     }
                 }
             }
 
-            if($consultaEstoque){
+            if($consultaFaixaCusto){
 
-                $EstoqueMes = $this->estoquemes($idEmpresas,$idMarcas,$idMarcasG,$codProdutos,$data,$idCurvas,$idOmvUsers,$tpPessoas,$idRegionais);
-                $EstoqueMesInicial  = $EstoqueMes[0];
-                $EstoqueMesFinal    = $EstoqueMes[1];
-                $EstoqueDias        = $EstoqueMes[2];
-                $EstoqueInRol       = $EstoqueMes[3];
-                $EstoqueInLb        = $EstoqueMes[4];
-                $EstoqueInGiro      = $EstoqueMes[5];
+                $FaixaCusto = $this->faixacusto($emp,$data,$produtos,$codProdutos,$idMarcas);
+                $FxCusto  = $FaixaCusto[0];
+                $FxCusto2  = $FaixaCusto[1];
             }
-
-            // $sql = "select trunc(a.dtentsai,'MM') as data,
-            //                 --e.emp, p.cod_marca, m.descricao_marca, p.cod_nbs,
-            //                 --a.codprod as cod_produto, p.descricao as descricao_produto,
-            //                 round(sum(a.rol),2) as rol,
-            //                 round(sum(a.lbreal),2) as lb,
-            //                 round((case when sum(a.lbreal) > 0 then sum(a.lbreal)/sum(a.rol) end)*100,2) as mb
-            //         from sankhya.VW_JS_PRICE_VENDAS_PRINCIPAL@Sk a,
-            //                 vw_skproduto p,
-            //                 vw_skmarca m,
-            //                 VW_SKEMPRESA e
-            //         where a.codprod = p.cod_produto
-            //         and p.cod_marca = m.COD_MARCA
-            //         and a.codemp = e.COD_EMPRESA
-            //         $andSql
-            //         group by trunc(a.dtentsai,'MM')
-            //         order by 1
-            //         ";
 
             $sql = "select a.data,
                            a.rol,
@@ -780,100 +815,42 @@ class AnalisegraficoController extends AbstractRestfulController
                          VM_SKDIAS_UTEIS du
                     where a.data = du.data
                     order by data";
-            
-                    // print "$sql";
-                    // exit;
-
+        
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
-            // $hydrator->addStrategy('desconto_uni', new ValueStrategy);
-            // $hydrator->addStrategy('preco_uni', new ValueStrategy);
-            // $hydrator->addStrategy('imposto_uni', new ValueStrategy);
-            // $hydrator->addStrategy('rol_uni', new ValueStrategy);
-            // $hydrator->addStrategy('custo_uni', new ValueStrategy);
-            // $hydrator->addStrategy('lucro_uni', new ValueStrategy);
-            // $hydrator->addStrategy('imposto_perc', new ValueStrategy);
-            // $hydrator->addStrategy('desconto_perc', new ValueStrategy);
-            // $hydrator->addStrategy('rob', new ValueStrategy);
             $hydrator->addStrategy('rol', new ValueStrategy);
-            // $hydrator->addStrategy('cmv', new ValueStrategy);
             $hydrator->addStrategy('lb', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
             $hydrator->addStrategy('qtde', new ValueStrategy);
-            // $hydrator->addStrategy('nf', new ValueStrategy);
-            // $hydrator->addStrategy('cc', new ValueStrategy);
-            // $hydrator->addStrategy('tkm_cc', new ValueStrategy);
-            // $hydrator->addStrategy('tkm_nf', new ValueStrategy);
-            // $hydrator->addStrategy('lb_cc', new ValueStrategy);
-            // $hydrator->addStrategy('lb_nf', new ValueStrategy);
-            // $hydrator->addStrategy('rob_dia', new ValueStrategy);
             $hydrator->addStrategy('rol_dia', new ValueStrategy);
-            // $hydrator->addStrategy('cmv_dia', new ValueStrategy);
             $hydrator->addStrategy('lb_dia', new ValueStrategy);
             $hydrator->addStrategy('qtde_dia', new ValueStrategy);
-            // $hydrator->addStrategy('nf_dia', new ValueStrategy);
-            // $hydrator->addStrategy('cc_dia', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
 
             $data = array();
             $cont = 0;
-
-
-
             foreach ($resultSet as $row) {
 
                 $elementos = $hydrator->extract($row);
 
-                
-                // $cont = $cont == 12 ? 11 : $cont;
-                while($categories[$cont] != $meses[(float)substr($elementos['data'], 3, 2)] && $cont<12){
-
-                    // var_dump($categories[$cont] );
-                    // var_dump($meses[(float)substr($elementos['data'], 3, 2)] );
-
-                    $cont++;
-
-                    // if($cont == 12){
-                    //     break;
-                    // }
-                }
-
-                // $cont = $cont == 12 ? 11 : $cont;
+                // while($categories[$cont] != $meses[(float)substr($elementos['data'], 3, 2)] && $cont<12){
+                //     $cont++;
+                // }
 
                 if($categories[$cont] == $meses[(float)substr($elementos['data'], 3, 2)]){
 
-                    // $arrayDesc[$cont]        = (float)$elementos['descontoUni'];
-                    // $arrayPreco[$cont]       = (float)$elementos['precoUni'];
-                    // $arrayImposto[$cont]     = (float)$elementos['impostoUni'];
-                    // $arrayRolUni[$cont]      = (float)$elementos['rolUni'];
-                    // $arrayCusto[$cont]       = (float)$elementos['custoUni'];
-                    // $arrayLucro[$cont]       = (float)$elementos['lucroUni'];
-                    // $arrayImpostoPc[$cont]   = (float)$elementos['impostoPerc'];
-                    // $arrayDescPc[$cont]      = (float)$elementos['descontoPerc'];
-                    // $arrayRob[$cont]         = (float)$elementos['rob'];
                     $arrayRol[$cont]         = (float)$elementos['rol'];
-                    // $arrayCmv[$cont]         = (float)$elementos['cmv'];
                     $arrayLb[$cont]          = (float)$elementos['lb'];
                     $arrayMb[$cont]          = (float)$elementos['mb'];
                     $arrayQtde[$cont]        = (float)$elementos['qtde'];
-                    // $arrayNf[$cont]          = (float)$elementos['nf'];
-                    // $arrayCc[$cont]          = (float)$elementos['cc'];
-                    // $arrayTkmcc[$cont]       = (float)$elementos['tkmCc'];
-                    // $arrayTkmnf[$cont]       = (float)$elementos['tkmNf'];
-                    // $arrayLbcc[$cont]        = (float)$elementos['lbCc'];
-                    // $arrayLbnf[$cont]        = (float)$elementos['lbNf'];
-                    // $arrayRobdia[$cont]      = (float)$elementos['robDia'];
                     $arrayRoldia[$cont]      = (float)$elementos['rolDia'];
-                    // $arrayCmvdia[$cont]      = (float)$elementos['cmvDia'];
                     $arrayLbdia[$cont]       = (float)$elementos['lbDia'];
                     $arrayQtdedia[$cont]     = (float)$elementos['qtdeDia'];
-                    // $arrayNfdia[$cont]       = (float)$elementos['nfDia'];
-                    // $arrayCcdia[$cont]       = (float)$elementos['ccDia'];
 
                 }
 
@@ -980,6 +957,34 @@ class AnalisegraficoController extends AbstractRestfulController
                                 'yAxis'=> 6,
                                 'color'=> $colors[14],
                                 'data' => $arrayQtdedia,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'ROL Fx 101-250',
+                                'yAxis'=> 7,
+                                'color'=> $colors[15],
+                                'data' => $FxCusto,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'ROL Fx 251-500',
+                                'yAxis'=> 8,
+                                'color'=> $colors[16],
+                                'data' => $FxCusto2,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
                                 'visible' => false,
