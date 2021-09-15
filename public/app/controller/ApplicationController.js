@@ -10,6 +10,7 @@ Ext.define('App.controller.ApplicationController', {
         'App.view.configmarcaempresa.ConfigmarcaempresaPanel',
         'App.view.grupodesconto.GrupodescontoPanel',
         'App.view.analisegrafica.AnalisegraficaPanel',
+        'App.view.analisemarca.AnalisemarcaPanel',
     ],
 
     control: {
@@ -23,7 +24,8 @@ Ext.define('App.controller.ApplicationController', {
         'estoque': { action: 'estoqueAction' },
         'configmarcaempresa': { action: 'configmarcaempresaAction' },
         'grupodesconto': { action: 'grupodescontoAction' },
-        'analisegrafica': { action: 'analisegraficaAction' }
+        'analisegrafica': { action: 'analisegraficaAction' },
+        'analisemarca': { action: 'analisemarcaAction' }
     },
 
     controllerEvent: function(){
@@ -88,6 +90,11 @@ Ext.define('App.controller.ApplicationController', {
     analisegraficaAction: function(){
         // this.goActionMasterTab('home', true)
         this.goActionMasterTab('analisegrafica', true)
+    },
+
+    analisemarcaAction: function(){
+        // this.goActionMasterTab('home', true)
+        this.goActionMasterTab('analisemarca', true)
     },
 
     configViewport: function(){

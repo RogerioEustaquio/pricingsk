@@ -54,6 +54,45 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
             }
         );
 
+        var elTagRegional = Ext.create('Ext.form.field.Tag',{
+            name: 'elRegional',
+            itemId: 'elRegional',
+            labelAlign: 'top',
+            multiSelect: true,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'id', type: 'string' },
+                    { name: 'regional', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisegrafico/listarregional',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            width: 230,
+            queryParam: 'regional',
+            queryMode: 'local',
+            displayField: 'regional',
+            valueField: 'id',
+            emptyText: 'Regional',
+            fieldLabel: 'Regional',
+            labelWidth: 60,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled:true
+        });
+        elTagRegional.store.load(
+            function(){
+                elTagRegional.setDisabled(false);
+            }
+        );
+
         var fielData = Ext.create('Ext.form.field.Date',{
             name: 'data',
             itemId: 'data',
@@ -217,6 +256,24 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                     hidden: false,
                     items:[
                         elTagEmpresa,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items:[
+                        elTagRegional,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',

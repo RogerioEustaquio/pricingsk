@@ -128,6 +128,7 @@ Ext.define('App.view.analisegrafica.Toolbar',{
         charts.setLoading({msg: 'Carregando...'});
 
         var idEmpresas  = me.up('container').down('#analisegraficafiltro').down('#elEmp').getValue();
+        var regional    = me.up('container').down('#analisegraficafiltro').down('#elRegional').getValue();
         var data  = me.up('container').down('#analisegraficafiltro').down('#data').getRawValue();
         var idproduto  = me.up('container').down('#analisegraficafiltro').down('#eltagidproduto').getValue();
         var produto  = me.up('container').down('#analisegraficafiltro').down('#elProduto').getValue();
@@ -135,6 +136,7 @@ Ext.define('App.view.analisegrafica.Toolbar',{
         
         var params = {
             idEmpresas: Ext.encode(idEmpresas),
+            regional: Ext.encode(regional),
             data: data,
             idProduto:  Ext.encode(idproduto),
             produto:  Ext.encode(produto),

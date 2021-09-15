@@ -68,24 +68,50 @@ class AnalisegraficoController extends AbstractRestfulController
         return $objReturn;
     }
 
-    // public function funcregionais($id){
-    //     // return array idEmpresas
+    public function funcregionais($id){
+        // return array idEmpresas
 
-    //     $regionais = array();
+        $regionais = array();
 
-    //     $regionais[] = ['id'=> 'R1','idEmpresas'=> [9,2,29,23,25,24,13,19]];
-    //     $regionais[] = ['id'=> 'R2','idEmpresas'=> [12,10,15,16,21,3,22,8]];
-    //     $regionais[] = ['id'=> 'R3','idEmpresas'=> [6,4,5,17,18,14,7]];
+        // $regionais[] = ['id'=> 'R1','idEmpresas'=> [9,2,29,23,25,24,13,19]];
+        // $regionais[] = ['id'=> 'R2','idEmpresas'=> [12,10,15,16,21,3,22,8]];
+        // $regionais[] = ['id'=> 'R3','idEmpresas'=> [6,4,5,17,18,14,7]];
 
-    //     foreach($regionais as $row){
+        $regionais[] = ['id'=> 'R1','idEmpresas'=> ['AR','BX','CG','JN','MA','NA','RE','SA']];
+        $regionais[] = ['id'=> 'R2','idEmpresas'=> ['FZ','IM','AP','MB','M1','SL','TE']];
+        $regionais[] = ['id'=> 'R3','idEmpresas'=> ['BH','CB','LE','GO','JF','RJ','SN','VC']];
 
-    //         if($row['id'] == $id){
-    //             return $row['idEmpresas'];
-    //         }
-    //     }
+        foreach($regionais as $row){
 
-    //     return null;
-    // }
+            if($row['id'] == $id){
+                return $row['idEmpresas'];
+            }
+        }
+
+        return null;
+    }
+
+    
+    public function listarregionalAction()
+    {
+        $data = array();
+        
+        try {
+
+            $pEmp    = $this->params()->fromQuery('emp',null);
+
+            $data[] = ['id'=> 'R1','regional'=> 'R1 '];
+            $data[] = ['id'=> 'R2','regional'=> 'R2 '];
+            $data[] = ['id'=> 'R3','regional'=> 'R3 '];
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
 
     public function listarprodutosAction()
     {
@@ -143,61 +169,6 @@ class AnalisegraficoController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    // public function listartabelaprecoAction()
-    // {
-    //     $data = array();
-        
-    //     try {
-
-    //         $pEmp    = $this->params()->fromQuery('emp',null);
-    //         $pCod    = $this->params()->fromQuery('codTabPreco',null);
-    //         $tipoSql = $this->params()->fromQuery('tipoSql',null);
-
-    //         if(!$pCod){
-    //             throw new \Exception('Parâmetros não informados.');
-    //         }
-
-    //         $em = $this->getEntityManager();
-
-    //         if(!$tipoSql){
-    //             $filtroProduto = "like upper('".$pCod."%')";
-    //         }else{
-    //             $produtos =  implode(",",json_decode($pCod));
-    //             $filtroProduto = "in ($produtos)";
-    //         }
-
-    //         $sql = "select distinct nvl(COD_TAB_PRECO,'') COD_TAB_PRECO, NOME_TAB_PRECO descricao
-    //         from SK_PRODUTO_TABELA_TMP
-    //         where 1 =1 
-    //         and COD_TAB_PRECO $filtroProduto";
-
-    //         $conn = $em->getConnection();
-    //         $stmt = $conn->prepare($sql);
-    //         // $stmt->bindValue(1, $pEmp);
-            
-    //         $stmt->execute();
-    //         $results = $stmt->fetchAll();
-
-    //         $hydrator = new ObjectProperty;
-    //         $hydrator->addStrategy('cod_tab_preco', new ValueStrategy);
-    //         $stdClass = new StdClass;
-    //         $resultSet = new HydratingResultSet($hydrator, $stdClass);
-    //         $resultSet->initialize($results);
-
-    //         $data = array();
-    //         foreach ($resultSet as $row) {
-    //             $data[] = $hydrator->extract($row);
-    //         }
-
-    //         $this->setCallbackData($data);
-            
-    //     } catch (\Exception $e) {
-    //         $this->setCallbackError($e->getMessage());
-    //     }
-        
-    //     return $this->getCallbackModel();
-    // }
-
     public function listaridprodutoAction()
     {
         $data = array();
@@ -253,55 +224,6 @@ class AnalisegraficoController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    // public function listargrupodescontosAction()
-    // {
-    //     $data = array();
-        
-    //     try {
-
-    //         // $idEmpresa      = $this->params()->fromQuery('idEmpresa',null);
-
-    //         $em = $this->getEntityManager();
-    //         $conn = $em->getConnection();
-
-    //         $sql = "select distinct nvl(grupo_desconto,'') cod_grupo_desconto,
-    //                     nvl(grupo_desconto,'') descricao
-    //             from SK_PRODUTO_TABELA_TMP
-    //         where grupo_desconto is not null
-    //         order by 1";
-            
-    //         // $sql = " select distinct nvl(cod_grupo,'') cod_grupo_desconto,
-    //         //             nvl(cod_grupo,'') descricao
-    //         //     from vw_skalcada_desconto
-    //         // where cod_grupo is not null
-    //         // order by 1 ";
-
-    //         $stmt = $conn->prepare($sql);
-    //         // $stmt->bindParam(':idEmpresa', $idEmpresa);
-    //         $stmt->execute();
-    //         $results = $stmt->fetchAll();
-
-    //         $hydrator = new ObjectProperty;
-    //         $hydrator->addStrategy('grupo_desconto', new ValueStrategy);
-    //         $stdClass = new StdClass;
-    //         $resultSet = new HydratingResultSet($hydrator, $stdClass);
-    //         $resultSet->initialize($results);
-
-    //         $data = array();
-    //         foreach ($resultSet as $row) {
-    //             $data[] = $hydrator->extract($row);
-    //         }
-
-    //         $this->setCallbackData($data);
-    //         $this->setMessage("Solicitação enviada com sucesso.");
-            
-    //     } catch (\Exception $e) {
-    //         $this->setCallbackError($e->getMessage());
-    //     }
-        
-    //     return $this->getCallbackModel();
-    // }
-
     public function listarmarcaAction()
     {
         $data = array();
@@ -343,149 +265,6 @@ class AnalisegraficoController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
-    
-    // public function listargrupodescontoAction()
-    // {
-    //     $data = array();
-        
-    //     try {
-
-    //         // $idEmpresa      = $this->params()->fromQuery('idEmpresa',null);
-
-    //         $em = $this->getEntityManager();
-    //         $conn = $em->getConnection();
-
-    //         $sql = "select distinct nvl(grupo_desconto,'') grupo_desconto
-    //             from SK_PRODUTO_TABELA_TMP";
-
-    //         $stmt = $conn->prepare($sql);
-    //         // $stmt->bindParam(':idEmpresa', $idEmpresa);
-    //         $stmt->execute();
-    //         $results = $stmt->fetchAll();
-
-    //         $hydrator = new ObjectProperty;
-    //         $hydrator->addStrategy('grupo_desconto', new ValueStrategy);
-    //         $stdClass = new StdClass;
-    //         $resultSet = new HydratingResultSet($hydrator, $stdClass);
-    //         $resultSet->initialize($results);
-
-    //         $data = array();
-    //         foreach ($resultSet as $row) {
-    //             $data[] = $hydrator->extract($row);
-    //         }
-
-    //         $this->setCallbackData($data);
-    //         $this->setMessage("Solicitação enviada com sucesso.");
-            
-    //     } catch (\Exception $e) {
-    //         $this->setCallbackError($e->getMessage());
-    //     }
-        
-    //     return $this->getCallbackModel();
-    // }
-
-
-    // public function gerarexcelAction()
-    // {
-    //     $data = array();
-        
-    //     try {
-
-    //         $session = $this->getSession();
-
-    //         if($session['exportestoque']){
-
-    //             ini_set('memory_limit', '5120M' );
-
-    //             $em = $this->getEntityManager();
-    //             $conn = $em->getConnection();
-
-    //             $sql = $session['exportestoque'] ;
-                
-    //             $conn = $em->getConnection();
-    //             $stmt = $conn->prepare($sql);
-                
-    //             $stmt->execute();
-    //             $results = $stmt->fetchAll();
-
-    //             $hydrator = new ObjectProperty;
-    //             // $hydrator->addStrategy('estoque', new ValueStrategy);
-    //             // $hydrator->addStrategy('custo_medio', new ValueStrategy);
-    //             // $hydrator->addStrategy('valor', new ValueStrategy);
-    //             // $hydrator->addStrategy('custo_operacao', new ValueStrategy);
-    //             // $hydrator->addStrategy('pis', new ValueStrategy);
-    //             // $hydrator->addStrategy('cofins', new ValueStrategy);
-    //             // $hydrator->addStrategy('icms', new ValueStrategy);
-    //             $stdClass = new StdClass;
-    //             $resultSet = new HydratingResultSet($hydrator, $stdClass);
-    //             $resultSet->initialize($results);
-
-    //             $data = array();
-                
-    //             $output = 'COD_EMPRESA;NOME_EMPRESA;COD_PRODUTO;DESCRICAO_PRODUTO;ESTOQUE;CUSTO_MEDIO;VALOR;CUSTO_OPERACAO;PIS;COFINS;ICMS;CURVA;CLIENTES'."\n";
-
-    //             $i=0;
-    //             foreach ($resultSet as $row) {
-    //                 $data[] = $hydrator->extract($row);
-
-    //                 $codEmpresa     = $data[$i]['codEmpresa'];
-    //                 $nomeEmpresa    = $data[$i]['nomeEmpresa'];
-
-    //                 $estoque        = $data[$i]['estoque'] >0 ? $data[$i]['estoque'] : null ;
-    //                 $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
-    //                 $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
-    //                 $custoOperacao  = $data[$i]['custoOperacao'] >0 ? $data[$i]['custoOperacao'] : null ;
-    //                 $pis            = $data[$i]['pis'] >0 ? $data[$i]['pis'] : null ;
-    //                 $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
-    //                 $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
-
-    //                 $output  .= $codEmpresa.';'.
-    //                             $nomeEmpresa.';'.
-    //                             $data[$i]['codProduto'].';'.
-    //                             $data[$i]['descricaoProduto'].';'.
-    //                             $estoque.';'.
-    //                             $custoMedio.';'.
-    //                             $valor.';'.
-    //                             $custoOperacao.';'.
-    //                             $pis.';'.
-    //                             $cofins.';'.
-    //                             $icms.';'.
-    //                             $data[$i]['curva'].';'.
-    //                             $data[$i]['clientes'].';'.
-    //                             "\n";
-    //                 $i++;
-    //             }
-
-    //             $response = new \Zend\Http\Response();
-    //             $response->setContent($output);
-    //             $response->setStatusCode(200);
-
-    //             $headers =[
-    //                     'Pragma' => 'public',
-    //                     'Cache-control' => 'must-revalidate, post-check=0, pre-check=0',
-    //                     'Cache-control' => 'private',
-    //                     'Expires' => '0000-00-00',
-    //                     'Content-Type' => 'application/CSV; charset=utf-8',
-    //                     'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Base Preço.csv',
-    //                 ];
-    //             $responseHeaders = new \Zend\Http\Headers();
-    //             $responseHeaders->addHeaders($headers);
-    //             $response->setHeaders($responseHeaders);
-
-    //             return $response;
-
-    //         }
-
-    //         $this->setCallbackData($data);
-
-    //         $objReturn = $this->getCallbackModel();
-            
-    //     } catch (\Exception $e) {
-    //         $objReturn = $this->setCallbackError($e->getMessage());
-    //     }
-        
-    //     return $objReturn;
-    // }
 
     public function faixacusto($idEmpresas,$data,$codNbs,$codProdutos,$idMarcas)
     {
@@ -595,7 +374,6 @@ class AnalisegraficoController extends AbstractRestfulController
                                 -- and descricao
                                 -- and cod_marca
                                 -- and marca
-                                
                             group by trunc(data, 'MM')) a,
                             VM_SKDIAS_UTEIS du
                     where a.data = du.data
@@ -649,7 +427,9 @@ class AnalisegraficoController extends AbstractRestfulController
         $data = array();
         
         try {
+            
             $emp     = $this->params()->fromPost('idEmpresas',null);
+            $regional       = $this->params()->fromPost('regional',null);
             $data           = $this->params()->fromPost('data',null);
             $codProdutos    = $this->params()->fromPost('idProduto',null);
             $produtos       = $this->params()->fromPost('produto',null);
@@ -660,6 +440,17 @@ class AnalisegraficoController extends AbstractRestfulController
             if($emp){
                 $emp =  implode("','",json_decode($emp));
             }
+            if($regional){
+
+                $arrayEmps = json_decode($regional);
+                $regional = '';
+                foreach($arrayEmps as $idRow){
+                    
+                    $arrayLinha = $this->funcregionais($idRow);
+                    $regional .= implode("','",$arrayLinha);
+                }
+            }
+
             if($idMarcas){
                 $idMarcas = implode(",",json_decode($idMarcas));
             }
@@ -673,6 +464,9 @@ class AnalisegraficoController extends AbstractRestfulController
             $andSql = '';
             if($emp){
                 $andSql = " and emp in ('$emp')";
+            }
+            if($regional){
+                $andSql = " and emp in ('$regional')";
             }
 
             if($idMarcas){

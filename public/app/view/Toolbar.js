@@ -62,6 +62,13 @@ Ext.define('App.view.Toolbar', {
                     handler: function(){
                         window.document.location= BASEURL +'/#analisegrafica';
                     }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Análise Marca',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#analisemarca';
+                    }
                 }
             ]
         });
