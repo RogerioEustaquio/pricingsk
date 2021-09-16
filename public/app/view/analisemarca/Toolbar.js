@@ -28,7 +28,6 @@ Ext.define('App.view.analisemarca.Toolbar',{
             handler: me.onBtnConsultar
         });
 
-        
         Ext.applyIf(me, {
 
             items : [
@@ -57,7 +56,6 @@ Ext.define('App.view.analisemarca.Toolbar',{
     onBtnConsultar: function(btn){
 
         var me = this.up('toolbar');
-
 
     }
 

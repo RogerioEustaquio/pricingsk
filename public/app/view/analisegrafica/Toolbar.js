@@ -130,9 +130,12 @@ Ext.define('App.view.analisegrafica.Toolbar',{
         var idEmpresas  = me.up('container').down('#analisegraficafiltro').down('#elEmp').getValue();
         var regional    = me.up('container').down('#analisegraficafiltro').down('#elRegional').getValue();
         var data  = me.up('container').down('#analisegraficafiltro').down('#data').getRawValue();
+        // var meses  = me.up('container').down('#analisegraficafiltro').down('radiofield[inputValue=24]');
         var idproduto  = me.up('container').down('#analisegraficafiltro').down('#eltagidproduto').getValue();
         var produto  = me.up('container').down('#analisegraficafiltro').down('#elProduto').getValue();
         var marca  = me.up('container').down('#analisegraficafiltro').down('#elMarca').getValue();
+
+        // console.log(meses);
         
         var params = {
             idEmpresas: Ext.encode(idEmpresas),

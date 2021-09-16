@@ -487,11 +487,12 @@ class AnalisegraficoController extends AbstractRestfulController
                 $sysdate = 'sysdate';
             }
 
+            $andSqlPeriodo = '';
             if($data){
-                $andSql .= " and trunc(data, 'MM') >= add_months(trunc($sysdate,'MM'),-11)";
-                $andSql .= " and trunc(data, 'MM') <= add_months(trunc($sysdate,'MM'),0)";
+                $andSqlPeriodo .= " and du.data >= add_months(trunc($sysdate,'MM'),-11)";
+                $andSqlPeriodo .= " and du.data <= add_months(trunc($sysdate,'MM'),0)";
             }else{
-                $andSql .= " and trunc(data, 'MM') >= add_months(trunc(sysdate,'MM'),-11)";
+                $andSqlPeriodo .= " and du.data >= add_months(trunc(sysdate,'MM'),-11)";
             }
 
             $em = $this->getEntityManager();
@@ -581,34 +582,30 @@ class AnalisegraficoController extends AbstractRestfulController
                 $FxCusto2  = $FaixaCusto[1];
             }
 
-            $sql = "select a.data,
-                           a.rol,
-                           a.lb,
-                           a.qtde,
-                           a.mb,
-                           du.dias,
-                           round(a.rol/du.dias,2) as rol_dia,
-                           round(a.lb/du.dias,2) as lb_dia,
-                           round(a.qtde/du.dias,0) as qtde_dia
-                    from (select trunc(data, 'MM') as data,
-                                    sum(rol) as rol,
-                                    sum(lb) as lb,
-                                    sum(qtde) as qtde,
-                                    round((sum(lb)/sum(rol))*100,2) as mb
-                            from vm_skvendaitem_master
-                          where 1=1
-                          $andSql
-                          --and data >= add_months(trunc(to_date('24/08/2021'),'MM'),-11)
-                          and data <  trunc(sysdate)
-                          -- and emp
-                          -- and cod_produto
-                          -- and descricao
-                          -- and cod_marca
-                          -- and marca
-                         group by trunc(data, 'MM')) a,
-                         VM_SKDIAS_UTEIS du
-                    where a.data = du.data
+            $sql = "select du.data,
+                        a.rol,
+                        a.lb,
+                        a.qtde,
+                        a.mb,
+                        du.dias,
+                        round(a.rol / du.dias, 2) as rol_dia,
+                        round(a.lb / du.dias, 2) as lb_dia,
+                        round(a.qtde / du.dias, 0) as qtde_dia
+                    from VM_SKDIAS_UTEIS du,
+                        (select trunc(data, 'MM') as data,
+                        sum(rol) as rol,
+                        sum(lb) as lb,
+                        sum(qtde) as qtde,
+                        round((sum(lb) / sum(rol)) * 100, 2) as mb
+                        from vm_skvendaitem_master
+                        where 1 = 1
+                        $andSql
+                        group by trunc(data, 'MM')) a
+                    where du.data = a.data(+)
+                    $andSqlPeriodo
                     order by data";
+            // print "$sql";
+            // exit;
         
             $stmt = $conn->prepare($sql);
             $stmt->execute();

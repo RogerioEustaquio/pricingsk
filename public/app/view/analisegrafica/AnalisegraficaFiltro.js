@@ -108,6 +108,46 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
             // value: sysdate
         });
 
+        var fielmeses = Ext.create('Ext.form.Panel',{
+
+                    layout: 'hbox',
+                    border: false,
+                    hidden: true,
+                    items:[
+                        {
+                            xtype: 'radiofield',
+                            checked: true,
+                            name : 'meses',
+                            inputValue: 12,
+                            boxLabel: '12 meses',
+                            labelTextAlign: 'right',
+                            labelWidth: 24,
+                            width: 80,
+                            margin: '1 1 1 8'
+                        },
+                        {
+                            xtype: 'radiofield',
+                            name : 'meses',
+                            inputValue: 24,
+                            boxLabel: '24 meses',
+                            labelTextAlign: 'right',
+                            labelWidth: 24,
+                            width: 80,
+                            // margin: '1 1 1 8',
+                        },
+                        {
+                            xtype: 'radiofield',
+                            name : 'meses',
+                            inputValue: 36,
+                            boxLabel: '36 meses',
+                            labelTextAlign: 'right',
+                            labelWidth: 24,
+                            width: 80,
+                            // margin: '1 1 1 8',
+                        }
+                    ]
+                });
+
         var elTagIdProduto = Ext.create('Ext.form.field.Tag',{
             name: 'eltagidproduto',
             itemId: 'eltagidproduto',
@@ -302,6 +342,7 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                         }
                     ]
                 },
+                fielmeses,
                 {
                     xtype: 'panel',
                     layout: 'hbox',
