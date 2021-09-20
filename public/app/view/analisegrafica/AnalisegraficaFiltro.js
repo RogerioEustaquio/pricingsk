@@ -112,12 +112,12 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
 
                     layout: 'hbox',
                     border: false,
-                    hidden: true,
+                    hidden: false,
                     items:[
                         {
                             xtype: 'radiofield',
                             checked: true,
-                            name : 'meses',
+                            name : 'qtdemeses',
                             inputValue: 12,
                             boxLabel: '12 meses',
                             labelTextAlign: 'right',
@@ -127,7 +127,7 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                         },
                         {
                             xtype: 'radiofield',
-                            name : 'meses',
+                            name : 'qtdemeses',
                             inputValue: 24,
                             boxLabel: '24 meses',
                             labelTextAlign: 'right',
@@ -137,7 +137,7 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                         },
                         {
                             xtype: 'radiofield',
-                            name : 'meses',
+                            name : 'qtdemeses',
                             inputValue: 36,
                             boxLabel: '36 meses',
                             labelTextAlign: 'right',

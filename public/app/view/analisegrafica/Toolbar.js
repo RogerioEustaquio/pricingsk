@@ -87,17 +87,17 @@ Ext.define('App.view.analisegrafica.Toolbar',{
             items : [
                 btnFiltro,
                 btnConsultar,
-                '->',
-                {
-                    xtype: 'button',
-                    text: 'Indicadores Adicionais',
-                    tooltip: 'Indicadores Adicionais',
-                    margin: '1 1 1 4',
-                    hidden: false,
-                    handler: function(){
-                        Ext.create('Ext.window.Window',optionWindow).show();
-                    }
-                }
+                // '->',
+                // {
+                //     xtype: 'button',
+                //     text: 'Indicadores Adicionais',
+                //     tooltip: 'Indicadores Adicionais',
+                //     margin: '1 1 1 4',
+                //     hidden: false,
+                //     handler: function(){
+                //         Ext.create('Ext.window.Window',optionWindow).show();
+                //     }
+                // }
 
             ]
         });
@@ -129,18 +129,27 @@ Ext.define('App.view.analisegrafica.Toolbar',{
 
         var idEmpresas  = me.up('container').down('#analisegraficafiltro').down('#elEmp').getValue();
         var regional    = me.up('container').down('#analisegraficafiltro').down('#elRegional').getValue();
-        var data  = me.up('container').down('#analisegraficafiltro').down('#data').getRawValue();
-        // var meses  = me.up('container').down('#analisegraficafiltro').down('radiofield[inputValue=24]');
-        var idproduto  = me.up('container').down('#analisegraficafiltro').down('#eltagidproduto').getValue();
-        var produto  = me.up('container').down('#analisegraficafiltro').down('#elProduto').getValue();
-        var marca  = me.up('container').down('#analisegraficafiltro').down('#elMarca').getValue();
+        var data        = me.up('container').down('#analisegraficafiltro').down('#data').getRawValue();
+        var meses24     = me.up('container').down('#analisegraficafiltro').down('radiofield[inputValue=24]');
+        var meses36     = me.up('container').down('#analisegraficafiltro').down('radiofield[inputValue=36]');
+        var idproduto   = me.up('container').down('#analisegraficafiltro').down('#eltagidproduto').getValue();
+        var produto     = me.up('container').down('#analisegraficafiltro').down('#elProduto').getValue();
+        var marca       = me.up('container').down('#analisegraficafiltro').down('#elMarca').getValue();
 
-        // console.log(meses);
+        var qtdemeses = 12;
+
+        if(meses24.checked){
+            qtdemeses = 24;
+        }
+        if(meses36.checked){
+            qtdemeses = 36;
+        }
         
         var params = {
             idEmpresas: Ext.encode(idEmpresas),
             regional: Ext.encode(regional),
             data: data,
+            qtdemeses : qtdemeses,
             idProduto:  Ext.encode(idproduto),
             produto:  Ext.encode(produto),
             marca: Ext.encode(marca),

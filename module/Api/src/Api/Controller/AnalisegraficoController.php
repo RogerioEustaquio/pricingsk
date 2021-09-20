@@ -266,14 +266,14 @@ class AnalisegraficoController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function faixacusto($idEmpresas,$data,$codNbs,$codProdutos,$idMarcas)
+    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas)
     {
         $data1 = array();
 
         $andSql = '';
         // $andSql2 = '';
         if($idEmpresas){
-            $andSql  = " and emp in ($idEmpresas)";
+            $andSql  = " and emp in ('$idEmpresas')";
         }
 
         if($idMarcas){
@@ -284,12 +284,9 @@ class AnalisegraficoController extends AbstractRestfulController
             $andSql .= " and cod_produto in ('$codProdutos')";
         }
 
-        if($data){
-            $andSql .= " and trunc(data, 'MM') >= add_months(trunc(to_date('01/".$data."'),'MM'),-11)";
-            $andSql .= " and trunc(data, 'MM') <= add_months(trunc(to_date('01/".$data."'),'MM'),0)";
-        }else{
-            $andSql .= " and trunc(data, 'MM') >= add_months(trunc(sysdate,'MM'),-11)";
-        }
+        $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
+        $andSqlPeriodo = '';
+        $sqlMeses = "";
 
         if($data){
             $sysdate = "to_date('01/".$data."')";
@@ -297,26 +294,43 @@ class AnalisegraficoController extends AbstractRestfulController
             $sysdate = 'sysdate';
         }
 
+        if($data){
+            $andSqlPeriodo .= " and du.data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlPeriodo .= " and du.data <= add_months(trunc($sysdate,'MM'),0)";
+        }else{
+            $andSqlPeriodo .= " and du.data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+        }
+
+        if($qtdemeses>12){
+
+            for($int = $qtdemeses; $int > 12; $int--){
+
+                $sqlMeses .= "select add_months(trunc($sysdate,'MM'),-".($int-1).") as id from dual union all \n";
+                
+            }
+        }
+
         try {
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
 
-            $mesesFaixa = ['null',
-                            'Janeiro',
-                            'Fevereiro',
-                            'Março',
-                            'Abril',
-                            'Maio',
-                            'Junho',
-                            'Julho',
-                            'Agosto',
-                            'Setembro',
-                            'Outubro',
-                            'Novembro',
-                            'Dezembro'];
+            $mesesFaixa = [null,
+                          'Jan',
+                          'Fev',
+                          'Mar',
+                          'Abr',
+                          'Mai',
+                          'Jun',
+                          'Jul',
+                          'Ago',
+                          'Set',
+                          'Out',
+                          'Nov',
+                          'Dez'];
 
-            $sql = "select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
+            $sql = "$sqlMeses
+                    select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-10) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-9) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-8) as id from dual union all
@@ -348,7 +362,7 @@ class AnalisegraficoController extends AbstractRestfulController
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
                 
-                $mesSelecao[] = $mesesFaixa[(float) substr($data1['id'], 3, 2)];
+                $mesSelecao[] = $mesesFaixa[(float) substr($data1['id'], 3, 2)] .'/'. substr($data1['id'], 6, 2);
 
                 $FaixaCusto[]    = 0;
                 $FaixaCusto2[]   = 0;
@@ -365,19 +379,13 @@ class AnalisegraficoController extends AbstractRestfulController
                                     round((sum(lb)/sum(rol))*100,2) as mb
                             from vm_skvendaitem_master
                             where 1=1
-                               -- and data >= add_months(trunc(to_date('24/08/2021'),'MM'),-11) 
-                               $andSql
-                                and data <  trunc(sysdate)
-                                --and cod_produto = 397
-                                -- and emp
-                                -- and cod_produto
-                                -- and descricao
-                                -- and cod_marca
-                                -- and marca
+                            $andSql
+                            and data <  trunc(sysdate)
                             group by trunc(data, 'MM')) a,
                             VM_SKDIAS_UTEIS du
-                    where a.data = du.data
+                    where du.data = a.data(+)
                     and fx_custo in ('101-250','251-500')
+                    $andSqlPeriodo
                     order by data
                     ";
 
@@ -399,7 +407,13 @@ class AnalisegraficoController extends AbstractRestfulController
 
                 $elementos = $hydrator->extract($row);
 
-                if($mesSelecao[$contMes] == $mesesFaixa[(float)substr($elementos['data'], 3, 2)] && $contMes<12){
+                $elementos['data'] = $mesesFaixa[(float) substr($elementos['data'], 3, 2)] .'/'. substr($elementos['data'], 6, 2);
+
+                while($mesSelecao[$contMes] != $elementos['data'] && $contMes< $qtdemeses){
+                    $contMes++;
+                }
+
+                if($mesSelecao[$contMes] == $elementos['data']){
 
                     $FaixaCusto[$contMes] = (float) $elementos['rol'];
 
@@ -431,10 +445,25 @@ class AnalisegraficoController extends AbstractRestfulController
             $emp     = $this->params()->fromPost('idEmpresas',null);
             $regional       = $this->params()->fromPost('regional',null);
             $data           = $this->params()->fromPost('data',null);
+            $qtdemeses      = $this->params()->fromPost('qtdemeses',null);
             $codProdutos    = $this->params()->fromPost('idProduto',null);
             $produtos       = $this->params()->fromPost('produto',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
+                                    
+            $meses = [null,
+                     'Jan',
+                     'Fev',
+                     'Mar',
+                     'Abr',
+                     'Mai',
+                     'Jun',
+                     'Jul',
+                     'Ago',
+                     'Set',
+                     'Out',
+                     'Nov',
+                     'Dez'];
 
             $indicadoresAdd = json_decode($indicadoresAdd);
             if($emp){
@@ -487,33 +516,33 @@ class AnalisegraficoController extends AbstractRestfulController
                 $sysdate = 'sysdate';
             }
 
+            $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
+
             $andSqlPeriodo = '';
+            $sqlMeses = "";
+
             if($data){
-                $andSqlPeriodo .= " and du.data >= add_months(trunc($sysdate,'MM'),-11)";
+                $andSqlPeriodo .= " and du.data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
                 $andSqlPeriodo .= " and du.data <= add_months(trunc($sysdate,'MM'),0)";
+
             }else{
-                $andSqlPeriodo .= " and du.data >= add_months(trunc(sysdate,'MM'),-11)";
+                $andSqlPeriodo .= " and du.data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+            }
+            
+            if($qtdemeses>12){
+
+                for($int = $qtdemeses; $int > 12; $int--){
+
+                    $sqlMeses .= "select add_months(trunc($sysdate,'MM'),-".($int-1).") as id from dual union all \n";
+                    
+                }
             }
 
             $em = $this->getEntityManager();
-            
-            $meses = [null,
-                     'Janeiro',
-                     'Fevereiro',
-                     'Março',
-                     'Abril',
-                     'Maio',
-                     'Junho',
-                     'Julho',
-                     'Agosto',
-                     'Setembro',
-                     'Outubro',
-                     'Novembro',
-                     'Dezembro'];
-
             $conn = $em->getConnection();
 
-            $sql = "select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
+            $sql = "$sqlMeses
+                    select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-10) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-9) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-8) as id from dual union all
@@ -527,6 +556,7 @@ class AnalisegraficoController extends AbstractRestfulController
                     select add_months(trunc($sysdate,'MM'),-0) as id from dual
             ";
 
+
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -538,6 +568,7 @@ class AnalisegraficoController extends AbstractRestfulController
 
             $data1 = array();
             $categories = array();
+            $categoriesView = array();
 
             $arrayRol       = array();
             $arrayLb        = array();
@@ -549,7 +580,15 @@ class AnalisegraficoController extends AbstractRestfulController
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
-                $categories[] = $meses[(float) substr($data1['id'], 3, 2)];
+                $categories[] = $meses[(float) substr($data1['id'], 3, 2)] .'/'. substr($data1['id'], 6, 2);
+
+                if((float) substr($data1['id'], 3, 2) == 1){ # 1 = mes de janeiro
+
+                    $categoriesView[] = $meses[(float) substr($data1['id'], 3, 2)] .'/'. substr($data1['id'], 6, 2);
+                }else{
+
+                    $categoriesView[] = $meses[(float) substr($data1['id'], 3, 2)];
+                }
 
                 $arrayRol[]         = 0;
                 $arrayLb[]          = 0;
@@ -577,7 +616,7 @@ class AnalisegraficoController extends AbstractRestfulController
 
             if($consultaFaixaCusto){
 
-                $FaixaCusto = $this->faixacusto($emp,$data,$produtos,$codProdutos,$idMarcas);
+                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas);
                 $FxCusto  = $FaixaCusto[0];
                 $FxCusto2  = $FaixaCusto[1];
             }
@@ -604,9 +643,7 @@ class AnalisegraficoController extends AbstractRestfulController
                     where du.data = a.data(+)
                     $andSqlPeriodo
                     order by data";
-            // print "$sql";
-            // exit;
-        
+
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -629,11 +666,13 @@ class AnalisegraficoController extends AbstractRestfulController
 
                 $elementos = $hydrator->extract($row);
 
-                // while($categories[$cont] != $meses[(float)substr($elementos['data'], 3, 2)] && $cont<12){
-                //     $cont++;
-                // }
+                $elementos['data'] = $meses[(float) substr($elementos['data'], 3, 2)] .'/'. substr($elementos['data'], 6, 2);
 
-                if($categories[$cont] == $meses[(float)substr($elementos['data'], 3, 2)]){
+                while($categories[$cont] != $elementos['data'] && $cont< $qtdemeses){
+                    $cont++;
+                }
+
+                if($categories[$cont] == $elementos['data']){
 
                     $arrayRol[$cont]         = (float)$elementos['rol'];
                     $arrayLb[$cont]          = (float)$elementos['lb'];
@@ -657,7 +696,7 @@ class AnalisegraficoController extends AbstractRestfulController
                 array(
                     'success' => true,
                     'data' => array(
-                        'categories' => $categories,
+                        'categories' => $categoriesView,
                         'series' => array(                            
                             array(
                                 'name' => 'ROL',
@@ -757,34 +796,34 @@ class AnalisegraficoController extends AbstractRestfulController
                                      'style' => array( 'fontSize' => '10')
                                     )
                             ),
-                            array(
-                                'name' => 'ROL Fx 101-250',
-                                'yAxis'=> 7,
-                                'color'=> $colors[15],
-                                'data' => $FxCusto,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'ROL Fx 251-500',
-                                'yAxis'=> 8,
-                                'color'=> $colors[16],
-                                'data' => $FxCusto2,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            )
+                            // array(
+                            //     'name' => 'ROL Fx 101-250',
+                            //     'yAxis'=> 7,
+                            //     'color'=> $colors[15],
+                            //     'data' => $FxCusto,
+                            //     'vFormat' => '',
+                            //     'vDecimos' => '0',
+                            //     'visible' => false,
+                            //     'showInLegend' => false,
+                            //     'dataLabels' => array(
+                            //          'enabled' => true,
+                            //          'style' => array( 'fontSize' => '10')
+                            //         )
+                            // ),
+                            // array(
+                            //     'name' => 'ROL Fx 251-500',
+                            //     'yAxis'=> 8,
+                            //     'color'=> $colors[16],
+                            //     'data' => $FxCusto2,
+                            //     'vFormat' => '',
+                            //     'vDecimos' => '0',
+                            //     'visible' => false,
+                            //     'showInLegend' => false,
+                            //     'dataLabels' => array(
+                            //          'enabled' => true,
+                            //          'style' => array( 'fontSize' => '10')
+                            //         )
+                            // )
                         )
                     )
                 )
