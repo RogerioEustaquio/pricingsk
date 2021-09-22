@@ -286,6 +286,48 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
             }
         );
 
+        var elTagMontadora = Ext.create('Ext.form.field.Tag',{
+            name: 'elMontadora',
+            itemId: 'elMontadora',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            store: Ext.data.Store({
+                fields: [
+                    // { name: 'marca', type: 'string' },
+                    { name: 'montadora', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisegrafico/listarmontadora',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'montadora',
+            queryMode: 'local',
+            displayField: 'montadora',
+            valueField: 'montadora',
+            emptyText: 'Montadora',
+            fieldLabel: 'Montadoras',
+            // labelWidth: 60,
+            margin: '1 1 1 8',
+            // padding: 1,
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTagMontadora.store.load(
+            function(){
+                elTagMontadora.setDisabled(false);
+            }
+        );
+
+
         Ext.applyIf(me, {
 
             items : [
@@ -396,6 +438,23 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                     ]
                 },
                 {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagMontadora,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
                     xtype: 'toolbar',
                     width: '100%',
                     border: false,
@@ -426,8 +485,6 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
 
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
-
-        console.log(me.up('container').down('#analisegraficafiltro'));
 
         if(me.up('container').down('#analisegraficafiltro').hidden){
             me.up('container').down('#analisegraficafiltro').setHidden(false);

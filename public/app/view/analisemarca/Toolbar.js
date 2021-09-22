@@ -28,11 +28,22 @@ Ext.define('App.view.analisemarca.Toolbar',{
             handler: me.onBtnConsultar
         });
 
+        var btnchart = Ext.create('Ext.button.Button',{
+
+            iconCls: 'fa fa-chart-bar',
+            tooltip: 'Consultar',
+            margin: '1 1 1 4',
+            enableToggle: true,
+            pressed: true,
+            toggleHandler: me.onBtnChart
+        });
+
         Ext.applyIf(me, {
 
             items : [
                 btnFiltro,
-                btnConsultar
+                btnConsultar,
+                btnchart
             ]
         });
 
@@ -42,8 +53,6 @@ Ext.define('App.view.analisemarca.Toolbar',{
 
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
-
-        console.log(me.up('container').down('#analisemarcafiltro'));
 
         if(me.up('container').down('#analisemarcafiltro').hidden){
             me.up('container').down('#analisemarcafiltro').setHidden(false);
@@ -57,6 +66,27 @@ Ext.define('App.view.analisemarca.Toolbar',{
 
         var me = this.up('toolbar');
 
+    },
+
+    onBtnChart: function(btn, pressed){
+
+        var me = this.up('toolbar');
+
+        var panelChart = me.up('container').down('#analisemarcachart');
+
+        if(pressed){
+
+            panelChart.setHidden(false);
+            // this.btnIconEl.addCls('red-text');
+            btn.setStyle('background-color: #ff0000 !important');
+            
+        }else{
+            
+            panelChart.setHidden(true);
+            // this.btnIconEl.addCls('black-text');
+            btn.setStyle('background-color: #00ff00 !important');
+            
+        }
     }
 
 });

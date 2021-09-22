@@ -135,6 +135,7 @@ Ext.define('App.view.analisegrafica.Toolbar',{
         var idproduto   = me.up('container').down('#analisegraficafiltro').down('#eltagidproduto').getValue();
         var produto     = me.up('container').down('#analisegraficafiltro').down('#elProduto').getValue();
         var marca       = me.up('container').down('#analisegraficafiltro').down('#elMarca').getValue();
+        var montadora   = me.up('container').down('#analisegraficafiltro').down('#elMontadora').getValue();
 
         var qtdemeses = 12;
 
@@ -153,7 +154,8 @@ Ext.define('App.view.analisegrafica.Toolbar',{
             idProduto:  Ext.encode(idproduto),
             produto:  Ext.encode(produto),
             marca: Ext.encode(marca),
-            indicadoresAdd: Ext.encode(me.indicadoresAdd)
+            indicadoresAdd: Ext.encode(me.indicadoresAdd),
+            montadora : Ext.encode(montadora)
         };
 
         var seriesOrig = Array();

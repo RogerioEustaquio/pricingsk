@@ -266,7 +266,49 @@ class AnalisegraficoController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas)
+    public function listarmontadoraAction()
+    {
+        $data = array();
+
+        $emp = $this->params()->fromQuery('emp',null);
+
+        try {
+
+            $session = $this->getSession();
+            $usuario = $session['info'];
+
+            $em = $this->getEntityManager();
+            
+            $sql = 'select distinct montadora
+             from tb_sk_produto_montadora
+            order by montadora';
+            
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora)
     {
         $data1 = array();
 
@@ -280,8 +322,13 @@ class AnalisegraficoController extends AbstractRestfulController
             $andSql .= " and cod_marca in ($idMarcas)";
         }
 
+
+        if($montadora){
+            $andSql .= " and m.montadora in ('$montadora')";
+        }
+
         if($codProdutos){
-            $andSql .= " and cod_produto in ('$codProdutos')";
+            $andSql .= " and i.cod_produto in ('$codProdutos')";
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -377,10 +424,12 @@ class AnalisegraficoController extends AbstractRestfulController
                                     sum(lb) as lb,
                                     sum(qtde) as qtde,
                                     round((sum(lb)/sum(rol))*100,2) as mb
-                            from vm_skvendaitem_master
+                            from vm_skvendaitem_master i,
+                                 tb_sk_produto_montadora m
                             where 1=1
                             $andSql
                             and data <  trunc(sysdate)
+                            and i.cod_produto = m.cod_produto(+)
                             group by trunc(data, 'MM')) a,
                             VM_SKDIAS_UTEIS du
                     where du.data = a.data(+)
@@ -449,6 +498,7 @@ class AnalisegraficoController extends AbstractRestfulController
             $codProdutos    = $this->params()->fromPost('idProduto',null);
             $produtos       = $this->params()->fromPost('produto',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
+            $montadora       = $this->params()->fromPost('montadora',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
                                     
             $meses = [null,
@@ -479,9 +529,12 @@ class AnalisegraficoController extends AbstractRestfulController
                     $regional .= implode("','",$arrayLinha);
                 }
             }
-
+            
             if($idMarcas){
                 $idMarcas = implode(",",json_decode($idMarcas));
+            }
+            if($montadora){
+                $montadora = implode("','",json_decode($montadora));
             }
             if($produtos){
                 $produtos =  implode("','",json_decode($produtos));
@@ -501,13 +554,17 @@ class AnalisegraficoController extends AbstractRestfulController
             if($idMarcas){
                 $andSql .= " and cod_marca in ($idMarcas)";
             }
+
+            if($montadora){
+                $andSql .= " and m.montadora in ('$montadora')";
+            }
             
             if($produtos){
                 $andSql .= " and cod_nbs in ('$produtos')";
             }
 
             if($codProdutos){
-                $andSql .= " and cod_produto in ($codProdutos)";
+                $andSql .= " and i.cod_produto in ($codProdutos)";
             }
             
             if($data){
@@ -616,7 +673,7 @@ class AnalisegraficoController extends AbstractRestfulController
 
             if($consultaFaixaCusto){
 
-                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas);
+                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora);
                 $FxCusto  = $FaixaCusto[0];
                 $FxCusto2  = $FaixaCusto[1];
             }
@@ -636,9 +693,11 @@ class AnalisegraficoController extends AbstractRestfulController
                         sum(lb) as lb,
                         sum(qtde) as qtde,
                         round((sum(lb) / sum(rol)) * 100, 2) as mb
-                        from vm_skvendaitem_master
+                        from vm_skvendaitem_master i,
+                             tb_sk_produto_montadora m
                         where 1 = 1
                         $andSql
+                        and i.cod_produto = m.cod_produto(+)
                         group by trunc(data, 'MM')) a
                     where du.data = a.data(+)
                     $andSqlPeriodo
