@@ -11,7 +11,7 @@ use Core\Hydrator\ObjectProperty;
 use Core\Hydrator\Strategy\ValueStrategy;
 use Core\Mvc\Controller\AbstractRestfulController;
 
-class AnalisegraficoController extends AbstractRestfulController
+class AnalisemarcaController extends AbstractRestfulController
 {
     
     /**
@@ -857,7 +857,7 @@ class AnalisegraficoController extends AbstractRestfulController
                             // array(
                             //     'name' => 'ROL Fx 101-250',
                             //     'yAxis'=> 7,
-                            //     'color'=> $colors[7],
+                            //     'color'=> $colors[175],
                             //     'data' => $FxCusto,
                             //     'vFormat' => '',
                             //     'vDecimos' => '0',

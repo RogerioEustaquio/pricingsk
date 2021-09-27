@@ -41,7 +41,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             me.setLoading({msg: 'Carregando...'});
                             
                             Ext.Ajax.request({
-                                url: BASEURL +'/api/analisegrafico/listarfichaitemgrafico',
+                                url: BASEURL +'/api/analisemarca/listarfichaitemgrafico',
                                 method: 'POST',
                                 params: me.params,
                                 async: true,
@@ -141,7 +141,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                 var recordSeries = record;
 
-                                var indicadoresAdd = me.up('panel').up('container').down('#analisegraficatoolbar').indicadoresAdd;
+                                var indicadoresAdd = me.up('panel').up('container').down('#analisemarcatoolbar').indicadoresAdd;
                                 
                                 element = {
                                     xtype: 'checkboxfield',
