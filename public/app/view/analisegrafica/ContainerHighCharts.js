@@ -445,7 +445,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Quantidade',
+                            text: 'QTDE',
                             style: {
                                 color: colors[3],
                                 fontSize: '10px'
@@ -470,7 +470,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         title: {
                             text: 'ROL Dia',
                             style: {
-                                color: colors[4],
+                                color: colors[5],
                                 fontSize: '10px'
                             }
                         },
@@ -482,7 +482,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[4],
+                                color: colors[5],
                                 fontSize: '10px'
                             }
                         },
@@ -493,7 +493,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         title: {
                             text: 'LB Dia',
                             style: {
-                                color: colors[5],
+                                color: colors[6],
                                 fontSize: '10px'
                             }
                         },
@@ -505,7 +505,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[5],
+                                color: colors[6],
                                 fontSize: '10px'
                             }
                         },
@@ -514,9 +514,9 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Qtde Dia',
+                            text: 'QTDE Dia',
                             style: {
-                                color: colors[6],
+                                color: colors[7],
                                 fontSize: '10px'
                             }
                         },
@@ -528,7 +528,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[6],
+                                color: colors[7],
                                 fontSize: '10px'
                             }
                         },
@@ -539,7 +539,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                     //     title: {
                     //         text: 'ROL Fx 101-250',
                     //         style: {
-                    //             color: colors[7],
+                    //             color: colors[8],
                     //             fontSize: '10px'
                     //         }
                     //     },
@@ -551,7 +551,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                     //         y: 0,
                     //         padding: 0,
                     //         style: {
-                    //             color: colors[7],
+                    //             color: colors[8],
                     //             fontSize: '10px'
                     //         }
                     //     },
@@ -562,7 +562,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                     //     title: {
                     //         text: 'ROL Fx 251-500',
                     //         style: {
-                    //             color: colors[7],
+                    //             color: colors[9],
                     //             fontSize: '10px'
                     //         }
                     //     },
@@ -574,7 +574,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                     //         y: 0,
                     //         padding: 0,
                     //         style: {
-                    //             color: colors[7],
+                    //             color: colors[9],
                     //             fontSize: '10px'
                     //         }
                     //     },

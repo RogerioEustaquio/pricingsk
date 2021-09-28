@@ -799,7 +799,7 @@ class AnalisegraficoController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Quantidade',
+                                'name' => 'QTDE',
                                 'yAxis'=> 3,
                                 'color' => $colors[3],
                                 'data' => $arrayQtde,
@@ -841,7 +841,7 @@ class AnalisegraficoController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Qtde Dia',
+                                'name' => 'QTDE Dia',
                                 'yAxis'=> 6,
                                 'color'=> $colors[6],
                                 'data' => $arrayQtdedia,

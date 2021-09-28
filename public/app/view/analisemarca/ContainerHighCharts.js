@@ -445,7 +445,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Quantidade',
+                            text: 'QTDE',
                             style: {
                                 color: colors[3],
                                 fontSize: '10px'
@@ -460,6 +460,29 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             padding: 0,
                             style: {
                                 color: colors[3],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'CMV',
+                            style: {
+                                color: colors[4],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[4],
                                 fontSize: '10px'
                             }
                         },
@@ -514,7 +537,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Qtde Dia',
+                            text: 'QTDE Dia',
                             style: {
                                 color: colors[6],
                                 fontSize: '10px'
@@ -537,7 +560,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'ROL Fx 101-250',
+                            text: 'CMV Dia',
                             style: {
                                 color: colors[7],
                                 fontSize: '10px'
@@ -545,7 +568,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         },
                         labels: {
                             formatter: function () {
-                                return utilFormat.ValueZero(this.value);
+                                return utilFormat.Value2(this.value,2);
                             },
                             x: 0,
                             y: 0,
@@ -558,29 +581,52 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         opposite: true,
                         visible: false
                     },
-                    {
-                        title: {
-                            text: 'ROL Fx 251-500',
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    }
+                    // {
+                    //     title: {
+                    //         text: 'ROL Fx 101-250',
+                    //         style: {
+                    //             color: colors[8],
+                    //             fontSize: '10px'
+                    //         }
+                    //     },
+                    //     labels: {
+                    //         formatter: function () {
+                    //             return utilFormat.ValueZero(this.value);
+                    //         },
+                    //         x: 0,
+                    //         y: 0,
+                    //         padding: 0,
+                    //         style: {
+                    //             color: colors[8],
+                    //             fontSize: '10px'
+                    //         }
+                    //     },
+                    //     opposite: true,
+                    //     visible: false
+                    // },
+                    // {
+                    //     title: {
+                    //         text: 'ROL Fx 251-500',
+                    //         style: {
+                    //             color: colors[9],
+                    //             fontSize: '10px'
+                    //         }
+                    //     },
+                    //     labels: {
+                    //         formatter: function () {
+                    //             return utilFormat.ValueZero(this.value);
+                    //         },
+                    //         x: 0,
+                    //         y: 0,
+                    //         padding: 0,
+                    //         style: {
+                    //             color: colors[9],
+                    //             fontSize: '10px'
+                    //         }
+                    //     },
+                    //     opposite: true,
+                    //     visible: false
+                    // }
                 ],
                 tooltip: {
                     // shared: true,
