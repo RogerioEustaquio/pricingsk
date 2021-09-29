@@ -826,11 +826,11 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CMV',
-                                'yAxis'=> 4,
+                                'yAxis'=> 0,
                                 'color' => $colors[4],
                                 'data' => $arrayCMV,
                                 'vFormat' => '',
-                                'vDecimos' => '2',
+                                'vDecimos' => '0',
                                 'visible' => false,
                                 'showInLegend' => false,
                                 'dataLabels' => array(
@@ -882,11 +882,11 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CMV Dia',
-                                'yAxis'=> 8,
+                                'yAxis'=> 5,
                                 'color'=> $colors[8],
                                 'data' => $arrayCmvDia,
                                 'vFormat' => '',
-                                'vDecimos' => '2',
+                                'vDecimos' => '0',
                                 'visible' => false,
                                 'showInLegend' => false,
                                 'dataLabels' => array(
