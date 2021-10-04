@@ -38,12 +38,87 @@ Ext.define('App.view.analisemarca.Toolbar',{
             toggleHandler: me.onBtnChart
         });
 
+        var optionWindow = {
+            title: 'Indicadores Adicionais',
+            scrollable: true,
+            height: 200,
+            width: 200,
+            items: [
+                // {
+                //     xtype: 'checkboxfield',
+                //     margin: '2 2 2 2',
+                //     labelWidth: 90,
+                //     fieldLabel: 'Faixa Custo',
+                //     name: 'faixaCusto',
+                //     idItem: 'faixaCusto',
+                //     // checked: false
+                // },
+                {
+                    xtype: 'checkboxfield',
+                    margin: '2 2 2 2',
+                    labelWidth: 90,
+                    fieldLabel: 'Estoque',
+                    name: 'estoque',
+                    idItem: 'estoque',
+                    // checked: false
+                }
+            ],
+            bbar:[
+                '->',
+                {
+                    xtype:'button',
+                    text: 'Salvar',
+                    handler: function(){
+                        var meWindow = this.up('window');
+                        var array = new Array();
+
+                        array.push({
+                            name : 'estoque',
+                            value: meWindow.down('checkboxfield[name=estoque]').getValue()
+                        });
+
+                        me.indicadoresAdd = array;
+
+                        meWindow.close();
+                    },
+                    listeners: {
+                        afterrender: function(){
+                            var meWindow = this.up('window');
+
+                            if(me.indicadoresAdd){
+                                for (let index = 0; index < me.indicadoresAdd.length; index++) {
+
+                                    if(me.indicadoresAdd[index].name == "estoque"){
+                                        if(me.indicadoresAdd[index].value)
+                                            meWindow.down('checkboxfield[name=estoque]').setValue(true);
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+
+                }
+            ]
+        };
+
         Ext.applyIf(me, {
 
             items : [
                 btnFiltro,
                 btnConsultar,
-                btnchart
+                btnchart,
+                '->',
+                {
+                    xtype: 'button',
+                    text: 'Indicadores Adicionais',
+                    tooltip: 'Indicadores Adicionais',
+                    margin: '1 1 1 4',
+                    hidden: false,
+                    handler: function(){
+                        Ext.create('Ext.window.Window',optionWindow).show();
+                    }
+                }
             ]
         });
 

@@ -41,6 +41,15 @@ Ext.define('App.view.analisegrafica.Toolbar',{
                     name: 'faixaCusto',
                     idItem: 'faixaCusto',
                     // checked: false
+                },
+                {
+                    xtype: 'checkboxfield',
+                    margin: '2 2 2 2',
+                    labelWidth: 90,
+                    fieldLabel: 'Estoque',
+                    name: 'estoque',
+                    idItem: 'estoque',
+                    // checked: false
                 }
             ],
             bbar:[
@@ -87,17 +96,17 @@ Ext.define('App.view.analisegrafica.Toolbar',{
             items : [
                 btnFiltro,
                 btnConsultar,
-                // '->',
-                // {
-                //     xtype: 'button',
-                //     text: 'Indicadores Adicionais',
-                //     tooltip: 'Indicadores Adicionais',
-                //     margin: '1 1 1 4',
-                //     hidden: false,
-                //     handler: function(){
-                //         Ext.create('Ext.window.Window',optionWindow).show();
-                //     }
-                // }
+                '->',
+                {
+                    xtype: 'button',
+                    text: 'Indicadores Adicionais',
+                    tooltip: 'Indicadores Adicionais',
+                    margin: '1 1 1 4',
+                    hidden: false,
+                    handler: function(){
+                        Ext.create('Ext.window.Window',optionWindow).show();
+                    }
+                }
 
             ]
         });

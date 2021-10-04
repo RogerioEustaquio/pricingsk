@@ -221,16 +221,11 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                 '{codItem} {descricao} {marca}',
                 '</tpl>'), 
             valueField: 'codItem',
-            // emptyText: 'Produto',
             fieldLabel: 'Código Produto NBS',
             emptyText: 'Código Produto NBS',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
-
             listeners: {
                 
             },
@@ -389,7 +384,7 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
-                    hidden: false,
+                    hidden: true,
                     items:[
                         elTagProduto,
                         {
