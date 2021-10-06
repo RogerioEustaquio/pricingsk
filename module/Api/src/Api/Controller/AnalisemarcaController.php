@@ -578,6 +578,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $arrayEstoque       = array();
             $EstoqueCustoMedio  = array();
             $EstoqueValor       = array();
+            $EstoqueSkud        = array();
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
@@ -587,13 +588,15 @@ class AnalisemarcaController extends AbstractRestfulController
                 $arrayEstoque[]         = 0;
                 $EstoqueCustoMedio[]    = 0;
                 $EstoqueValor[]         = 0;
+                $EstoqueSkud[]          = 0;
 
             }
 
             $sql = "select data,
                             round(sum(estoque),2) estoque,
-                            round(sum(custo_medio),2) custo_medio,
-                            round(sum(valor),2) valor
+                            round(sum(valor)/sum(estoque),2) custo_medio,
+                            round(sum(valor),2) valor,
+                            sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
                     from vw_skestoque_master a,
                          vw_skmarca m,
                          tb_sk_produto_montadora m2
@@ -612,6 +615,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $hydrator->addStrategy('estoque', new ValueStrategy);
             $hydrator->addStrategy('custo_medio', new ValueStrategy);
             $hydrator->addStrategy('valor', new ValueStrategy);
+            $hydrator->addStrategy('sku_disp', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -634,6 +638,8 @@ class AnalisemarcaController extends AbstractRestfulController
                     $arrayEstoque[$contMes]         = (float) $elementos['estoque'];
                     $EstoqueCustoMedio[$contMes]    = (float) $elementos['custoMedio'];
                     $EstoqueValor[$contMes]         = (float) $elementos['valor'];
+                    $EstoqueSkud[$contMes]          = (float) $elementos['skuDisp'];
+                    
                 }
 
                 $contMes++;
@@ -645,11 +651,13 @@ class AnalisemarcaController extends AbstractRestfulController
             $arrayEstoque       = null;
             $EstoqueCustoMedio  = null;
             $EstoqueValor       = null;
+            $EstoqueSkud        = null;
         }
 
         $arrayEstoqueMes[] = $arrayEstoque;
         $arrayEstoqueMes[] = $EstoqueCustoMedio;
         $arrayEstoqueMes[] = $EstoqueValor;
+        $arrayEstoqueMes[] = $EstoqueSkud;
 
         return $arrayEstoqueMes;
     }
@@ -865,6 +873,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $estoque            = array();
             $estoqueCustoMedio  = array();
             $estoqueValor       = array();
+            $estoqueSkud        = array();
             
             if($consultaEstoque){
 
@@ -872,6 +881,7 @@ class AnalisemarcaController extends AbstractRestfulController
                 $estoque            = $estoqueMes[0];
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
+                $estoqueSkud        = $estoqueMes[3];
             }
 
             $sql = "select du.data,
@@ -1135,12 +1145,12 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'ES. Custo Médio',
+                                'name' => 'ES. CUSTO MÉDIO',
                                 'yAxis'=> 12,
                                 'color'=> $colors[12],
                                 'data' => $estoqueCustoMedio,
                                 'vFormat' => '',
-                                'vDecimos' => '0',
+                                'vDecimos' => '2',
                                 'visible' => false,
                                 'showInLegend' => false,
                                 'dataLabels' => array(
@@ -1149,10 +1159,24 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                                 ),
                             array(
-                                'name' => 'ES. Valor',
+                                'name' => 'ES. VALOR',
                                 'yAxis'=> 13,
                                 'color'=> $colors[13],
                                 'data' => $estoqueValor,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'SKUD',
+                                'yAxis'=> 14,
+                                'color'=> $colors[14],
+                                'data' => $estoqueSkud,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
                                 'visible' => false,

@@ -660,7 +660,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         },
                         labels: {
                             formatter: function () {
-                                return utilFormat.ValueZero(this.value);
+                                return utilFormat.Value2(this.value,2);
                             },
                             x: 0,
                             y: 0,
@@ -690,6 +690,29 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             padding: 0,
                             style: {
                                 color: colors[13],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'SKUD',
+                            style: {
+                                color: colors[14],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[14],
                                 fontSize: '10px'
                             }
                         },
