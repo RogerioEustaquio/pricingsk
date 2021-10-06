@@ -146,7 +146,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                 element = {
                                     xtype: 'checkboxfield',
                                     margin: '2 2 2 2',
-                                    labelWidth: 120,
+                                    labelWidth: 190,
                                     fieldLabel: record.name,
                                     name: record.name,
                                     checked: recordSeries.options.showInLegend,
@@ -445,7 +445,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'QTDE',
+                            text: 'QTD',
                             style: {
                                 color: colors[3],
                                 fontSize: '10px'
@@ -491,7 +491,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Cliente',
+                            text: 'CC',
                             style: {
                                 color: colors[5],
                                 fontSize: '10px'
@@ -560,7 +560,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'QTDE Dia',
+                            text: 'QTD Dia',
                             style: {
                                 color: colors[8],
                                 fontSize: '10px'
@@ -606,7 +606,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Cliente Dia',
+                            text: 'CC Dia',
                             style: {
                                 color: colors[10],
                                 fontSize: '10px'
@@ -629,7 +629,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Estoque',
+                            text: 'ES. QTD',
                             style: {
                                 color: colors[11],
                                 fontSize: '10px'
@@ -652,7 +652,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Estoque Custo Médio',
+                            text: 'ES. Custo Médio',
                             style: {
                                 color: colors[12],
                                 fontSize: '10px'
@@ -675,7 +675,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'Estoque Valor',
+                            text: 'ES. Valor',
                             style: {
                                 color: colors[13],
                                 fontSize: '10px'

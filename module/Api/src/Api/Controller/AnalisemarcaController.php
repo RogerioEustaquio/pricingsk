@@ -903,7 +903,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     where du.data = a.data(+)
                     $andSqlPeriodo
                     order by data";
-                    
+
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -965,7 +965,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     'success' => true,
                     'data' => array(
                         'categories' => $categoriesView,
-                        'series' => array(                            
+                        'series' => array(                           
                             array(
                                 'name' => 'ROL',
                                 'yAxis'=> 0,
@@ -1009,7 +1009,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'QTDE',
+                                'name' => 'QTD',
                                 'yAxis'=> 3,
                                 'color' => $colors[3],
                                 'data' => $arrayQtde,
@@ -1037,7 +1037,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Cliente',
+                                'name' => 'CC',
                                 'yAxis'=> 5,
                                 'color' => $colors[5],
                                 'data' => $arrayCc,
@@ -1079,7 +1079,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'QTDE Dia',
+                                'name' => 'QTD Dia',
                                 'yAxis'=> 8,
                                 'color'=> $colors[8],
                                 'data' => $arrayQtdedia,
@@ -1107,7 +1107,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Cliente Dia',
+                                'name' => 'CC Dia',
                                 'yAxis'=> 10,
                                 'color'=> $colors[10],
                                 'data' => $arrayCcDia,
@@ -1121,7 +1121,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Estoque',
+                                'name' => 'ES. QTD',
                                 'yAxis'=> 11,
                                 'color'=> $colors[11],
                                 'data' => $estoque,
@@ -1135,7 +1135,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Estoque Custo Médio',
+                                'name' => 'ES. Custo Médio',
                                 'yAxis'=> 12,
                                 'color'=> $colors[12],
                                 'data' => $estoqueCustoMedio,
@@ -1149,7 +1149,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                                 ),
                             array(
-                                'name' => 'Estoque Valor',
+                                'name' => 'ES. Valor',
                                 'yAxis'=> 13,
                                 'color'=> $colors[13],
                                 'data' => $estoqueValor,
