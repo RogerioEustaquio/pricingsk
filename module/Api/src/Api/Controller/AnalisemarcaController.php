@@ -662,6 +662,197 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayEstoqueMes;
     }
 
+    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora)
+    {
+        $data1 = array();
+
+        $andSql = '';
+        $andSql2 = '';
+        if($emp){
+            $andSql  = " and emp in ('$emp')";
+        }
+        if($codProdutos){
+
+            $codProdutos =  implode("','",explode(',',$codProdutos));
+
+            $andSql .= " and cod_produto in ('$codProdutos')";
+        }
+        if($idMarcas){
+            $andSql .= " and marca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
+        }
+        if($montadora){
+            $andSql .= " and cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+        }
+
+        $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
+        $sqlMeses = "";
+
+        if($data){
+            $sysdate = "to_date('01/".$data."')";
+        }else{
+            $sysdate = 'sysdate';
+        }
+
+        $andSqlData = '';
+        if($data){
+            $andSqlData .= " and data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlData .= " and data <= add_months(trunc($sysdate,'MM'),0)";
+        }else{
+            $andSqlData .= " and data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+        }
+
+        if($qtdemeses>12){
+
+            for($int = $qtdemeses; $int > 12; $int--){
+
+                $sqlMeses .= "select add_months(trunc($sysdate,'MM'),-".($int-1).") as id from dual union all \n";
+                
+            }
+        }
+
+        try {
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $mesesCliente = [null,
+                            'Jan',
+                            'Fev',
+                            'Mar',
+                            'Abr',
+                            'Mai',
+                            'Jun',
+                            'Jul',
+                            'Ago',
+                            'Set',
+                            'Out',
+                            'Nov',
+                            'Dez'];
+
+            $sql = "$sqlMeses
+                    select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-10) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-9) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-8) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-7) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-6) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-5) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-4) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-3) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-2) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-1) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-0) as id from dual    
+                    order by 1        
+            ";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data1      = array();
+            $mesSelecao = array();
+
+            $arrayCc    = array();
+            $arrayNf    = array();
+            $arrayTkm   = array();
+
+            foreach ($resultSet as $row) {
+                $data1 = $hydrator->extract($row);
+
+                $mesSelecao[] = $mesesCliente[(float) substr($data1['id'], 3, 2)] .'/'. substr($data1['id'], 6, 2);
+
+                $arrayCc[]  = 0;
+                $arrayNf[]  = 0;
+                $arrayTkm[] = 0;
+
+            }
+
+            $sql = "select  a.data, 
+                            b.cc as cc, 
+                            c.nota as nf,
+                            round(a.rol/b.cc,2) tkm
+                            -- incluir cc dia por fora no php
+                    from (select data, sum(xrol) as rol 
+                            from vm_skbi_venda3 
+                            where 1=1
+                            group by data) a,
+                            (select data, count(*) as cc
+                            from (select data, emp, cnpj_parceiro, sum(xrol) as rol  
+                                    from vm_skbi_venda3
+                                    where 1=1
+                                    $andSql
+                                    $andSqlData
+                                    group by data, emp, cnpj_parceiro)
+                            where rol > 0
+                            group by data) b,
+                            (select data, count(*) as nota
+                            from (select data, emp, nota, sum(xrol) as rol  
+                                    from vm_skbi_venda3
+                                    where 1=1
+                                    $andSql
+                                    $andSqlData
+                                    group by data, emp, nota)
+                            where rol > 0
+                            group by data) c
+                    where a.data = b.data
+                    and a.data = c.data
+                    order by data asc";
+                    
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('data', new ValueStrategy);
+            $hydrator->addStrategy('cc', new ValueStrategy);
+            $hydrator->addStrategy('nf', new ValueStrategy);
+            $hydrator->addStrategy('tkm', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data2 = array();
+            $contMes = 0;
+
+            foreach ($resultSet as $row) {
+
+                $elementos = $hydrator->extract($row);
+
+                $elementos['data'] = $mesesCliente[(float) substr($elementos['data'], 3, 2)] .'/'. substr($elementos['data'], 6, 2);
+
+                while($mesSelecao[$contMes] != $elementos['data'] && $contMes< $qtdemeses){
+                    $contMes++;
+                }
+
+                if($mesSelecao[$contMes] == $elementos['data']){
+
+                    $arrayCc[$contMes]      = (float) $elementos['cc'];
+                    $arrayNf[$contMes]      = (float) $elementos['nf'];
+                    $arrayTkm[$contMes]     = (float) $elementos['tkm'];
+                    
+                }
+
+                $contMes++;
+
+            }
+            // $this->setCallbackData($arrayClienteMes);
+            
+        } catch (\Exception $e) {
+            $arrayCc    = null;
+            $arrayNf    = null;
+            $arrayTkm   = null;
+        }
+
+        $arrayClienteMes[] = $arrayCc;
+        $arrayClienteMes[] = $arrayNf;
+        $arrayClienteMes[] = $arrayTkm;
+
+        return $arrayClienteMes;
+    }
 
     public function listarfichaitemgraficoAction()
     {
@@ -808,9 +999,9 @@ class AnalisemarcaController extends AbstractRestfulController
             $arrayRol       = array();
             $arrayLb        = array();
             $arrayMb        = array();
+            $arrayDias      = array();
             $arrayQtde      = array();
             $arrayCMV       = array();
-            $arrayCc        = array();
             $arrayRoldia    = array();
             $arrayLbdia     = array();
             $arrayQtdedia   = array();
@@ -832,9 +1023,9 @@ class AnalisemarcaController extends AbstractRestfulController
                 $arrayRol[]         = 0;
                 $arrayLb[]          = 0;
                 $arrayMb[]          = 0;
+                $arrayDias[]        = 0;
                 $arrayQtde[]        = 0;
                 $arrayCMV[]         = 0;
-                $arrayCc[]          = 0;
                 $arrayRoldia[]      = 0;
                 $arrayLbdia[]       = 0;
                 $arrayQtdedia[]     = 0;
@@ -843,8 +1034,9 @@ class AnalisemarcaController extends AbstractRestfulController
 
             }
 
-            $consultaEstoque = false;
             $consultaFaixaCusto = false;
+            $consultaEstoque = false;
+            $consultaCliente = false;
             $FxCusto  = array();
             $FxCusto2  = array();
 
@@ -852,8 +1044,12 @@ class AnalisemarcaController extends AbstractRestfulController
 
                 for ($i=0; $i < count($indicadoresAdd); $i++) {
             
-                    if($indicadoresAdd[$i]->value){
-                        $consultaEstoque = true;
+                    if($indicadoresAdd[$i]->name == "estoque"){
+                        $consultaEstoque = $indicadoresAdd[$i]->value;
+                    }
+
+                    if($indicadoresAdd[$i]->name == "cliente"){
+                        $consultaCliente = $indicadoresAdd[$i]->value;
                     }
                 }
             }
@@ -884,19 +1080,29 @@ class AnalisemarcaController extends AbstractRestfulController
                 $estoqueSkud        = $estoqueMes[3];
             }
 
+            $cc     = array();
+            $nf     = array();
+            $tkm    = array();
+
+            if($consultaCliente){
+
+                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora);
+                $cc         = $clienteMes[0];
+                $nf         = $clienteMes[1];
+                $tkm        = $clienteMes[2];
+            }
+
             $sql = "select du.data,
                         a.rol,
                         a.lb,
-                        a.qtde,
-                        a.cmv,
                         a.mb,
                         du.dias,
-                        1 cc,
+                        a.qtde,
+                        a.cmv,
                         round(a.rol / du.dias, 2) as rol_dia,
                         round(a.lb / du.dias, 2) as lb_dia,
                         round(a.qtde / du.dias, 0) as qtde_dia,
-                        round(a.cmv / du.dias, 2) as cmv_dia,
-                        rownum  cc_dia
+                        round(a.cmv / du.dias, 2) as cmv_dia
                     from VM_SKDIAS_UTEIS du,
                         (select trunc(data, 'MM') as data,
                                 round(sum(rol),2) as rol,
@@ -919,17 +1125,17 @@ class AnalisemarcaController extends AbstractRestfulController
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('data', new ValueStrategy);
             $hydrator->addStrategy('rol', new ValueStrategy);
             $hydrator->addStrategy('lb', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
+            $hydrator->addStrategy('dias', new ValueStrategy);
             $hydrator->addStrategy('qtde', new ValueStrategy);
             $hydrator->addStrategy('cmv', new ValueStrategy);
-            $hydrator->addStrategy('cc', new ValueStrategy);
             $hydrator->addStrategy('rol_dia', new ValueStrategy);
             $hydrator->addStrategy('lb_dia', new ValueStrategy);
             $hydrator->addStrategy('qtde_dia', new ValueStrategy);
             $hydrator->addStrategy('cmv_dia', new ValueStrategy);
-            $hydrator->addStrategy('cc_dia', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -951,14 +1157,22 @@ class AnalisemarcaController extends AbstractRestfulController
                     $arrayRol[$cont]         = (float)$elementos['rol'];
                     $arrayLb[$cont]          = (float)$elementos['lb'];
                     $arrayMb[$cont]          = (float)$elementos['mb'];
+                    $arrayDias[$cont]        = (float)$elementos['dias'];
                     $arrayQtde[$cont]        = (float)$elementos['qtde'];
                     $arrayCMV[$cont]         = (float)$elementos['cmv'];
-                    $arrayCc[$cont]          = (float)$elementos['cc'];
                     $arrayRoldia[$cont]      = (float)$elementos['rolDia'];
                     $arrayLbdia[$cont]       = (float)$elementos['lbDia'];
                     $arrayQtdedia[$cont]     = (float)$elementos['qtdeDia'];
                     $arrayCmvDia[$cont]      = (float)$elementos['cmvDia'];
-                    $arrayCcDia[$cont]       = (float)$elementos['ccDia'];
+
+                    if($consultaCliente){
+
+                        if($cc[$cont] > 0){
+
+                            $arrayCcDia[$cont] = round($cc[$cont] / $arrayDias[$cont] ,0);
+                        }  
+
+                    }                 
 
                 }
 
@@ -1019,9 +1233,23 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'QTD',
+                                'name' => 'Dias',
                                 'yAxis'=> 3,
                                 'color' => $colors[3],
+                                'data' => $arrayDias,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => true,
+                                'showInLegend' => true,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'QTD',
+                                'yAxis'=> 4,
+                                'color' => $colors[4],
                                 'data' => $arrayQtde,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1035,22 +1263,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             array(
                                 'name' => 'CMV',
                                 'yAxis'=> 0,
-                                'color' => $colors[4],
-                                'data' => $arrayCMV,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'CC',
-                                'yAxis'=> 5,
                                 'color' => $colors[5],
-                                'data' => $arrayCc,
+                                'data' => $arrayCMV,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
                                 'visible' => false,
@@ -1104,7 +1318,7 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CMV Dia',
-                                'yAxis'=> 6,
+                                'yAxis'=> 9,
                                 'color'=> $colors[9],
                                 'data' => $arrayCmvDia,
                                 'vFormat' => '',
@@ -1117,23 +1331,9 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'CC Dia',
+                                'name' => 'ES. QTD',
                                 'yAxis'=> 10,
                                 'color'=> $colors[10],
-                                'data' => $arrayCcDia,
-                                'vFormat' => '',
-                                'vDecimos' => '0',
-                                'visible' => false,
-                                'showInLegend' => false,
-                                'dataLabels' => array(
-                                     'enabled' => true,
-                                     'style' => array( 'fontSize' => '10')
-                                    )
-                            ),
-                            array(
-                                'name' => 'ES. QTD',
-                                'yAxis'=> 11,
-                                'color'=> $colors[11],
                                 'data' => $estoque,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1146,8 +1346,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'ES. CUSTO MÉDIO',
-                                'yAxis'=> 12,
-                                'color'=> $colors[12],
+                                'yAxis'=> 11,
+                                'color'=> $colors[11],
                                 'data' => $estoqueCustoMedio,
                                 'vFormat' => '',
                                 'vDecimos' => '2',
@@ -1160,8 +1360,8 @@ class AnalisemarcaController extends AbstractRestfulController
                                 ),
                             array(
                                 'name' => 'ES. VALOR',
-                                'yAxis'=> 13,
-                                'color'=> $colors[13],
+                                'yAxis'=> 12,
+                                'color'=> $colors[12],
                                 'data' => $estoqueValor,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1174,9 +1374,65 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'SKUD',
+                                'yAxis'=> 13,
+                                'color'=> $colors[13],
+                                'data' => $estoqueSkud,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'CC',
                                 'yAxis'=> 14,
                                 'color'=> $colors[14],
-                                'data' => $estoqueSkud,
+                                'data' => $cc,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'NF',
+                                'yAxis'=> 15,
+                                'color'=> $colors[15],
+                                'data' => $nf,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'TKM',
+                                'yAxis'=> 16,
+                                'color'=> $colors[16],
+                                'data' => $tkm,
+                                'vFormat' => '',
+                                'vDecimos' => '0',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'CC Dia',
+                                'yAxis'=> 17,
+                                'color'=> $colors[17],
+                                'data' => $arrayCcDia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
                                 'visible' => false,

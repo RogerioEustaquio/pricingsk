@@ -36,13 +36,6 @@ Ext.define('App.controller.ApplicationController', {
                 click: function(btn) {
                     me.redirectTo('home')
                 }
-            },
-
-            // 'apptoolbar button[action=recarregar]': {
-            'apptoolbar #cotacaodolarpomercial': {
-                click: function(btn) {
-                    me.redirectTo('cotacaodolarpomercial')
-                }
             }
         }
     },
@@ -59,7 +52,6 @@ Ext.define('App.controller.ApplicationController', {
     },
 
     homeAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('home', true)
     },
 
@@ -68,32 +60,26 @@ Ext.define('App.controller.ApplicationController', {
     },
 
     produtoAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('produto', true)
     },
 
     estoqueAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('estoque', true)
     },
 
     configmarcaempresaAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('configmarcaempresa', true)
     },
 
     grupodescontoAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('grupodesconto', true)
     },
 
     analisegraficaAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('analisegrafica', true)
     },
 
     analisemarcaAction: function(){
-        // this.goActionMasterTab('home', true)
         this.goActionMasterTab('analisemarca', true)
     },
 

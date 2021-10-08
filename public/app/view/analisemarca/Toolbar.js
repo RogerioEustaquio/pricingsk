@@ -44,15 +44,6 @@ Ext.define('App.view.analisemarca.Toolbar',{
             height: 200,
             width: 200,
             items: [
-                // {
-                //     xtype: 'checkboxfield',
-                //     margin: '2 2 2 2',
-                //     labelWidth: 90,
-                //     fieldLabel: 'Faixa Custo',
-                //     name: 'faixaCusto',
-                //     idItem: 'faixaCusto',
-                //     // checked: false
-                // },
                 {
                     xtype: 'checkboxfield',
                     margin: '2 2 2 2',
@@ -60,6 +51,15 @@ Ext.define('App.view.analisemarca.Toolbar',{
                     fieldLabel: 'Estoque',
                     name: 'estoque',
                     idItem: 'estoque',
+                    // checked: false
+                },
+                {
+                    xtype: 'checkboxfield',
+                    margin: '2 2 2 2',
+                    labelWidth: 90,
+                    fieldLabel: 'Cliente',
+                    name: 'cliente',
+                    idItem: 'cliente',
                     // checked: false
                 }
             ],
@@ -76,6 +76,10 @@ Ext.define('App.view.analisemarca.Toolbar',{
                             name : 'estoque',
                             value: meWindow.down('checkboxfield[name=estoque]').getValue()
                         });
+                        array.push({
+                            name : 'cliente',
+                            value: meWindow.down('checkboxfield[name=cliente]').getValue()
+                        });
 
                         me.indicadoresAdd = array;
 
@@ -91,6 +95,11 @@ Ext.define('App.view.analisemarca.Toolbar',{
                                     if(me.indicadoresAdd[index].name == "estoque"){
                                         if(me.indicadoresAdd[index].value)
                                             meWindow.down('checkboxfield[name=estoque]').setValue(true);
+                                    }
+
+                                    if(me.indicadoresAdd[index].name == "cliente"){
+                                        if(me.indicadoresAdd[index].value)
+                                            meWindow.down('checkboxfield[name=cliente]').setValue(true);
                                     }
                                 }
                             }
