@@ -180,33 +180,41 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                             recordSeries.update({showInLegend: index, visible: index},false);
                                             meChart.yAxis[recordSeries.index].update({visible: index},false);
 
-                                            var iColor = 0
-                                            var iCont = 0
-                                            meChart.series.forEach(function(rowSerie){
-                                                if(rowSerie.visible){
-                                                    const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
+                                            var iColor = 0;
+                                            var iCont = 0;
 
-                                                    rowSerie.update({color:color},false);
-                                                    meChart.yAxis[iCont].update(
-                                                        {
-                                                            title:{
-                                                                style: {
-                                                                    color: color
-                                                                }
-                                                            },
-                                                            labels:{
-                                                                style: {
-                                                                    color: color
+                                            setTimeout(function(){
+                                                
+                                                meChart.series.forEach(function(rowSerie){
+
+                                                    if(rowSerie.visible){
+                                                        const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
+
+                                                        rowSerie.update({color:color},false);
+                                                        meChart.yAxis[iCont].update(
+                                                            {
+                                                                title:{
+                                                                    style: {
+                                                                        color: color
+                                                                    }
+                                                                },
+                                                                labels:{
+                                                                    style: {
+                                                                        color: color
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                        ,false);
-                                                        
-                                                    iColor++;
-                                                }
+                                                            ,false);
+                                                            
+                                                        iColor++;
+                                                    }
 
-                                                iCont++;
-                                            });
+                                                    iCont++;
+                                                });
+
+                                                meChart.redraw();
+                                            },100);
+
                                         }
 
                                         meChart.redraw();
@@ -222,7 +230,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                     }
                                 }
 
-                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','SKUD'];
+                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','SKUD','CC','NF','TKM','CC Dia'];
 
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){

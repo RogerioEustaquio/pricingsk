@@ -31,11 +31,21 @@ Ext.define('App.view.analisemarca.Toolbar',{
         var btnchart = Ext.create('Ext.button.Button',{
 
             iconCls: 'fa fa-chart-bar',
-            tooltip: 'Consultar',
+            tooltip: 'Gráfico',
             margin: '1 1 1 4',
             enableToggle: true,
             pressed: true,
             toggleHandler: me.onBtnChart
+        });
+
+        var btncards = Ext.create('Ext.button.Button',{
+
+            iconCls: 'fa fa-th-list',
+            tooltip: 'Listas',
+            margin: '1 1 1 4',
+            enableToggle: true,
+            pressed: true,
+            toggleHandler: me.onBtnListas
         });
 
         var optionWindow = {
@@ -117,6 +127,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
                 btnFiltro,
                 btnConsultar,
                 btnchart,
+                btncards,
                 '->',
                 {
                     xtype: 'button',
@@ -284,6 +295,32 @@ Ext.define('App.view.analisemarca.Toolbar',{
             btn.setStyle('background-color: #00ff00 !important');
             
         }
+    },
+
+    onBtnListas: function(btn, pressed){
+
+        var me = this.up('toolbar');
+
+        var panelChart = me.up('container').down('#listaspanel');
+
+        var charts = me.up('container').down('#panelcenter').down('#analisemarcachart');
+
+        if(pressed){
+
+            panelChart.setHidden(false);
+            charts.up('panel').setLayout('border');
+            
+        }else{
+            
+            panelChart.setHidden(true);
+            charts.up('panel').setLayout('fit');
+            
+        }
+        
+        setTimeout(function(){
+            charts.chart.redraw();
+        },250);
+
     }
 
 });

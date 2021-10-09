@@ -44,6 +44,7 @@ Ext.define('App.view.analisemarca.AnalisemarcaPanel', {
                                 },
                                 {
                                     xtype: 'tabpanel',
+                                    itemId: 'listaspanel',
                                     region: 'center',
                                     items:[
                                         {

@@ -802,7 +802,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     where a.data = b.data
                     and a.data = c.data
                     order by data asc";
-                    
+
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -964,6 +964,24 @@ class AnalisemarcaController extends AbstractRestfulController
                 }
             }
 
+            $consultaFaixaCusto = false;
+            $consultaEstoque = false;
+            $consultaCliente = false;
+            
+            if($indicadoresAdd){
+
+                for ($i=0; $i < count($indicadoresAdd); $i++) {
+            
+                    if($indicadoresAdd[$i]->name == "estoque"){
+                        $consultaEstoque = $indicadoresAdd[$i]->value;
+                    }
+
+                    if($indicadoresAdd[$i]->name == "cliente"){
+                        $consultaCliente = $indicadoresAdd[$i]->value;
+                    }
+                }
+            }
+
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
 
@@ -1030,29 +1048,16 @@ class AnalisemarcaController extends AbstractRestfulController
                 $arrayLbdia[]       = 0;
                 $arrayQtdedia[]     = 0;
                 $arrayCmvDia[]      = 0;
-                $arrayCcDia[]       = 0;
+
+                if($consultaCliente){
+                    $arrayCcDia[]   = 0;
+                }
 
             }
 
-            $consultaFaixaCusto = false;
-            $consultaEstoque = false;
-            $consultaCliente = false;
             $FxCusto  = array();
             $FxCusto2  = array();
 
-            if($indicadoresAdd){
-
-                for ($i=0; $i < count($indicadoresAdd); $i++) {
-            
-                    if($indicadoresAdd[$i]->name == "estoque"){
-                        $consultaEstoque = $indicadoresAdd[$i]->value;
-                    }
-
-                    if($indicadoresAdd[$i]->name == "cliente"){
-                        $consultaCliente = $indicadoresAdd[$i]->value;
-                    }
-                }
-            }
 
             if($regional){
                 $emp =  $emp."','".$regional;
