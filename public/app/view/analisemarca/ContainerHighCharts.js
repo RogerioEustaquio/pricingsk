@@ -230,7 +230,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                     }
                                 }
 
-                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','SKUD','CC','NF','TKM','CC Dia'];
+                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia'];
 
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){
@@ -729,101 +729,9 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'SKUD',
+                            text: 'ES. Fator',
                             style: {
                                 color: colors[15],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[15],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CC',
-                            style: {
-                                color: colors[16],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[16],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'NF',
-                            style: {
-                                color: colors[17],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[17],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'TKM',
-                            style: {
-                                color: colors[18],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[18],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CC Dia',
-                            style: {
-                                color: colors[19],
                                 fontSize: '10px'
                             }
                         },
@@ -835,7 +743,168 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
+                                color: colors[15],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'ES. GIRO',
+                            style: {
+                                color: colors[16],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[16],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'ES. DIAS',
+                            style: {
+                                color: colors[17],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[17],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'SKUD',
+                            style: {
+                                color: colors[18],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[18],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'CC',
+                            style: {
                                 color: colors[19],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[19],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'NF',
+                            style: {
+                                color: colors[20],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[20],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'TKM',
+                            style: {
+                                color: colors[21],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[21],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'CC Dia',
+                            style: {
+                                color: colors[22],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[22],
                                 fontSize: '10px'
                             }
                         },

@@ -1027,6 +1027,9 @@ class AnalisemarcaController extends AbstractRestfulController
             $arrayQtdedia       = array();
             $arrayCmvDia        = array();
             $arrayCcDia         = array();
+            $estoqueFator       = array();
+            $estoqueGiro        = array();
+            $estoqueDias        = array();
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
@@ -1055,6 +1058,12 @@ class AnalisemarcaController extends AbstractRestfulController
 
                 if($consultaCliente){
                     $arrayCcDia[]   = 0;
+                }
+
+                if($consultaEstoque){
+                    $estoqueFator[] = 0;
+                    $estoqueGiro[]  = 0;
+                    $estoqueDias[]  = 0;
                 }
 
             }
@@ -1183,7 +1192,18 @@ class AnalisemarcaController extends AbstractRestfulController
                             $arrayCcDia[$cont] = round($cc[$cont] / $arrayDias[$cont] ,0);
                         }
 
-                    }             
+                    }
+
+                    if($consultaEstoque){
+                        
+                        if($estoqueValor[$cont] > 0){
+
+                            $estoqueFator[$cont] =  round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2);
+                            $estoqueGiro[$cont]  =  round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2);
+                            $estoqueDias[$cont] =  round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2);
+
+                        }
+                    }
 
                 }
 
@@ -1412,9 +1432,51 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'SKUD',
+                                'name' => 'ES. FATOR',
                                 'yAxis'=> 15,
                                 'color'=> $colors[15],
+                                'data' => $estoqueFator,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'ES. GIRO',
+                                'yAxis'=> 16,
+                                'color'=> $colors[16],
+                                'data' => $estoqueGiro,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'ES. DIAS',
+                                'yAxis'=> 17,
+                                'color'=> $colors[17],
+                                'data' => $estoqueDias,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'SKUD',
+                                'yAxis'=> 18,
+                                'color'=> $colors[18],
                                 'data' => $estoqueSkud,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1427,8 +1489,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CC',
-                                'yAxis'=> 16,
-                                'color'=> $colors[16],
+                                'yAxis'=> 19,
+                                'color'=> $colors[19],
                                 'data' => $cc,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1441,8 +1503,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'NF',
-                                'yAxis'=> 17,
-                                'color'=> $colors[17],
+                                'yAxis'=> 20,
+                                'color'=> $colors[20],
                                 'data' => $nf,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1455,8 +1517,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'TKM',
-                                'yAxis'=> 18,
-                                'color'=> $colors[18],
+                                'yAxis'=> 21,
+                                'color'=> $colors[21],
                                 'data' => $tkm,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1469,8 +1531,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CC Dia',
-                                'yAxis'=> 19,
-                                'color'=> $colors[19],
+                                'yAxis'=> 22,
+                                'color'=> $colors[22],
                                 'data' => $arrayCcDia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
