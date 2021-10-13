@@ -1014,17 +1014,19 @@ class AnalisemarcaController extends AbstractRestfulController
             $categories = array();
             $categoriesView = array();
 
-            $arrayRol       = array();
-            $arrayLb        = array();
-            $arrayMb        = array();
-            $arrayDias      = array();
-            $arrayQtde      = array();
-            $arrayCMV       = array();
-            $arrayRoldia    = array();
-            $arrayLbdia     = array();
-            $arrayQtdedia   = array();
-            $arrayCmvDia    = array();
-            $arrayCcDia     = array();
+            $arrayRol           = array();
+            $arrayLb            = array();
+            $arrayMb            = array();
+            $arrayPrecoMedio    = array();
+            $arrayCustoMedio    = array();
+            $arrayDias          = array();
+            $arrayQtde          = array();
+            $arrayCMV           = array();
+            $arrayRoldia        = array();
+            $arrayLbdia         = array();
+            $arrayQtdedia       = array();
+            $arrayCmvDia        = array();
+            $arrayCcDia         = array();
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
@@ -1041,6 +1043,8 @@ class AnalisemarcaController extends AbstractRestfulController
                 $arrayRol[]         = 0;
                 $arrayLb[]          = 0;
                 $arrayMb[]          = 0;
+                $arrayPrecoMedio[]  = 0;
+                $arrayCustoMedio[]  = 0;
                 $arrayDias[]        = 0;
                 $arrayQtde[]        = 0;
                 $arrayCMV[]         = 0;
@@ -1162,6 +1166,8 @@ class AnalisemarcaController extends AbstractRestfulController
                     $arrayRol[$cont]         = (float)$elementos['rol'];
                     $arrayLb[$cont]          = (float)$elementos['lb'];
                     $arrayMb[$cont]          = (float)$elementos['mb'];
+                    $arrayPrecoMedio[$cont]  = round( ((float)$elementos['rol']/(float)$elementos['qtde']) ,2);
+                    $arrayCustoMedio[$cont]  = round( ((float)$elementos['cmv']/(float)$elementos['qtde']) ,2);
                     $arrayDias[$cont]        = (float)$elementos['dias'];
                     $arrayQtde[$cont]        = (float)$elementos['qtde'];
                     $arrayCMV[$cont]         = (float)$elementos['cmv'];
@@ -1175,9 +1181,9 @@ class AnalisemarcaController extends AbstractRestfulController
                         if($cc[$cont] > 0){
 
                             $arrayCcDia[$cont] = round($cc[$cont] / $arrayDias[$cont] ,0);
-                        }  
+                        }
 
-                    }                 
+                    }             
 
                 }
 
@@ -1194,7 +1200,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     'success' => true,
                     'data' => array(
                         'categories' => $categoriesView,
-                        'series' => array(                           
+                        'series' => array(
                             array(
                                 'name' => 'ROL',
                                 'yAxis'=> 0,
@@ -1238,9 +1244,37 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'Dias',
+                                'name' => 'PREÇO MÉDIO',
                                 'yAxis'=> 3,
                                 'color' => $colors[3],
+                                'data' => $arrayPrecoMedio,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'CUSTO MÉDIO',
+                                'yAxis'=> 4,
+                                'color' => $colors[4],
+                                'data' => $arrayCustoMedio,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'Dias',
+                                'yAxis'=> 5,
+                                'color' => $colors[5],
                                 'data' => $arrayDias,
                                 'vFormat' => '',
                                 'vDecimos' => '2',
@@ -1253,8 +1287,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'QTD',
-                                'yAxis'=> 4,
-                                'color' => $colors[4],
+                                'yAxis'=> 6,
+                                'color' => $colors[6],
                                 'data' => $arrayQtde,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1268,7 +1302,7 @@ class AnalisemarcaController extends AbstractRestfulController
                             array(
                                 'name' => 'CMV',
                                 'yAxis'=> 0,
-                                'color' => $colors[5],
+                                'color' => $colors[7],
                                 'data' => $arrayCMV,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1281,8 +1315,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'ROL Dia',
-                                'yAxis'=> 6,
-                                'color'=> $colors[6],
+                                'yAxis'=> 8,
+                                'color'=> $colors[8],
                                 'data' => $arrayRoldia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1295,8 +1329,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'LB Dia',
-                                'yAxis'=> 7,
-                                'color'=> $colors[7],
+                                'yAxis'=> 9,
+                                'color'=> $colors[9],
                                 'data' => $arrayLbdia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1309,8 +1343,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'QTD Dia',
-                                'yAxis'=> 8,
-                                'color'=> $colors[8],
+                                'yAxis'=> 10,
+                                'color'=> $colors[10],
                                 'data' => $arrayQtdedia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1323,8 +1357,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CMV Dia',
-                                'yAxis'=> 9,
-                                'color'=> $colors[9],
+                                'yAxis'=> 11,
+                                'color'=> $colors[10],
                                 'data' => $arrayCmvDia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1337,8 +1371,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'ES. QTD',
-                                'yAxis'=> 10,
-                                'color'=> $colors[10],
+                                'yAxis'=> 12,
+                                'color'=> $colors[12],
                                 'data' => $estoque,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1351,8 +1385,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'ES. CUSTO MÉDIO',
-                                'yAxis'=> 11,
-                                'color'=> $colors[11],
+                                'yAxis'=> 13,
+                                'color'=> $colors[13],
                                 'data' => $estoqueCustoMedio,
                                 'vFormat' => '',
                                 'vDecimos' => '2',
@@ -1362,11 +1396,11 @@ class AnalisemarcaController extends AbstractRestfulController
                                      'enabled' => true,
                                      'style' => array( 'fontSize' => '10')
                                     )
-                                ),
+                            ),
                             array(
                                 'name' => 'ES. VALOR',
-                                'yAxis'=> 12,
-                                'color'=> $colors[12],
+                                'yAxis'=> 14,
+                                'color'=> $colors[14],
                                 'data' => $estoqueValor,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1379,8 +1413,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'SKUD',
-                                'yAxis'=> 13,
-                                'color'=> $colors[13],
+                                'yAxis'=> 15,
+                                'color'=> $colors[15],
                                 'data' => $estoqueSkud,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1393,8 +1427,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CC',
-                                'yAxis'=> 14,
-                                'color'=> $colors[14],
+                                'yAxis'=> 16,
+                                'color'=> $colors[16],
                                 'data' => $cc,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1407,8 +1441,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'NF',
-                                'yAxis'=> 15,
-                                'color'=> $colors[15],
+                                'yAxis'=> 17,
+                                'color'=> $colors[17],
                                 'data' => $nf,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1421,8 +1455,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'TKM',
-                                'yAxis'=> 16,
-                                'color'=> $colors[16],
+                                'yAxis'=> 18,
+                                'color'=> $colors[18],
                                 'data' => $tkm,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1435,8 +1469,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CC Dia',
-                                'yAxis'=> 17,
-                                'color'=> $colors[17],
+                                'yAxis'=> 19,
+                                'color'=> $colors[19],
                                 'data' => $arrayCcDia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
