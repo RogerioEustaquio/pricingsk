@@ -1279,7 +1279,7 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CUSTO MÉDIO',
-                                'yAxis'=> 4,
+                                'yAxis'=> 3,
                                 'color' => $colors[4],
                                 'data' => $arrayCustoMedio,
                                 'vFormat' => '',
@@ -1378,7 +1378,7 @@ class AnalisemarcaController extends AbstractRestfulController
                             array(
                                 'name' => 'CMV Dia',
                                 'yAxis'=> 11,
-                                'color'=> $colors[10],
+                                'color'=> $colors[11],
                                 'data' => $arrayCmvDia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -1405,7 +1405,7 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'ES. CUSTO MÉDIO',
-                                'yAxis'=> 13,
+                                'yAxis'=> 3,
                                 'color'=> $colors[13],
                                 'data' => $estoqueCustoMedio,
                                 'vFormat' => '',

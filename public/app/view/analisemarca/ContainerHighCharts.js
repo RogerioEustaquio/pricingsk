@@ -185,32 +185,32 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                             setTimeout(function(){
                                                 
-                                                meChart.series.forEach(function(rowSerie){
+                                                // meChart.series.forEach(function(rowSerie){
 
-                                                    if(rowSerie.visible){
-                                                        const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
+                                                //     if(rowSerie.visible){
+                                                //         const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
 
-                                                        rowSerie.update({color:color},false);
-                                                        meChart.yAxis[iCont].update(
-                                                            {
-                                                                title:{
-                                                                    style: {
-                                                                        color: color
-                                                                    }
-                                                                },
-                                                                labels:{
-                                                                    style: {
-                                                                        color: color
-                                                                    }
-                                                                }
-                                                            }
-                                                            ,false);
+                                                //         rowSerie.update({color:color},false);
+                                                //         meChart.yAxis[iCont].update(
+                                                //             {
+                                                //                 title:{
+                                                //                     style: {
+                                                //                         color: color
+                                                //                     }
+                                                //                 },
+                                                //                 labels:{
+                                                //                     style: {
+                                                //                         color: color
+                                                //                     }
+                                                //                 }
+                                                //             }
+                                                //             ,false);
                                                             
-                                                        iColor++;
-                                                    }
+                                                //         iColor++;
+                                                //     }
 
-                                                    iCont++;
-                                                });
+                                                //     iCont++;
+                                                // });
 
                                                 meChart.redraw();
                                             },100);
