@@ -84,11 +84,12 @@ Ext.define('App.view.analisemarca.Toolbar',{
 
                         array.push({
                             name : 'estoque',
-                            value: meWindow.down('checkboxfield[name=estoque]').getValue()
+                            value: meWindow.down('checkboxfield[name=estoque]').checked
                         });
                         array.push({
                             name : 'cliente',
-                            value: meWindow.down('checkboxfield[name=cliente]').getValue()
+                            // value: meWindow.down('checkboxfield[name=cliente]').getValue()
+                            value: meWindow.down('checkboxfield[name=cliente]').checked
                         });
 
                         me.indicadoresAdd = array;
@@ -103,14 +104,15 @@ Ext.define('App.view.analisemarca.Toolbar',{
                                 for (let index = 0; index < me.indicadoresAdd.length; index++) {
 
                                     if(me.indicadoresAdd[index].name == "estoque"){
-                                        if(me.indicadoresAdd[index].value)
-                                            meWindow.down('checkboxfield[name=estoque]').setValue(true);
+                                            meWindow.down('checkboxfield[name=estoque]').setValue(me.indicadoresAdd[index].value);
+                                            meWindow.down('checkboxfield[name=estoque]').checked = me.indicadoresAdd[index].value;
                                     }
 
                                     if(me.indicadoresAdd[index].name == "cliente"){
-                                        if(me.indicadoresAdd[index].value)
-                                            meWindow.down('checkboxfield[name=cliente]').setValue(true);
+                                            meWindow.down('checkboxfield[name=cliente]').setValue(me.indicadoresAdd[index].value);
+                                            meWindow.down('checkboxfield[name=cliente]').checked = me.indicadoresAdd[index].value;
                                     }
+
                                 }
                             }
                             
@@ -272,7 +274,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
                     text: 'Erro sistema: '+ result.message.substr(0,20)
                 }).show();
             }
-        });        
+        });
 
     },
 

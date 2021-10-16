@@ -1172,11 +1172,21 @@ class AnalisemarcaController extends AbstractRestfulController
 
                 if($categories[$cont] == $elementos['data']){
 
+                    $precoMedio=0;
+                    if($elementos['rol']>0){
+                        $precoMedio =  round( ((float)$elementos['rol']/(float)$elementos['qtde']) ,2);
+                    }
+
+                    $custoMedio=0;
+                    if($elementos['cmv']>0){
+                        $custoMedio =  round( ((float)$elementos['cmv']/(float)$elementos['qtde']) ,2);
+                    }
+
                     $arrayRol[$cont]         = (float)$elementos['rol'];
                     $arrayLb[$cont]          = (float)$elementos['lb'];
                     $arrayMb[$cont]          = (float)$elementos['mb'];
-                    $arrayPrecoMedio[$cont]  = round( ((float)$elementos['rol']/(float)$elementos['qtde']) ,2);
-                    $arrayCustoMedio[$cont]  = round( ((float)$elementos['cmv']/(float)$elementos['qtde']) ,2);
+                    $arrayPrecoMedio[$cont]  = $precoMedio;
+                    $arrayCustoMedio[$cont]  = $custoMedio;
                     $arrayDias[$cont]        = (float)$elementos['dias'];
                     $arrayQtde[$cont]        = (float)$elementos['qtde'];
                     $arrayCMV[$cont]         = (float)$elementos['cmv'];
