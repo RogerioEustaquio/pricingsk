@@ -1071,7 +1071,6 @@ class AnalisemarcaController extends AbstractRestfulController
             $FxCusto  = array();
             $FxCusto2  = array();
 
-
             if($regional){
                 $emp =  $emp."','".$regional;
             }

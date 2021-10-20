@@ -472,7 +472,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             }
                         },
                         opposite: true,
-                        visible: true
+                        visible: false
                     },
                     {
                         title: {
@@ -495,7 +495,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             }
                         },
                         opposite: true,
-                        visible: true
+                        visible: false
                     },
                     {
                         title: {

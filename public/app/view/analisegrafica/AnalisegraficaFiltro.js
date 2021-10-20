@@ -389,7 +389,7 @@ Ext.define('App.view.analisegrafica.AnalisegraficaFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
-                    hidden: false,
+                    hidden: true,
                     items:[
                         elTagProduto,
                         {

@@ -180,36 +180,37 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                                             recordSeries.update({showInLegend: index, visible: index},false);
                                             meChart.yAxis[recordSeries.index].update({visible: index},false);
 
-                                            var iColor = 0
-                                            var iCont = 0
-                                            meChart.series.forEach(function(rowSerie){
-                                                if(rowSerie.visible){
-                                                    const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
+                                            var iColor = 0;
+                                            var iCont = 0;
+                                            // meChart.series.forEach(function(rowSerie){
+                                            //     if(rowSerie.visible){
+                                            //         const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
 
-                                                    rowSerie.update({color:color},false);
-                                                    meChart.yAxis[iCont].update(
-                                                        {
-                                                            title:{
-                                                                style: {
-                                                                    color: color
-                                                                }
-                                                            },
-                                                            labels:{
-                                                                style: {
-                                                                    color: color
-                                                                }
-                                                            }
-                                                        }
-                                                        ,false);
+                                            //         rowSerie.update({color:color},false);
+                                            //         meChart.yAxis[iCont].update(
+                                            //             {
+                                            //                 title:{
+                                            //                     style: {
+                                            //                         color: color
+                                            //                     }
+                                            //                 },
+                                            //                 labels:{
+                                            //                     style: {
+                                            //                         color: color
+                                            //                     }
+                                            //                 }
+                                            //             }
+                                            //             ,false);
                                                         
-                                                    iColor++;
-                                                }
+                                            //         iColor++;
+                                            //     }
 
-                                                iCont++;
-                                            });
+                                            //     iCont++;
+                                            // });
                                         }
-
-                                        meChart.redraw();
+                                        setTimeout(function(){
+                                            meChart.redraw();
+                                        },100);
                                         record.up('window').down('displayfield[name=contCheck]').setValue(cont);
                                     }
                                 };
@@ -222,7 +223,7 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                                     }
                                 }
 
-                                var serieExtras = ['Estoque Inicial','Estoque Final','Dias de Estoque','Índice Estoque/ROL','Índice Estoque/LB','Índice Estoque/Giro'];
+                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia','ROL Fx 26-50','ROL Fx 101-250','ROL Fx 251-500'];
 
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){
@@ -373,39 +374,200 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                 crosshair: true
             },
             yAxis: [
-                    {
-                        title: {
-                            text: 'ROL',
-                            style: {
-                                color: colors[0], //Highcharts.getOptions().colors[0],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                                formatter: function () {
-                                    var v = utilFormat.ValueZero(this.value);
-                                    return v;
-                                },
-                                x: 0,
-                                y: 0,
-                                padding: 0,
-                                style: {
-                                    color: colors[0],
-                                    fontSize: '10px'
-                                }
-                        },
-                        opposite: true,
-                        visible: true
+                {
+                    title: {
+                        text: 'ROL',
+                        style: {
+                            color: colors[0], //Highcharts.getOptions().colors[0],
+                            fontSize: '10px'
+                        }
                     },
-                    {
-                        title: {
-                            text: 'LB',
+                    labels: {
+                            formatter: function () {
+                                var v = utilFormat.ValueZero(this.value);
+                                return v;
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
                             style: {
-                                color: colors[1],
+                                color: colors[0],
                                 fontSize: '10px'
                             }
+                    },
+                    opposite: true,
+                    visible: true
+                },
+                {
+                    title: {
+                        text: 'LB',
+                        style: {
+                            color: colors[1],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[1],
+                        fontSize: '10px'
+                    }
+                    },
+                    opposite: true,
+                    visible: true
+                },
+                {
+                    title: {
+                        text: 'MB',
+                        style: {
+                            color: colors[2],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                        return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
                         },
-                        labels: {
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[2],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: true
+                },
+                {
+                    title: {
+                        text: 'PREÇO MÉDIO',
+                        style: {
+                            color: colors[3],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[3],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'CUSTO MÉDIO',
+                        style: {
+                            color: colors[4],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[4],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'Dias',
+                        style: {
+                            color: colors[5],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                        return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[5],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: true
+                },
+                {
+                    title: {
+                        text: 'QTD',
+                        style: {
+                            color: colors[6],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[6],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'CMV',
+                        style: {
+                            color: colors[7],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[7],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ROL Dia',
+                        style: {
+                            color: colors[8],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
                         formatter: function () {
                             return utilFormat.ValueZero(this.value);
                         },
@@ -413,174 +575,404 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                         y: 0,
                         padding: 0,
                         style: {
-                            color: colors[1],
+                            color: colors[8],
                             fontSize: '10px'
                         }
-                        },
-                        opposite: true,
-                        visible: true
                     },
-                    {
-                        title: {
-                            text: 'MB',
-                            style: {
-                                color: colors[2],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[2],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: true
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'LB Dia',
+                        style: {
+                            color: colors[9],
+                            fontSize: '10px'
+                        }
                     },
-                    {
-                        title: {
-                            text: 'QTDE',
-                            style: {
-                                color: colors[3],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
+                    labels: {
+                        formatter: function () {
                             return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[3],
-                                fontSize: '10px'
-                            }
                         },
-                        opposite: true,
-                        visible: false
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[9],
+                            fontSize: '10px'
+                        }
                     },
-                    {
-                        title: {
-                            text: 'ROL Dia',
-                            style: {
-                                color: colors[5],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[5],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'QTD Dia',
+                        style: {
+                            color: colors[10],
+                            fontSize: '10px'
+                        }
                     },
-                    {
-                        title: {
-                            text: 'LB Dia',
-                            style: {
-                                color: colors[6],
-                                fontSize: '10px'
-                            }
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
                         },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[6],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[10],
+                            fontSize: '10px'
+                        }
                     },
-                    {
-                        title: {
-                            text: 'QTDE Dia',
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'CMV Dia',
+                        style: {
+                            color: colors[11],
+                            fontSize: '10px'
+                        }
                     },
-                    // {
-                    //     title: {
-                    //         text: 'ROL Fx 101-250',
-                    //         style: {
-                    //             color: colors[8],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     labels: {
-                    //         formatter: function () {
-                    //             return utilFormat.ValueZero(this.value);
-                    //         },
-                    //         x: 0,
-                    //         y: 0,
-                    //         padding: 0,
-                    //         style: {
-                    //             color: colors[8],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     opposite: true,
-                    //     visible: false
-                    // },
-                    // {
-                    //     title: {
-                    //         text: 'ROL Fx 251-500',
-                    //         style: {
-                    //             color: colors[9],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     labels: {
-                    //         formatter: function () {
-                    //             return utilFormat.ValueZero(this.value);
-                    //         },
-                    //         x: 0,
-                    //         y: 0,
-                    //         padding: 0,
-                    //         style: {
-                    //             color: colors[9],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     opposite: true,
-                    //     visible: false
-                    // }
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[11],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ES. QTD',
+                        style: {
+                            color: colors[12],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[12],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ES. Custo Médio',
+                        style: {
+                            color: colors[13],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[13],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ES. Valor',
+                        style: {
+                            color: colors[14],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[14],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ES. Fator',
+                        style: {
+                            color: colors[15],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[15],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ES. GIRO',
+                        style: {
+                            color: colors[16],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[16],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ES. DIAS',
+                        style: {
+                            color: colors[17],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[17],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'SKUD',
+                        style: {
+                            color: colors[18],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[18],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'CC',
+                        style: {
+                            color: colors[19],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[19],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'NF',
+                        style: {
+                            color: colors[20],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[20],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'TKM',
+                        style: {
+                            color: colors[21],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[21],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'CC Dia',
+                        style: {
+                            color: colors[22],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.value,2);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[22],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ROL Fx 26-50',
+                        style: {
+                            color: colors[23],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[23],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ROL Fx 101-250',
+                        style: {
+                            color: colors[24],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[24],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                },
+                {
+                    title: {
+                        text: 'ROL Fx 251-500',
+                        style: {
+                            color: colors[25],
+                            fontSize: '10px'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[25],
+                            fontSize: '10px'
+                        }
+                    },
+                    opposite: true,
+                    visible: false
+                }
                 ],
                 tooltip: {
                     // shared: true,

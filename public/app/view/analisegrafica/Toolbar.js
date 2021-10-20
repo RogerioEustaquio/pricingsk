@@ -50,6 +50,15 @@ Ext.define('App.view.analisegrafica.Toolbar',{
                     name: 'estoque',
                     idItem: 'estoque',
                     // checked: false
+                },
+                {
+                    xtype: 'checkboxfield',
+                    margin: '2 2 2 2',
+                    labelWidth: 90,
+                    fieldLabel: 'Cliente',
+                    name: 'cliente',
+                    idItem: 'cliente',
+                    // checked: false
                 }
             ],
             bbar:[
@@ -63,7 +72,15 @@ Ext.define('App.view.analisegrafica.Toolbar',{
 
                         array.push({
                             name : 'faixaCusto',
-                            value: meWindow.down('checkboxfield[name=faixaCusto]').getValue()
+                            value: meWindow.down('checkboxfield[name=faixaCusto]').checked
+                        });
+                        array.push({
+                            name : 'estoque',
+                            value: meWindow.down('checkboxfield[name=estoque]').checked
+                        });
+                        array.push({
+                            name : 'cliente',
+                            value: meWindow.down('checkboxfield[name=cliente]').checked
                         });
 
                         me.indicadoresAdd = array;
@@ -78,8 +95,16 @@ Ext.define('App.view.analisegrafica.Toolbar',{
                                 for (let index = 0; index < me.indicadoresAdd.length; index++) {
 
                                     if(me.indicadoresAdd[index].name == "faixaCusto"){
-                                        if(me.indicadoresAdd[index].value)
-                                            meWindow.down('checkboxfield[name=faixaCusto]').setValue(true);
+                                        meWindow.down('checkboxfield[name=faixaCusto]').setValue(me.indicadoresAdd[index].value);
+                                        meWindow.down('checkboxfield[name=faixaCusto]').checked = me.indicadoresAdd[index].value;
+                                    }
+                                    if(me.indicadoresAdd[index].name == "estoque"){
+                                        meWindow.down('checkboxfield[name=estoque]').setValue(me.indicadoresAdd[index].value);
+                                        meWindow.down('checkboxfield[name=estoque]').checked = me.indicadoresAdd[index].value;
+                                    }
+                                    if(me.indicadoresAdd[index].name == "cliente"){
+                                            meWindow.down('checkboxfield[name=cliente]').setValue(me.indicadoresAdd[index].value);
+                                            meWindow.down('checkboxfield[name=cliente]').checked = me.indicadoresAdd[index].value;
                                     }
                                 }
                             }
