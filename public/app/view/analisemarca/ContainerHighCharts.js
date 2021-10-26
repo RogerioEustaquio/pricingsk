@@ -41,7 +41,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             me.setLoading({msg: 'Carregando...'});
                             
                             Ext.Ajax.request({
-                                url: BASEURL +'/api/analisemarca/listarfichaitemgrafico',
+                                url: BASEURL + '/api/analisemarca/listarfichaitemgrafico',
                                 method: 'POST',
                                 params: me.params,
                                 async: true,

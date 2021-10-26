@@ -24,26 +24,18 @@ Ext.define('App.view.analisemarca.RankGrid', {
             store: Ext.create('Ext.data.Store', {
                         model: Ext.create('Ext.data.Model', {
                         fields:[{name:'codEmpresa', type: 'number'},
-                                {name:'nomeEmpresa', type: 'string'},
-                                {name:'filial', type: 'string'},
-                                {name:'codTabPreco', type: 'string'},
-                                {name:'nomeTabPreco', type: 'string'},
-                                {name:'nmTabPreco', type: 'string'},
-                                {name:'dtVigor', type: 'string' },
-                                {name:'preco', type: 'number' },
+                                {name:'emp', type: 'string'},
                                 {name:'codProduto', type: 'number' },
                                 {name:'descricao', type: 'string' },
-                                {name:'marca', type: 'string' },
-                                {name:'codItemNbs', type: 'string' },
-                                {name:'mb', type: 'number' },
-                                {name:'tipoPrecificacao', type: 'string' },
-                                {name:'grupoDesconto', type: 'string' },
-                                {name:'estoque', type: 'number' },
-                                {name:'custoMedio', type: 'number' },
-                                {name:'valorEstoque', type: 'number' },
-                                {name:'custoOpe', type: 'number' },
-                                {name:'pisCofins', type: 'number' },
-                                {name:'icms', type: 'number' }
+                                {name:'codMarca', type: 'number'},
+                                {name:'descricaoMarca', type: 'string'},
+                                {name:'fxCuso', type: 'number'},
+                                {name:'estoque', type: 'number'},
+                                {name:'custoMedio', type: 'number'},
+                                {name:'valor', type: 'number'},
+                                {name:'curva', type: 'string'},
+                                {name:'clientes', type: 'number'}
+
                             ]
                         }),
                         pageSize: 50,
@@ -51,7 +43,7 @@ Ext.define('App.view.analisemarca.RankGrid', {
                         proxy: {
                             type: 'ajax',
                             method:'POST',
-                            url : BASEURL + '/api/basepreco/listarpreco',
+                            url : BASEURL + '/api/analisemarca/listarrank',
                             encode: true,
                             timeout: 240000,
                             format: 'json',
@@ -67,149 +59,85 @@ Ext.define('App.view.analisemarca.RankGrid', {
                     text: 'Cód. Filial',
                     dataIndex: 'codEmpresa',
                     width: 80,
-                    hidden: true
+                    hidden: false
                 },
                 {
                     text: 'Filial',
-                    dataIndex: 'nomeEmpresa',
+                    dataIndex: 'emp',
                     width: 68,
                     align: 'right'
                 },
                 {
-                    text: 'Cód. Tab. Preço',
-                    dataIndex: 'codTabPreco',
-                    width: 120,
-                    hidden: true
-                },
-                {
-                    text: 'Tabela Preço',
-                    dataIndex: 'nomeTabPreco',
-                    width: 200,
-                    align: 'right',
-                    hidden: true
-                },
-                {
-                    text: 'Vigor',
-                    dataIndex: 'dtVigor',
-                    width: 90,
-                    align: 'right'
-                },
-                {
-                    text: 'Preço',
-                    dataIndex: 'preco',
-                    width: 90,
-                    align: 'right',
-                    renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    },
-                },
-                {
-                    text: 'Id Produto',
+                    text: 'Cód. Produto',
                     dataIndex: 'codProduto',
-                    width: 90,
+                    width: 120,
                     hidden: false
                 },
                 {
-                    text: 'Produto',
+                    text: 'Descrição',
                     dataIndex: 'descricao',
+                    // width: 200,
+                    flex: 1,
+                    align: 'right',
+                    hidden: false
+                },
+                {
+                    text: 'Cód. Marca',
+                    dataIndex: 'codMarca',
                     width: 120,
-                    // align: 'right'
+                    align: 'right'
                 },
                 {
                     text: 'Marca',
-                    dataIndex: 'marca',
-                    width: 110,
-                    // align: 'right'
-                },
-                {
-                    text: 'Cód. Item NBS',
-                    dataIndex: 'codItemNbs',
+                    dataIndex: 'descricaoMarca',
                     width: 120,
+                    align: 'right'
+                },
+                {
+                    text: 'FX. Custo',
+                    dataIndex: 'fxCusto',
+                    width: 90,
                     hidden: false
-                },
-                {
-                    text: 'MB',
-                    dataIndex: 'mb',
-                    width: 74,
-                    align: 'right',
-                    renderer: function (v) {
-
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    },
-                },
-                {
-                    text: 'Tipo Precificação',
-                    dataIndex: 'tipoPrecificacao',
-                    width: 150,
-                    align: 'right'
-                },
-                {
-                    text: 'Grupo Desconto',
-                    dataIndex: 'grupoDesconto',
-                    width: 130,
-                    align: 'right'
                 },
                 {
                     text: 'Estoque',
                     dataIndex: 'estoque',
-                    width: 90,
-                    align: 'right',
+                    width: 120,
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     },
                 },
                 {
-                    text: 'Custo Unitário',
+                    text: 'Custo Médio',
                     dataIndex: 'custoMedio',
-                    width: 120,
-                    align: 'right',
-                    renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    },
-                },
-                {
-                    text: 'Valor Estoque',
-                    dataIndex: 'valorEstoque',
-                    width: 120,
-                    align: 'right',
-                    renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    },
-                },
-                {
-                    text: 'Custo Operacional',
-                    dataIndex: 'custoOpe',
-                    width: 150,
-                    align: 'right',
-                    renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    },
-                },
-                {
-                    text: 'Pis Cofins',
-                    dataIndex: 'pisCofins',
                     width: 110,
-                    align: 'right',
                     renderer: function (v) {
                         v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     },
                 },
                 {
-                    text: 'ICMS',
-                    dataIndex: 'icms',
-                    width: 90,
-                    align: 'right',
+                    text: 'Valor',
+                    dataIndex: 'valor',
+                    width: 120,
+                    hidden: false,
                     renderer: function (v) {
                         v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     },
+                },
+                {
+                    text: 'Curva',
+                    dataIndex: 'curva',
+                    width: 74,
+                    align: 'right',
+                },
+                {
+                    text: 'Cliente',
+                    dataIndex: 'cliente',
+                    width: 150,
+                    align: 'right'
                 }
             ],
             // features: [

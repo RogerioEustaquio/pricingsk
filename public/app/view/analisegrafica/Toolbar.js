@@ -143,7 +143,7 @@ Ext.define('App.view.analisegrafica.Toolbar',{
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
 
-        console.log(me.up('container').down('#analisegraficafiltro'));
+        // console.log(me.up('container').down('#analisegraficafiltro'));
 
         if(me.up('container').down('#analisegraficafiltro').hidden){
             me.up('container').down('#analisegraficafiltro').setHidden(false);

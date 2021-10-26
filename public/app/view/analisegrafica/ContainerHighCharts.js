@@ -208,9 +208,8 @@ Ext.define('App.view.analisegrafica.ContainerHighCharts', {
                                             //     iCont++;
                                             // });
                                         }
-                                        setTimeout(function(){
-                                            meChart.redraw();
-                                        },100);
+                                        
+                                        meChart.redraw();
                                         record.up('window').down('displayfield[name=contCheck]').setValue(cont);
                                     }
                                 };

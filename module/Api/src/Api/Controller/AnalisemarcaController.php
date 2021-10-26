@@ -1591,4 +1591,174 @@ class AnalisemarcaController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
+
+    public function listarrankAction()
+    {
+
+        // $emp            = $this->params()->fromPost('idEmpresas',null);
+        $emp            = $this->params()->fromQuery('idEmpresas',null);
+        $regional       = $this->params()->fromQuery('regional',null);
+        $data           = $this->params()->fromQuery('data',null);
+        $qtdemeses      = $this->params()->fromQuery('qtdemeses',null);
+        $codProdutos    = $this->params()->fromQuery('idProduto',null);
+        $produtos       = $this->params()->fromQuery('produto',null);
+        $idMarcas       = $this->params()->fromQuery('marca',null);
+        $montadora      = $this->params()->fromQuery('montadora',null);
+        $indicadoresAdd = $this->params()->fromQuery('indicadoresAdd',null);
+
+        $inicio     = $this->params()->fromQuery('start',null);
+        $final      = $this->params()->fromQuery('limit',null);
+
+        $indicadoresAdd = json_decode($indicadoresAdd);
+        if($emp){
+            $emp =  implode("','",json_decode($emp));
+        }
+        if($regional){
+
+            $arrayEmps = json_decode($regional);
+            $regional = '';
+            foreach($arrayEmps as $idRow){
+                
+                $arrayLinha = $this->funcregionais($idRow);
+                $regional .= implode("','",$arrayLinha);
+            }
+            
+            $emp = $emp ? $emp . "','". $regional : $regional;
+        }
+        
+        if($idMarcas){
+            $idMarcas = implode(",",json_decode($idMarcas));
+        }
+        if($montadora){
+            $montadora = implode("','",json_decode($montadora));
+        }
+        if($produtos){
+            $produtos =  implode("','",json_decode($produtos));
+        }
+        if($codProdutos){
+            $codProdutos =  implode(",",json_decode($codProdutos));
+        }
+
+        $data = array();
+
+        $andSql = '';
+        $andSql2 = '';
+        if($emp){
+            $andSql  = " and es.emp in ('$emp')";
+        }
+        if($codProdutos){
+
+            // $codProdutos =  implode("','",explode(',',$codProdutos));
+            $andSql .= " and p.cod_produto in ($codProdutos)";
+        }
+        if($idMarcas){
+            $andSql .= " and m.cod_marca in ($idMarcas)";
+        }
+        if($montadora){
+            $andSql .= " and p.cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+        }
+
+        // $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
+        // $sqlMeses = "";
+
+        // if($data){
+        //     $sysdate = "to_date('01/".$data."')";
+        // }else{
+        //     $sysdate = 'sysdate';
+        // }
+
+        // $andSqlData = '';
+        // if($data){
+        //     $andSqlData .= " and data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
+        //     $andSqlData .= " and data <= add_months(trunc($sysdate,'MM'),0)";
+        // }else{
+        //     $andSqlData .= " and data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+        // }
+        
+        try {
+
+            $pNode = $this->params()->fromQuery('node',null);
+
+            $sql = "select es.COD_EMPRESA,
+                            es.emp,
+                            es.COD_PRODUTO,
+                            p.DESCRICAO,
+                            p.COD_MARCA,
+                            m.DESCRICAO_MARCA,
+                            es.fx_custo,
+                            round(es.ESTOQUE,2) estoque,
+                            round(es.CUSTO_MEDIO,2) custo_medio,
+                            round(es.VALOR,2) valor,
+                            es.CURVA,
+                            es.CLIENTES
+                    from vw_skestoque es,
+                        vw_skproduto p,
+                        vw_skmarca m
+                    where es.COD_PRODUTO = p.COD_PRODUTO
+                    and p.COD_MARCA = m.COD_MARCA
+                    --and es.cod_produto = 397
+                    --and es.emp not in ('SA')
+                    $andSql
+                    and round(es.VALOR,2) > 0
+                    and rownum < 100";
+                    // print "$sql";
+                    // exit;
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql1 = "select count(*) as total from ($sql)";
+            // $stmt = $conn->prepare($sql1);
+            // $stmt->execute();
+            $stmt = $conn->query($sql1);
+            $resultCount = $stmt->fetchAll();
+
+        $sql = "
+            SELECT PGN.*
+            FROM (SELECT ROWNUM AS RNUM, PGN.*
+                    FROM ($sql) PGN) PGN
+            WHERE RNUM BETWEEN " . ($inicio +1 ) . " AND " . ($inicio + $final) . "
+        ";
+
+        // $stmt = $conn->prepare($sql);
+        // $stmt->execute();
+        $stmt = $conn->query($sql);
+        $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('cod_empresa', new ValueStrategy);
+            $hydrator->addStrategy('cod_produto', new ValueStrategy);
+            $hydrator->addStrategy('descricao', new ValueStrategy);
+            $hydrator->addStrategy('cod_marca', new ValueStrategy);
+            $hydrator->addStrategy('descricao_marca', new ValueStrategy);
+            $hydrator->addStrategy('fx_custo', new ValueStrategy);
+            $hydrator->addStrategy('estoque', new ValueStrategy);
+            $hydrator->addStrategy('custo_medio', new ValueStrategy);
+            $hydrator->addStrategy('valor', new ValueStrategy);
+            $hydrator->addStrategy('curva', new ValueStrategy);
+            $hydrator->addStrategy('clientes', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+
+            $objReturn = $this->getCallbackModel();
+            
+            $objReturn->total = $resultCount[0]['TOTAL'];
+            
+        } catch (\Exception $e) {
+            $objReturn = $this->setCallbackError($e->getMessage());
+        }
+
+
+        
+        return $objReturn;
+    }
+
 }

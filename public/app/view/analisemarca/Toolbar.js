@@ -276,6 +276,10 @@ Ext.define('App.view.analisemarca.Toolbar',{
             }
         });
 
+        var grid = me.up('container').down('#panelcenter').down('#listaspanel').down('#produtotpanel').down('#rankgrid');
+        grid.getStore().getProxy().setExtraParams(params);
+        grid.getStore().loadPage(1);
+
     },
 
     onBtnChart: function(btn, pressed){
