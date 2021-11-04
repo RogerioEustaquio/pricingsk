@@ -76,7 +76,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
                     xtype: 'checkboxfield',
                     margin: '2 2 2 2',
                     labelWidth: 90,
-                    fieldLabel: 'ìndices',
+                    fieldLabel: 'índices',
                     name: 'indices',
                     idItem: 'indices',
                     // checked: false
