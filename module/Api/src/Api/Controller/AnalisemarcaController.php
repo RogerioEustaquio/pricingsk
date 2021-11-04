@@ -10,6 +10,7 @@ use Core\Stdlib\StdClass;
 use Core\Hydrator\ObjectProperty;
 use Core\Hydrator\Strategy\ValueStrategy;
 use Core\Mvc\Controller\AbstractRestfulController;
+use Zend\Console\Prompt\Char;
 
 class AnalisemarcaController extends AbstractRestfulController
 {
@@ -593,10 +594,10 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
             $sql = "select data,
-                            round(sum(estoque),2) estoque,
-                            round(sum(valor)/sum(estoque),2) custo_medio,
-                            round(sum(valor),2) valor,
-                            sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
+                           round(sum(estoque),2) estoque,
+                           round(sum(valor)/sum(estoque),2) custo_medio,
+                           round(sum(valor),2) valor,
+                           sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
                     from vw_skestoque_master a,
                          vw_skmarca m,
                          tb_sk_produto_montadora m2
@@ -854,6 +855,253 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayClienteMes;
     }
 
+    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora)
+    {
+        $data1 = array();
+
+        $andSql = '';
+        $andSql2 = '';
+        $andSqlEmp  = '';
+        if($emp){
+            $andSql  = " and a.emp in ('$emp')";
+            $andSqlEmp  = " and emp in ('$emp')";
+        }
+        if($codProdutos){
+
+            // $codProdutos =  implode("','",explode(',',$codProdutos));
+
+            $andSql  .= " and a.COD_PRODUTO in ($codProdutos)";
+            $andSql2 .= " and COD_PRODUTO in ($codProdutos)";
+        }
+        $andSqlmarca = '';
+        if($idMarcas){
+            $andSql  .= " and m.cod_marca in ($idMarcas)";
+            $andSqlmarca .= " and marca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
+        }
+        if($montadora){
+            $andSql  .= " and a.cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+            $andSql2 .= " and cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+        }
+
+        $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
+        $sqlMeses = "";
+
+        if($data){
+            $sysdate = "to_date('01/".$data."')";
+        }else{
+            $sysdate = 'sysdate';
+        }
+
+        $andSqlData = '';
+        if($data){
+            $andSqlData .= " and data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlData .= " and data <= add_months(trunc($sysdate,'MM'),0)";
+        }else{
+            $andSqlData .= " and data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+        }
+
+        if($qtdemeses>12){
+
+            for($int = $qtdemeses; $int > 12; $int--){
+
+                $sqlMeses .= "select add_months(trunc($sysdate,'MM'),-".($int-1).") as id from dual union all \n";
+                
+            }
+        }
+
+        try {
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $mesesIdx = [null,
+                        'Jan',
+                        'Fev',
+                        'Mar',
+                        'Abr',
+                        'Mai',
+                        'Jun',
+                        'Jul',
+                        'Ago',
+                        'Set',
+                        'Out',
+                        'Nov',
+                        'Dez'];
+
+            $sql = "$sqlMeses
+                    select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-10) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-9) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-8) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-7) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-6) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-5) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-4) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-3) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-2) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-1) as id from dual union all
+                    select add_months(trunc($sysdate,'MM'),-0) as id from dual    
+                    order by 1        
+            ";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data1      = array();
+            $mesSelecao = array();
+
+            $arrayIdxEstoque    = array();
+            $arrayIdxCompra     = array();
+
+            foreach ($resultSet as $row) {
+                $data1 = $hydrator->extract($row);
+
+                $mesSelecao[] = $mesesIdx[(float) substr($data1['id'], 3, 2)] .'/'. substr($data1['id'], 6, 2);
+
+                $arrayIdxEstoque[]  = 0;
+                $arrayIdxCompra[]    = 0;
+
+            }
+
+            $sql = "select data,
+                            sum(valor) as estoque_valor, 
+                            sum(valor2) as estoque_valor_custo_anterior,
+                            --sum(valor2)/sum(valor) as idx,
+                            round((sum(valor)/sum(valor2)-1)*100,2) as idx
+                    from ( select a.data,
+                                    a.estoque as estoque,
+                                    round(a.valor/a.estoque,2) custo_medio,
+                                    round(a.estoque*a.custo_medio,2) valor,
+                                    round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
+                            from vw_skestoque_master a,
+                                 vw_skmarca m,
+                                 (select data, emp, cod_produto, estoque, custo_medio, valor
+                                    from vw_skestoque_master
+                                 where data = '01/12/2020') a2
+                            where 1=1
+                            and a.marca = m.descricao_marca
+                            and a.emp = a2.emp(+)
+                            and a.cod_produto = a2.cod_produto(+)
+                            and a.data >= '01/01/2021' -- Não alterar essa data
+                            $andSql
+                            -- Aplicar filtro de produtos / marcas / lojas
+                            --and a.COD_PRODUTO = 397
+                            --and a.emp = 'SA'
+                            order by a.data
+                            )
+                    where 1 = 1 
+                    $andSqlData
+                    group by data
+                    order by data";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('data', new ValueStrategy);
+            // $hydrator->addStrategy('estoque_valor', new ValueStrategy);
+            // $hydrator->addStrategy('estoque_valor_custo_anterior', new ValueStrategy);
+            $hydrator->addStrategy('idx', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $contMes = 0;
+
+            foreach ($resultSet as $row) {
+
+                $elementos = $hydrator->extract($row);
+
+                $elementos['data'] = $mesesIdx[(float) substr($elementos['data'], 3, 2)] .'/'. substr($elementos['data'], 6, 2);
+
+                while($mesSelecao[$contMes] != $elementos['data'] && $contMes< $qtdemeses){
+                    $contMes++;
+                }
+
+                if($mesSelecao[$contMes] == $elementos['data']){
+
+                    $arrayIdxEstoque[$contMes]  = (float) $elementos['idx'];
+                    
+                }
+
+                $contMes++;
+
+            }
+
+            $andSqlEmp;
+            $andSqlmarca;
+            $andSql2;
+            $andSqlData;
+
+            $sql = "select data,
+                            sum(qtd_operacao) as qtd_operacao,
+                            round(sum(custo_operacao_pon_u)/sum(qtd_operacao),2) as custo_operacao_med_u,
+                            round(sum(custo_operacao_pon_n)/sum(qtd_operacao),2) as custo_operacao_med_n,
+                            round(sum(custo_operacao_pon_u),2) as custo_operacao_pon_u,
+                            round(sum(custo_operacao_pon_n),2) as custo_operacao_pon_n,
+                            round((sum(custo_operacao_pon_n)/sum(custo_operacao_pon_u)-1)*100,2) as idx
+                        from vm_idx_inflacao_compra_item
+                    where custo_operacao_pon_u is not null
+                    -- Aplicar filtro de produtos / marcas / lojas
+                    $andSqlEmp
+                    $andSqlmarca
+                    $andSql2
+                    $andSqlData
+                    group by data
+                    order by data asc";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('data', new ValueStrategy);
+            // $hydrator->addStrategy('custo_operacao_pon_u', new ValueStrategy);
+            // $hydrator->addStrategy('custo_operacao_pon_n', new ValueStrategy);
+            $hydrator->addStrategy('idx', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $contMes = 0;
+
+            foreach ($resultSet as $row) {
+
+                $elementos = $hydrator->extract($row);
+
+                $elementos['data'] = $mesesIdx[(float) substr($elementos['data'], 3, 2)] .'/'. substr($elementos['data'], 6, 2);
+
+                while($mesSelecao[$contMes] != $elementos['data'] && $contMes< $qtdemeses){
+                    $contMes++;
+                }
+
+                if($mesSelecao[$contMes] == $elementos['data']){
+
+                    $arrayIdxCompra[$contMes]  = (float) $elementos['idx'];
+                    
+                }
+
+                $contMes++;
+
+            }
+            // $this->setCallbackData($arrayClienteMes);
+            
+        } catch (\Exception $e) {
+            $arrayIdxEstoque    = null;
+            $arrayIdxCompra     = null;
+        }
+
+        $arrayIndecesMes[] = $arrayIdxEstoque;
+        $arrayIndecesMes[] = $arrayIdxCompra;
+
+        return $arrayIndecesMes;
+    }
+
     public function listarfichaitemgraficoAction()
     {
         $data = array();
@@ -967,6 +1215,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $consultaFaixaCusto = false;
             $consultaEstoque = false;
             $consultaCliente = false;
+            $consultaIndices = false;
             
             if($indicadoresAdd){
 
@@ -978,6 +1227,10 @@ class AnalisemarcaController extends AbstractRestfulController
 
                     if($indicadoresAdd[$i]->name == "cliente"){
                         $consultaCliente = $indicadoresAdd[$i]->value;
+                    }
+
+                    if($indicadoresAdd[$i]->name == "indices"){
+                        $consultaIndices = $indicadoresAdd[$i]->value;
                     }
                 }
             }
@@ -1030,6 +1283,8 @@ class AnalisemarcaController extends AbstractRestfulController
             $estoqueFator       = array();
             $estoqueGiro        = array();
             $estoqueDias        = array();
+            $idxEstoque         = array();
+            $idxCompra          = array();
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
@@ -1064,6 +1319,11 @@ class AnalisemarcaController extends AbstractRestfulController
                     $estoqueFator[] = 0;
                     $estoqueGiro[]  = 0;
                     $estoqueDias[]  = 0;
+                }
+
+                if($consultaIndices){
+                    $idxEstoque[]   = 0;
+                    $idxCompra[]    = 0;
                 }
 
             }
@@ -1107,6 +1367,16 @@ class AnalisemarcaController extends AbstractRestfulController
                 $cc         = $clienteMes[0];
                 $nf         = $clienteMes[1];
                 $tkm        = $clienteMes[2];
+            }
+
+            $idxestoque     = array();
+            $idxcompra      = array();
+
+            if($consultaIndices){
+
+                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora);
+                $idxestoque         = $idxMes[0];
+                $idxcompra          = $idxMes[1];
             }
 
             $sql = "select du.data,
@@ -1212,6 +1482,13 @@ class AnalisemarcaController extends AbstractRestfulController
                             $estoqueDias[$cont] =  round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2);
 
                         }
+                    }
+
+                    if($consultaIndices){
+
+                        $idxEstoque[$cont]  = round($idxestoque[$cont] ,2);
+                        $idxCompra[$cont]   = round($idxcompra[$cont] ,2);
+
                     }
 
                 }
@@ -1552,6 +1829,34 @@ class AnalisemarcaController extends AbstractRestfulController
                                      'style' => array( 'fontSize' => '10')
                                     )
                             ),
+                            array(
+                                'name' => 'IDX Estoque',
+                                'yAxis'=> 23,
+                                'color'=> $colors[23],
+                                'data' => $idxEstoque,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'IDX Compra',
+                                'yAxis'=> 24,
+                                'color'=> $colors[24],
+                                'data' => $idxCompra,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
                             // array(
                             //     'name' => 'ROL Fx 101-250',
                             //     'yAxis'=> 11,
@@ -1620,10 +1925,11 @@ class AnalisemarcaController extends AbstractRestfulController
             foreach($arrayEmps as $idRow){
                 
                 $arrayLinha = $this->funcregionais($idRow);
+
                 $regional .= implode("','",$arrayLinha);
             }
             
-            $emp = $emp ? $emp . "','". $regional : $regional;
+            $emp = $emp ? $emp . ($regional ? "','". $regional: "") : $regional;
         }
         
         if($idMarcas){
@@ -1685,7 +1991,7 @@ class AnalisemarcaController extends AbstractRestfulController
                             p.DESCRICAO,
                             p.COD_MARCA,
                             m.DESCRICAO_MARCA,
-                            es.fx_custo,
+                            to_char(es.fx_custo) fx_custo,
                             round(es.ESTOQUE,2) estoque,
                             round(es.CUSTO_MEDIO,2) custo_medio,
                             round(es.VALOR,2) valor,
@@ -1700,9 +2006,14 @@ class AnalisemarcaController extends AbstractRestfulController
                     --and es.emp not in ('SA')
                     $andSql
                     and round(es.VALOR,2) > 0
-                    and rownum < 100";
+                    and rownum < 100
+                    ";
                     // print "$sql";
                     // exit;
+
+            $session = $this->getSession();
+            $session['exportprodutorank'] = "$sql";
+            $this->setSession($session);
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
@@ -1713,17 +2024,17 @@ class AnalisemarcaController extends AbstractRestfulController
             $stmt = $conn->query($sql1);
             $resultCount = $stmt->fetchAll();
 
-        $sql = "
-            SELECT PGN.*
-            FROM (SELECT ROWNUM AS RNUM, PGN.*
-                    FROM ($sql) PGN) PGN
-            WHERE RNUM BETWEEN " . ($inicio +1 ) . " AND " . ($inicio + $final) . "
-        ";
+            $sql = "
+                SELECT PGN.*
+                FROM (SELECT ROWNUM AS RNUM, PGN.*
+                        FROM ($sql) PGN) PGN
+                WHERE RNUM BETWEEN " . ($inicio +1 ) . " AND " . ($inicio + $final) . "
+            ";
 
-        // $stmt = $conn->prepare($sql);
-        // $stmt->execute();
-        $stmt = $conn->query($sql);
-        $results = $stmt->fetchAll();
+            // $stmt = $conn->prepare($sql);
+            // $stmt->execute();
+            $stmt = $conn->query($sql);
+            $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
             $hydrator->addStrategy('cod_empresa', new ValueStrategy);
@@ -1759,6 +2070,225 @@ class AnalisemarcaController extends AbstractRestfulController
 
         
         return $objReturn;
+    }
+
+    public function gerarexcelAction()
+    {
+        $data = array();
+        
+        try {
+
+            $session = $this->getSession();
+
+            if($session['exportprodutorank']){
+
+                ini_set('memory_limit', '5120M' );
+
+                $em = $this->getEntityManager();
+                $conn = $em->getConnection();
+
+                $sql = $session['exportprodutorank'] ;
+
+                // $response = new \Zend\Http\Response();
+                // $response->setContent($sql);
+                // $response->setStatusCode(200);
+                // return $response;
+                
+                $conn = $em->getConnection();
+                $stmt = $conn->prepare($sql);
+                
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('cod_empresa', new ValueStrategy);
+                $hydrator->addStrategy('cod_produto', new ValueStrategy);
+                $hydrator->addStrategy('descricao', new ValueStrategy);
+                $hydrator->addStrategy('cod_marca', new ValueStrategy);
+                $hydrator->addStrategy('descricao_marca', new ValueStrategy);
+                $hydrator->addStrategy('fx_custo', new ValueStrategy);
+                $hydrator->addStrategy('estoque', new ValueStrategy);
+                $hydrator->addStrategy('custo_medio', new ValueStrategy);
+                $hydrator->addStrategy('valor', new ValueStrategy);
+                $hydrator->addStrategy('curva', new ValueStrategy);
+                $hydrator->addStrategy('clientes', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $data = array();
+                
+                $output = 'COD_EMPRESA;NOME_EMPRESA;COD_PRODUTO;DESCRICAO;COD_MARCA;DESCRICAO_MARCA'.
+                          ';FX_CUSTO;ESTOQUE;CUSTO_MEDIO;VALOR;CURVA;CLIENTE'."\n";
+
+                $i=0;
+                $fxCusto = ' ';
+                foreach ($resultSet as $row) {
+                    $data[] = $hydrator->extract($row);
+
+                    $codEmpresa     = $data[$i]['codEmpresa'];
+                    $nomeEmpresa    = $data[$i]['emp'];
+                    $codProduto     = $data[$i]['codProduto'];
+                    $descricao      = $data[$i]['descricao'];
+                    $codMarca       = $data[$i]['codMarca'];
+                    $marca          = $data[$i]['descricaoMarca'];
+                    $fxCusto        = (string) $data[$i]['fxCusto'];
+                    $estoque        = $data[$i]['estoque'];
+
+                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
+                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
+                    $curva          = (string) $data[$i]['curva'];
+                    $clientes       = $data[$i]['clientes'];
+
+                    $output  .= $codEmpresa.';'.
+                                $nomeEmpresa.';'.
+                                $codProduto.';'.
+                                $descricao.';'.
+                                $codMarca.';'.
+                                $marca.';'.
+                                $fxCusto."\";".
+                                $estoque.';'.
+                                $custoMedio.';'.
+                                $valor.';'.
+                                $curva.';'.
+                                $clientes."\n";
+                    $i++;
+                }
+
+                $response = new \Zend\Http\Response();
+                $response->setContent($output);
+                $response->setStatusCode(200);
+
+                $headers = [
+                        'Pragma' => 'public',
+                        'Cache-control' => 'must-revalidate, post-check=0, pre-check=0',
+                        'Cache-control' => 'private',
+                        'Expires' => '0000-00-00',
+                        'Content-Type' => 'application/CSV; charset=utf-8',
+                        'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Produto Rank.csv',
+                    ];
+                $responseHeaders = new \Zend\Http\Headers();
+                $responseHeaders->addHeaders($headers);
+                $response->setHeaders($responseHeaders);
+
+                return $response;
+
+            }
+
+            $this->setCallbackData($data);
+
+            $objReturn = $this->getCallbackModel();
+            
+        } catch (\Exception $e) {
+            $objReturn = $this->setCallbackError($e->getMessage());
+        }
+        
+        return $objReturn;
+    }
+
+    public function gerarexcel2Action()
+    {
+
+        $data = array();
+
+        try {
+
+            $session = $this->getSession();
+            $usuario = $session['info']['usuarioSistema'];
+
+            ini_set('memory_limit', '5120M' );
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql = $session['exportprodutorank'] ;
+            
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $sm = $this->getEvent()->getApplication()->getServiceManager();
+            $excelService = $sm->get('ExcelService');
+            $arqFile = '.\data\exportprodutorank_'.$session['info']['usuarioSistema'].'1.xlsx';
+            fopen($arqFile,'w'); // Paramentro $phpExcel somente retorno
+
+            $phpExcel = $excelService->createPHPExcelObject($arqFile);
+            $phpExcel->getActiveSheet()->setCellValue('A'.'1', 'COD_EMPRESA')
+                                       ->setCellValue('B'.'1', 'NOME_EMPRESA')
+                                       ->setCellValue('C'.'1', 'COD_PRODUTO')
+                                       ->setCellValue('D'.'1', 'DESCRICAO')
+                                       ->setCellValue('E'.'1', 'COD_MARCA')
+                                       ->setCellValue('F'.'1', 'DESCRICAO_MARCA')
+                                       ->setCellValue('G'.'1', 'FX_CUSTO')
+                                       ->setCellValue('H'.'1', 'ESTOQUE')
+                                       ->setCellValue('I'.'1', 'CUSTO_MEDIO')
+                                       ->setCellValue('J'.'1', 'VALOR')
+                                       ->setCellValue('K'.'1', 'CURVA')
+                                       ->setCellValue('L'.'1', 'CLIENTE');
+
+                $i=0;
+                $ix=2;
+                foreach ($resultSet as $row) {
+                    $data[] = $hydrator->extract($row);
+
+                    $codEmpresa     = $data[$i]['codEmpresa'];
+                    $nomeEmpresa    = $data[$i]['emp'];
+                    $codProduto     = $data[$i]['codProduto'];
+                    $descricao      = $data[$i]['descricao'];
+                    $codMarca       = $data[$i]['codMarca'];
+                    $marca          = $data[$i]['descricaoMarca'];
+                    $fxCusto        = $data[$i]['fxCusto'] ? $data[$i]['fxCusto'] : null ;
+                    $estoque        = $data[$i]['estoque'] ? $data[$i]['estoque'] : null ;
+
+                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
+                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
+                    $curva          = $data[$i]['curva'] ? $data[$i]['curva'] : null ;
+                    $clientes       = $data[$i]['clientes'] ? $data[$i]['clientes'] : null ;
+
+                    $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
+                                           ->setCellValue('B'.$ix, $nomeEmpresa)
+                                           ->setCellValue('C'.$ix, $codProduto)
+                                           ->setCellValue('D'.$ix, $descricao)
+                                           ->setCellValue('E'.$ix, $codMarca)
+                                           ->setCellValue('F'.$ix, $marca)
+                                           ->setCellValue('G'.$ix, $fxCusto)
+                                           ->setCellValue('H'.$ix, $estoque)
+                                           ->setCellValue('I'.$ix, $custoMedio)
+                                           ->setCellValue('J'.$ix, $valor)
+                                           ->setCellValue('K'.$ix, $curva)
+                                           ->setCellValue('L'.$ix, $clientes);
+                    $i++;
+                    $ix++;
+                }
+
+            $objWriter = $sm->get('ExcelService')->createWriter($phpExcel, 'Excel5');
+
+            $response = $excelService->createHttpResponse($objWriter, 200, [
+                'Pragma' => 'public',
+                'Cache-control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Cache-control' => 'private',
+                'Expires' => '0000-00-00',
+                'Content-Type' => 'application/vnd.ms-excel; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Produto Rank.xls',
+            ]);
+
+            return $response;
+
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+
+        $this->setCallbackData($data);
+        $this->setMessage("Solicitação enviada com sucesso.");
+        return $this->getCallbackModel();
+        
     }
 
 }

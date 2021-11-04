@@ -71,6 +71,15 @@ Ext.define('App.view.analisemarca.Toolbar',{
                     name: 'cliente',
                     idItem: 'cliente',
                     // checked: false
+                },
+                {
+                    xtype: 'checkboxfield',
+                    margin: '2 2 2 2',
+                    labelWidth: 90,
+                    fieldLabel: 'Indices',
+                    name: 'indices',
+                    idItem: 'indices',
+                    // checked: false
                 }
             ],
             bbar:[
@@ -90,6 +99,11 @@ Ext.define('App.view.analisemarca.Toolbar',{
                             name : 'cliente',
                             // value: meWindow.down('checkboxfield[name=cliente]').getValue()
                             value: meWindow.down('checkboxfield[name=cliente]').checked
+                        });
+                        array.push({
+                            name : 'indices',
+                            // value: meWindow.down('checkboxfield[name=indices]').getValue()
+                            value: meWindow.down('checkboxfield[name=indices]').checked
                         });
 
                         me.indicadoresAdd = array;
@@ -111,6 +125,11 @@ Ext.define('App.view.analisemarca.Toolbar',{
                                     if(me.indicadoresAdd[index].name == "cliente"){
                                             meWindow.down('checkboxfield[name=cliente]').setValue(me.indicadoresAdd[index].value);
                                             meWindow.down('checkboxfield[name=cliente]').checked = me.indicadoresAdd[index].value;
+                                    }
+
+                                    if(me.indicadoresAdd[index].name == "indices"){
+                                            meWindow.down('checkboxfield[name=indices]').setValue(me.indicadoresAdd[index].value);
+                                            meWindow.down('checkboxfield[name=indices]').checked = me.indicadoresAdd[index].value;
                                     }
 
                                 }
@@ -323,9 +342,9 @@ Ext.define('App.view.analisemarca.Toolbar',{
             
         }
         
-        setTimeout(function(){
+        // setTimeout(function(){
             charts.chart.redraw();
-        },250);
+        // },250);
 
     }
 

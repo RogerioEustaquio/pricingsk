@@ -71,12 +71,12 @@ return [
             'app-pricing' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route'    => '/precificacao[/:action]',
+                    'route'    => '/pricingsk[/:action]',
                     'constraints' => array(
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*'
                     ),
                     'defaults' => [
-                        'controller' => Controller\PrecificacaoController::class,
+                        'controller' => Controller\PricingskController::class,
                         'action' => 'index',
                     ],
                 ],

@@ -1,5 +1,5 @@
 Ext.define('App.view.basepreco.BaseprecoPanel', {
-    extend: 'Ext.tab.Panel',
+    extend: 'Ext.panel.Panel',
     xtype: 'baseprecopanel',
     itemId: 'baseprecopanel',
     // height: Ext.getBody().getHeight() * 0.9,
@@ -23,7 +23,6 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
                     xtype: 'container',
                     layout: 'border',
                     width: '100%',
-                    title: 'Parâmetros de Preço',
                     items:[
                         {
                             xtype: 'bprecotoolbar'
@@ -45,11 +44,6 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
 
                         }
                     ]
-                },
-                {
-                    xtype: 'panel',
-                    title: 'Geração de Preço'
-                    
                 }
 
             ]

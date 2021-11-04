@@ -45,7 +45,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                 method: 'POST',
                                 params: me.params,
                                 async: true,
-                                timeout: 240000,
+                                timeout: 480000,
                                 success: function (response) {
                                     
                                     me.setLoading(false);
@@ -230,7 +230,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                     }
                                 }
 
-                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia'];
+                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia','IDX Estoque','IDX Compra'];
 
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){
@@ -905,6 +905,52 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             padding: 0,
                             style: {
                                 color: colors[22],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'IDX Estoque',
+                            style: {
+                                color: colors[23],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[23],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'IDX Compra',
+                            style: {
+                                color: colors[24],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[24],
                                 fontSize: '10px'
                             }
                         },

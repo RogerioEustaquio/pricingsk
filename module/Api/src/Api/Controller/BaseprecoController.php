@@ -613,7 +613,6 @@ class BaseprecoController extends AbstractRestfulController
 
         $session = $this->getSession();
         $session['exportbasepreco'] = "$sql";
-
         $this->setSession($session);
 
         $sql1 = "select count(*) as totalCount from ($sql)";

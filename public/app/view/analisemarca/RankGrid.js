@@ -8,6 +8,58 @@ Ext.define('App.view.analisemarca.RankGrid', {
         'Ext.toolbar.Paging',
         'Ext.ux.util.Format'
     ],
+    title: 'Rank',
+    tools:[
+        {
+            xtype:'button',
+            iconCls: 'fa fa-download',
+            tooltip: 'Export',
+            menu: [
+                {
+                    text: 'CSV',
+                    handler: function(){
+
+                        var win = open('','forml');
+                        var link = BASEURL + '/api/analisemarca/gerarexcel';
+                        var dados = this.dado;
+
+                        var input = "<input type='hidden' name='dados' value='"+dados+"'></input>";
+                        input +=  " <input type='hidden' name='nome' value='produtorankexport'></input>";
+                        input +=  " <input type='hidden' name='total' value='"+this.total+"'></input>";
+
+                        var html = "<html><body><form id='forml' method='POST' action='"+link+"'> " +input+" </form></body></html>"
+
+                        win.document.write(html);
+                        win.document.close();
+                        win.document.getElementById('forml').submit();
+                    }
+                },
+                {
+                    text: 'XLS',
+                    handler: function(){
+
+                        var win = open('','forml');
+                        var link = BASEURL + '/api/analisemarca/gerarexcel2';
+                        var dados = this.dado;
+
+                        var input = "<input type='hidden' name='dados' value='"+dados+"'></input>";
+                        input +=  " <input type='hidden' name='nome' value='produtorankexport'></input>";
+                        input +=  " <input type='hidden' name='total' value='"+this.total+"'></input>";
+
+                        var html = "<html><body><form id='forml' method='POST' action='"+link+"'> " +input+" </form></body></html>"
+
+                        win.document.write(html);
+                        win.document.close();
+                        win.document.getElementById('forml').submit();
+                    }
+                }
+            ],
+            // handler: function(event, toolEl, panel){
+            //     // show help here
+            //     console.log(toolEl);
+            // }
+        }
+    ],
     bbar: {
         xtype: 'pagingtoolbar',
         displayInfo: true,
@@ -45,7 +97,7 @@ Ext.define('App.view.analisemarca.RankGrid', {
                             method:'POST',
                             url : BASEURL + '/api/analisemarca/listarrank',
                             encode: true,
-                            timeout: 240000,
+                            timeout: 580000,
                             format: 'json',
                             reader: {
                                 type: 'json',
