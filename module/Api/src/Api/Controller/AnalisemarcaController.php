@@ -1830,7 +1830,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'IDX Estoque',
+                                'name' => 'Inflação de Estoque',
                                 'yAxis'=> 23,
                                 'color'=> $colors[23],
                                 'data' => $idxEstoque,
@@ -1844,7 +1844,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'IDX Compra',
+                                'name' => 'Inflação de Compra',
                                 'yAxis'=> 24,
                                 'color'=> $colors[24],
                                 'data' => $idxCompra,

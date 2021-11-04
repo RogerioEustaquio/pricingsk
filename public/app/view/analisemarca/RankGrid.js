@@ -91,7 +91,7 @@ Ext.define('App.view.analisemarca.RankGrid', {
                             ]
                         }),
                         pageSize: 50,
-                        autoLoad: false,
+                        // autoLoad: false,
                         proxy: {
                             type: 'ajax',
                             method:'POST',

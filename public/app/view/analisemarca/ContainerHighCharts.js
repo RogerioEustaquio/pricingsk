@@ -230,7 +230,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                     }
                                 }
 
-                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia','IDX Estoque','IDX Compra'];
+                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia','Inflação de Estoque','Inflação de Compra'];
 
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){
@@ -913,7 +913,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'IDX Estoque',
+                            text: 'Inflação de Estoque',
                             style: {
                                 color: colors[23],
                                 fontSize: '10px'
@@ -936,7 +936,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'IDX Compra',
+                            text: 'Inflação de Compra',
                             style: {
                                 color: colors[24],
                                 fontSize: '10px'

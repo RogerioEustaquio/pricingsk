@@ -40,17 +40,25 @@ Ext.define('App.view.analisemarca.AnalisemarcaPanel', {
                                 {
                                     xtype: 'analisemarcachart',
                                     hidden: false,
-                                    region: 'north'
+                                    region: 'north',
                                 },
                                 {
                                     xtype: 'tabpanel',
                                     itemId: 'listaspanel',
                                     region: 'center',
+                                    hidden: true,
                                     items:[
                                         {
                                             xtype: 'produtotpanel'
                                         }
-                                    ]
+                                    ],
+                                    listeners: {
+                                        afterrender: function(){
+                                            if(this.hidden){
+                                                this.up('panel').setLayout('fit');
+                                            }
+                                        }
+                                    },
                                 }
                             ]
 

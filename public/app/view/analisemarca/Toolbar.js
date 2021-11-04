@@ -44,7 +44,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
             tooltip: 'Listas',
             margin: '1 1 1 4',
             enableToggle: true,
-            pressed: true,
+            pressed: false,
             toggleHandler: me.onBtnListas
         });
 
@@ -76,7 +76,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
                     xtype: 'checkboxfield',
                     margin: '2 2 2 2',
                     labelWidth: 90,
-                    fieldLabel: 'Indices',
+                    fieldLabel: 'ìndices',
                     name: 'indices',
                     idItem: 'indices',
                     // checked: false
