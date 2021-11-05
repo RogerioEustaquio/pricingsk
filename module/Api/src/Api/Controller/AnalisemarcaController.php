@@ -1477,9 +1477,9 @@ class AnalisemarcaController extends AbstractRestfulController
                         
                         if($estoqueValor[$cont] > 0){
 
-                            $estoqueFator[$cont] =  round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2);
-                            $estoqueGiro[$cont]  =  round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2);
-                            $estoqueDias[$cont] =  round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2);
+                            $estoqueFator[$cont] = $arrayCMV[$cont] >  0 ? round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2) : 0;
+                            $estoqueGiro[$cont]  = $arrayCMV[$cont] > 0 ? round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2) : 0;
+                            $estoqueDias[$cont] =  $arrayCMV[$cont] > 0 ? round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2) : 0;
 
                         }
                     }
