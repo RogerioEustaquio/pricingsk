@@ -1468,7 +1468,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
                         if($cc[$cont] > 0){
 
-                            $arrayCcDia[$cont] = round($cc[$cont] / $arrayDias[$cont] ,0);
+                            $arrayCcDia[$cont] = $arrayDias[$cont] > 0 ? round($cc[$cont] / $arrayDias[$cont] ,0) : 0;
                         }
 
                     }
@@ -1477,7 +1477,7 @@ class AnalisemarcaController extends AbstractRestfulController
                         
                         if($estoqueValor[$cont] > 0){
 
-                            $estoqueFator[$cont] = $arrayCMV[$cont] >  0 ? round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2) : 0;
+                            $estoqueFator[$cont] = $arrayCMV[$cont] > 0 ? round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2) : 0;
                             $estoqueGiro[$cont]  = $arrayCMV[$cont] > 0 ? round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2) : 0;
                             $estoqueDias[$cont] =  $arrayCMV[$cont] > 0 ? round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2) : 0;
 
@@ -2067,8 +2067,6 @@ class AnalisemarcaController extends AbstractRestfulController
             $objReturn = $this->setCallbackError($e->getMessage());
         }
 
-
-        
         return $objReturn;
     }
 
@@ -2233,40 +2231,40 @@ class AnalisemarcaController extends AbstractRestfulController
                                        ->setCellValue('K'.'1', 'CURVA')
                                        ->setCellValue('L'.'1', 'CLIENTE');
 
-                $i=0;
-                $ix=2;
-                foreach ($resultSet as $row) {
-                    $data[] = $hydrator->extract($row);
+            $i=0;
+            $ix=2;
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
 
-                    $codEmpresa     = $data[$i]['codEmpresa'];
-                    $nomeEmpresa    = $data[$i]['emp'];
-                    $codProduto     = $data[$i]['codProduto'];
-                    $descricao      = $data[$i]['descricao'];
-                    $codMarca       = $data[$i]['codMarca'];
-                    $marca          = $data[$i]['descricaoMarca'];
-                    $fxCusto        = $data[$i]['fxCusto'] ? $data[$i]['fxCusto'] : null ;
-                    $estoque        = $data[$i]['estoque'] ? $data[$i]['estoque'] : null ;
+                $codEmpresa     = $data[$i]['codEmpresa'];
+                $nomeEmpresa    = $data[$i]['emp'];
+                $codProduto     = $data[$i]['codProduto'];
+                $descricao      = $data[$i]['descricao'];
+                $codMarca       = $data[$i]['codMarca'];
+                $marca          = $data[$i]['descricaoMarca'];
+                $fxCusto        = $data[$i]['fxCusto'] ? $data[$i]['fxCusto'] : null ;
+                $estoque        = $data[$i]['estoque'] ? $data[$i]['estoque'] : null ;
 
-                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
-                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
-                    $curva          = $data[$i]['curva'] ? $data[$i]['curva'] : null ;
-                    $clientes       = $data[$i]['clientes'] ? $data[$i]['clientes'] : null ;
+                $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
+                $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
+                $curva          = $data[$i]['curva'] ? $data[$i]['curva'] : null ;
+                $clientes       = $data[$i]['clientes'] ? $data[$i]['clientes'] : null ;
 
-                    $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
-                                           ->setCellValue('B'.$ix, $nomeEmpresa)
-                                           ->setCellValue('C'.$ix, $codProduto)
-                                           ->setCellValue('D'.$ix, $descricao)
-                                           ->setCellValue('E'.$ix, $codMarca)
-                                           ->setCellValue('F'.$ix, $marca)
-                                           ->setCellValue('G'.$ix, $fxCusto)
-                                           ->setCellValue('H'.$ix, $estoque)
-                                           ->setCellValue('I'.$ix, $custoMedio)
-                                           ->setCellValue('J'.$ix, $valor)
-                                           ->setCellValue('K'.$ix, $curva)
-                                           ->setCellValue('L'.$ix, $clientes);
-                    $i++;
-                    $ix++;
-                }
+                $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
+                                        ->setCellValue('B'.$ix, $nomeEmpresa)
+                                        ->setCellValue('C'.$ix, $codProduto)
+                                        ->setCellValue('D'.$ix, $descricao)
+                                        ->setCellValue('E'.$ix, $codMarca)
+                                        ->setCellValue('F'.$ix, $marca)
+                                        ->setCellValue('G'.$ix, $fxCusto)
+                                        ->setCellValue('H'.$ix, $estoque)
+                                        ->setCellValue('I'.$ix, $custoMedio)
+                                        ->setCellValue('J'.$ix, $valor)
+                                        ->setCellValue('K'.$ix, $curva)
+                                        ->setCellValue('L'.$ix, $clientes);
+                $i++;
+                $ix++;
+            }
 
             $objWriter = $sm->get('ExcelService')->createWriter($phpExcel, 'Excel5');
 

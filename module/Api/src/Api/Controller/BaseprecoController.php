@@ -326,7 +326,6 @@ class BaseprecoController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-
     public function listarprecoAction(){
 
         $idEmpresas     = $this->params()->fromQuery('idEmpresas',null);
@@ -887,6 +886,574 @@ class BaseprecoController extends AbstractRestfulController
                 'Expires' => '0000-00-00',
                 'Content-Type' => 'application/vnd.ms-excel; charset=utf-8',
                 'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Base Preço.xls',
+            ]);
+
+            return $response;
+
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+
+        $this->setCallbackData($data);
+        $this->setMessage("Solicitação enviada com sucesso.");
+        return $this->getCallbackModel();
+        
+    }
+
+    public function listargprecoAction(){
+
+        $idEmpresas     = $this->params()->fromQuery('idEmpresas',null);
+        $notMarca       = $this->params()->fromQuery('notMarca',null);
+        $marcas         = $this->params()->fromQuery('idMarcas',null);
+        $produtos       = $this->params()->fromQuery('produtos',null);
+        $codTabPreco    = $this->params()->fromQuery('codTabPreco',null);
+        $idProduto      = $this->params()->fromQuery('idProduto',null);
+        $grupoDesconto  = $this->params()->fromQuery('grupoDesconto',null);
+
+        $checkEstoque           = $this->params()->fromQuery('checkEstoque',null);
+        $checkpreco             = $this->params()->fromQuery('checkpreco',null);
+        $checkmargem            = $this->params()->fromQuery('checkmargem',null);
+        $checktipoprecificacao  = $this->params()->fromQuery('checktipoprecificacao',null);
+        $checkgrupodesconto     = $this->params()->fromQuery('checkgrupodesconto',null);
+        $checktabelapreco       = $this->params()->fromQuery('checktabelapreco',null);
+        $checkcustounitario     = $this->params()->fromQuery('checkcustounitario',null);
+
+        $inicio     = $this->params()->fromQuery('start',null);
+        $final      = $this->params()->fromQuery('limit',null);
+
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+
+        if($idEmpresas){
+            $idEmpresas =  implode(",",json_decode($idEmpresas));
+        }
+        if($marcas){
+            $marcas = implode("','",json_decode($marcas));
+        }
+        if($produtos){
+            $produtos = implode("','",json_decode($produtos));
+        }
+        if($codTabPreco){
+            $codTabPreco = implode(",",json_decode($codTabPreco));
+        }
+        if($idProduto){
+            $idProduto = implode(",",json_decode($idProduto));
+        }
+        // if($grupoDesconto){
+        //     $grupoDesconto = implode("','",json_decode($grupoDesconto));
+        // }
+
+        $andSql = '';
+        $andSqlEmp = "";
+        if($idEmpresas){
+            $andSqlEmp = " and cod_empresa in ($idEmpresas)";
+        }
+        $andSqlMarca = "";
+        if($marcas){
+            $notMarca = !$notMarca? '': 'not';
+            $andSqlMarca = " and marca $notMarca in ('$marcas')";
+        }
+        
+        $andSqlProduto ='';
+        if($produtos){
+            $andSqlProduto = " and cod_nbs in ('$produtos')";
+        }
+        if($idProduto){
+            $andSqlProduto .= " and nvl(cod_produto,'') in ($idProduto)";
+        }
+        $andSqlPreco = "";
+        if($codTabPreco){
+            $andSqlPreco = " and nvl(cod_tabela,'') in ($codTabPreco)";
+        }
+        // $andSqlGrupo = "";
+        // if($grupoDesconto){
+        //     $andSqlGrupo = " and pd.grupo_desconto in ('$grupoDesconto')";
+        // }
+        $andSqlCkEstoque = "";
+        switch ($checkEstoque) {
+            case 'Com':
+                $andSqlCkEstoque = " and nvl(ESTOQUE,0) > 0";
+                break;
+            case 'Sem':
+                $andSqlCkEstoque = " and nvl(ESTOQUE,0) = 0";
+                break;
+            default:
+               break;
+        }
+        $andSqlCkPreco = "";
+        switch ($checkpreco) {
+            case 'Com':
+                $andSqlCkPreco = " and nvl(preco_atual,0) > 0";
+                break;
+            case 'Sem':
+                $andSqlCkPreco = " and nvl(preco_atual,0) = 0";
+                break;
+        }
+        $andSqlCkTbPreco = "";
+        switch ($checktabelapreco) {
+            case 'Com':
+                $andSqlCkTbPreco = " and trim(cod_tabela) is not null";
+                break;
+            case 'Sem':
+                $andSqlCkTbPreco = " and trim(cod_tabela) is null";
+                break;
+        }
+        // $andSqlCkMb = "";
+        // switch ($checkmargem) {
+        //     case 'Com':
+        //         $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) > 0";
+        //         break;
+        //     case 'Sem':
+        //         $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) = 0";
+        //         break;
+        //     case '>10':
+        //         $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) > 10";
+        //         break;
+        //     case '>5':
+        //         $andSqlCkMb = " and nvl(round((preco_liq - custo_medio) / preco_liq *100,2),0) > 5";
+        //         break;
+        // }
+        $andSqlTpPrecificacao = '';
+        switch ($checktipoprecificacao) {
+            case 'Com':
+                $andSqlTpPrecificacao = " and trim(TIPO_PRECIFICACAO) is not null";
+                break;
+            case 'Sem':
+                $andSqlTpPrecificacao = " and trim(TIPO_PRECIFICACAO) is null";
+                break;
+        }
+        $andSqlCkGdesc = "";
+        switch ($checkgrupodesconto) {
+            case 'Com':
+                $andSqlCkGdesc = " and trim(grupo_desconto) is not null";
+                break;
+            case 'Sem':
+                $andSqlCkGdesc = " and trim(grupo_desconto) is null";
+                break;
+        }
+        // $andSqlCkUnitario = "";
+        // switch ($checkcustounitario) {
+        //     case 'Com':
+        //         $andSqlCkUnitario = " and trim(custo_medio) is not null";
+        //         break;
+        //     case 'Sem':
+        //         $andSqlCkUnitario = " and trim(custo_medio) is null";
+        //         break;
+        //     case 'c<p':
+        //         $andSqlCkUnitario = " and nvl(custo_medio,0) < nvl(PRECO,0)";
+        //         break;
+        // }
+
+        $sql = "select cod_empresa,
+                        empresa,
+                        cod_tabela,
+                        cod_produto,
+                        descricao,
+                        marca,
+                        cod_nbs,
+                        estoque,
+                        fx_custo,
+                        tipo_precificacao,
+                        curva,
+                        custo_medio,
+                        valor,
+                        pis,
+                        cofins,
+                        icms,
+                        grupo_desconto,
+                        perc_vendedor,
+                        cc_med12m,
+                        cc_med6m,
+                        cc_med3m,
+                        cc_m3,
+                        cc_m2,
+                        cc_m1,
+                        mb_12m,
+                        mb_6m,
+                        mb_3m,
+                        mb_m3,
+                        mb_m2,
+                        mb_m1,
+                        param_margem,
+                        margem_preco_atual,
+                        preco_atual,
+                        preco_atual_min,
+                        preco_atual_liq,
+                        preco_margem_param
+                from tmp_skbase_preco_teste
+             where 1= 1 
+             $andSqlEmp
+             $andSqlProduto
+             $andSqlMarca
+             $andSqlPreco
+             $andSqlCkEstoque
+             $andSqlCkPreco
+             $andSqlCkTbPreco
+             $andSqlTpPrecificacao
+             $andSqlCkGdesc
+          ";
+
+        $session = $this->getSession();
+        $session['exportgerapreco'] = "$sql";
+        $this->setSession($session);
+
+        $sql1 = "select count(*) as totalCount from ($sql)";
+        // $stmt = $conn->prepare($sql1);
+        // $stmt->execute();
+        $stmt = $conn->query($sql1);
+        $resultCount = $stmt->fetchAll();
+
+        $sql = "
+            SELECT PGN.*
+            FROM (SELECT ROWNUM AS RNUM, PGN.*
+                    FROM ($sql) PGN) PGN
+            WHERE RNUM BETWEEN " . ($inicio +1 ) . " AND " . ($inicio + $final) . "
+        ";
+
+        // $stmt = $conn->prepare($sql);
+        // $stmt->execute();
+        $stmt = $conn->query($sql);
+        $results = $stmt->fetchAll();
+
+        $hydrator = new ObjectProperty;
+        $hydrator->addStrategy('preco', new ValueStrategy);
+        $hydrator->addStrategy('estoque', new ValueStrategy);
+        $hydrator->addStrategy('custo_medio', new ValueStrategy);
+        $hydrator->addStrategy('valor', new ValueStrategy);
+        $hydrator->addStrategy('fx_custo', new ValueStrategy);
+        $hydrator->addStrategy('pis', new ValueStrategy);
+        $hydrator->addStrategy('cofins', new ValueStrategy);
+        $hydrator->addStrategy('icms', new ValueStrategy);
+        $hydrator->addStrategy('prec_vendedor', new ValueStrategy);
+        $hydrator->addStrategy('cc_med12m', new ValueStrategy);
+        $hydrator->addStrategy('cc_med6m', new ValueStrategy);
+        $hydrator->addStrategy('cc_med3m', new ValueStrategy);
+        $hydrator->addStrategy('cc_m3', new ValueStrategy);
+        $hydrator->addStrategy('cc_m2', new ValueStrategy);
+        $hydrator->addStrategy('cc_m1', new ValueStrategy);
+        $hydrator->addStrategy('mb_6m', new ValueStrategy);
+        $hydrator->addStrategy('mb_3m', new ValueStrategy);
+        $hydrator->addStrategy('mb_m3', new ValueStrategy);
+        $hydrator->addStrategy('mb_m2', new ValueStrategy);
+        $hydrator->addStrategy('mb_m1', new ValueStrategy);
+        $hydrator->addStrategy('margem_preco_atual', new ValueStrategy);
+        $hydrator->addStrategy('preco_atual', new ValueStrategy);
+        $hydrator->addStrategy('preco_atual_min', new ValueStrategy);
+        $hydrator->addStrategy('preco_atual_liq', new ValueStrategy);
+        $stdClass = new StdClass;
+        $resultSet = new HydratingResultSet($hydrator, $stdClass);
+        $resultSet->initialize($results);
+
+        $data = array();
+        foreach ($resultSet as $row) {
+            $data[] = $hydrator->extract($row);
+        }
+
+        $this->setCallbackData($data);
+
+        $objReturn = $this->getCallbackModel();
+
+        $objReturn->total = $resultCount[0]['TOTALCOUNT'];
+
+        return $objReturn;
+    }
+    
+    public function gerarprecoexcelAction()
+    {
+        $data = array();
+        
+        try {
+
+            $session = $this->getSession();
+
+            if($session['exportgerapreco']){
+
+                ini_set('memory_limit', '5120M' );
+
+                $em = $this->getEntityManager();
+                $conn = $em->getConnection();
+
+                $sql = $session['exportgerapreco'] ;
+                
+                $conn = $em->getConnection();
+                $stmt = $conn->prepare($sql);
+                
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('tipo_precificacao', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $data = array();
+                
+                $output = 'COD_EMPRESA;NOME_EMPRESA;COD_TABELA;COD_PRODUTO;DESCRICAO'.
+                          ';MARCA;COD_NBS;ESTOQUE;FX_CUSTO;TIPO_PRECIFICACAO;CURVA;CUSTO_MEDIO'.
+                          ';VALOR;PIS;COFINS;GRUPO_DESCONTO;PERC_VENDEDOR;CC_MED12M,CC_MED6M;CC_MED3M'.
+                          ';CC_M3;CC_M2;CC_M1;MB_12M;MB_6M;MB_3M;MB_M3;MB_M2;MB_M1'.
+                          ';PARAM_MARGEM;MARGEM_PRECO_ATUAL;PRECO_ATUAL;PRECO_ATUAL_MIN;PRECO_ATUAL_LIQ'.
+                          ';PRECO_MARGEM_PARAM'."\n";
+
+                $i=0;
+                foreach ($resultSet as $row) {
+                    $data[] = $hydrator->extract($row);
+
+                    $codEmpresa     = $data[$i]['codEmpresa'];
+                    $nomeEmpresa    = $data[$i]['empresa'];
+                    $codTabPreco    = $data[$i]['codTabela'];
+
+                    $estoque        = $data[$i]['estoque'] >0 ? $data[$i]['estoque'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
+                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
+                    $pis            = $data[$i]['pis'] >0 ? $data[$i]['pis'] : null ;
+                    $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
+                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
+                    $percVendedor   = $data[$i]['percVendedor'] >0 ? $data[$i]['percVendedor'] : null ;
+                    $ccMed12m       = $data[$i]['ccMed12m'] >0 ? $data[$i]['ccMed12m'] : null ;
+                    $ccMed6m        = $data[$i]['ccMed6m'] >0 ? $data[$i]['ccMed6m'] : null ;
+                    $ccMed3m        = $data[$i]['ccMed3m'] >0 ? $data[$i]['ccMed3m'] : null ;
+                    $ccM3           = $data[$i]['ccM3'] >0 ? $data[$i]['ccM3'] : null ;
+                    $ccM2           = $data[$i]['ccM2'] >0 ? $data[$i]['ccM2'] : null ;
+                    $ccM1           = $data[$i]['ccM1'] >0 ? $data[$i]['ccM1'] : null ;
+                    $mb_12m         = $data[$i]['mb_12m'] >0 ? $data[$i]['mb_12m'] : null ;
+                    $mb_6m          = $data[$i]['mb_6m'] >0 ? $data[$i]['mb_6m'] : null ;
+                    $mb_3m          = $data[$i]['mb_3m'] >0 ? $data[$i]['mb_3m'] : null ;
+                    $mbM3           = $data[$i]['mbM3'] >0 ? $data[$i]['mbM3'] : null ;
+                    $mbM2           = $data[$i]['mbM2'] >0 ? $data[$i]['mbM2'] : null ;
+                    $mbM1           = $data[$i]['mbM1'] >0 ? $data[$i]['mbM1'] : null ;
+                    $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] >0 ? $data[$i]['margemPrecoAtual'] : null ;
+                    $precoAtual         = $data[$i]['precoAtual'] >0 ? $data[$i]['precoAtual'] : null ;
+                    $precoAtualMin      = $data[$i]['precoAtualMin'] >0 ? $data[$i]['precoAtualMin'] : null ;
+                    $precoAtualLiq      = $data[$i]['precoAtualLiq'] >0 ? $data[$i]['precoAtualLiq'] : null ;
+                    $precoMargemParam               = $data[$i]['precoMargemParam'] >0 ? $data[$i]['precoMargemParam'] : null ;
+
+
+                    $output  .= $codEmpresa.';'.
+                                $nomeEmpresa.';'.
+                                $codTabPreco.';'.
+                                $data[$i]['codProduto'].';'.
+                                $data[$i]['descricao'].';'.
+                                $data[$i]['marca'].';'.
+                                $data[$i]['codNbs'].';'.
+                                $estoque.';'.
+                                $data[$i]['fxCusto'].';'.
+                                $data[$i]['tipoPrecificacao'].';'.
+                                $data[$i]['curva'].';'.
+                                $custoMedio.';'.
+                                $valor.';'.
+                                $pis.';'.
+                                $cofins.';'.
+                                $icms.';'.
+                                $data[$i]['grupoDesconto'].';'.
+                                $percVendedor.';'.
+                                $ccMed12m.';'.
+                                $ccMed6m.';'.
+                                $ccMed3m.';'.
+                                $ccM3.';'.
+                                $ccM2.';'.
+                                $ccM1.';'.
+                                $mb_12m.';'.
+                                $mb_6m.';'.
+                                $mb_3m.';'.
+                                $mbM3.';'.
+                                $mbM2.';'.
+                                $mbM1.';'.
+                                $data[$i]['paramMargem'].';'.
+                                $margemPrecoAtual.';'.
+                                $precoAtual.';'.
+                                $precoAtualMin.';'.
+                                $precoAtualLiq.';'.
+                                $precoMargemParam.';'."\n";
+                    $i++;
+                }
+
+                $response = new \Zend\Http\Response();
+                $response->setContent($output);
+                $response->setStatusCode(200);
+
+                $headers =[
+                        'Pragma' => 'public',
+                        'Cache-control' => 'must-revalidate, post-check=0, pre-check=0',
+                        'Cache-control' => 'private',
+                        'Expires' => '0000-00-00',
+                        'Content-Type' => 'application/CSV; charset=utf-8',
+                        'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Gerar Preço.csv',
+                    ];
+                $responseHeaders = new \Zend\Http\Headers();
+                $responseHeaders->addHeaders($headers);
+                $response->setHeaders($responseHeaders);
+
+                return $response;
+
+            }
+
+            $this->setCallbackData($data);
+
+            $objReturn = $this->getCallbackModel();
+            
+        } catch (\Exception $e) {
+            $objReturn = $this->setCallbackError($e->getMessage());
+        }
+        
+        return $objReturn;
+    }
+
+    public function gerarprecoexcel2Action()
+    {
+
+        $data = array();
+
+        try {
+
+            $session = $this->getSession();
+            $usuario = $session['info']['usuarioSistema'];
+
+            ini_set('memory_limit', '5120M' );
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql = $session['exportgerapreco'] ;
+            
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $sm = $this->getEvent()->getApplication()->getServiceManager();
+            $excelService = $sm->get('ExcelService');
+            $arqFile = '.\data\exportgerapreco_'.$session['info']['usuarioSistema'].'1.xlsx';
+            fopen($arqFile,'w'); // Paramentro $phpExcel somente retorno
+
+            $phpExcel = $excelService->createPHPExcelObject($arqFile);
+            $phpExcel->getActiveSheet()->setCellValue('A'.'1', 'COD_EMPRESA')
+                                       ->setCellValue('B'.'1', 'NOME_EMPRESA')
+                                       ->setCellValue('C'.'1', 'COD_TABELA')
+                                       ->setCellValue('D'.'1', 'NOME_TAB_PRECO')
+                                       ->setCellValue('E'.'1', 'COD_PRODUTO')
+                                       ->setCellValue('F'.'1', 'DESCRICAO')
+                                       ->setCellValue('G'.'1', 'MARCA')
+                                       ->setCellValue('H'.'1', 'COD_NBS')
+                                       ->setCellValue('I'.'1', 'ESTOQUE')
+                                       ->setCellValue('J'.'1', 'FX_CUSTO')
+                                       ->setCellValue('K'.'1', 'TIPO_PRECIFICACAO')
+                                       ->setCellValue('L'.'1', 'CURVA')
+                                       ->setCellValue('M'.'1', 'CUSTO_MEDIO')
+                                       ->setCellValue('N'.'1', 'VALOR')
+                                       ->setCellValue('O'.'1', 'PIS')
+                                       ->setCellValue('P'.'1', 'COFINS')
+                                       ->setCellValue('Q'.'1', 'GRUPO_DESCONTO')
+                                       ->setCellValue('R'.'1', 'PERC_VENDEDOR')
+                                       ->setCellValue('S'.'1', 'CC_MED12M')
+                                       ->setCellValue('T'.'1', 'CC_MED6M')
+                                       ->setCellValue('U'.'1', 'CC_MED3M')
+                                       ->setCellValue('V'.'1', 'CC_M3')
+                                       ->setCellValue('W'.'1', 'CC_M2')
+                                       ->setCellValue('X'.'1', 'CC_M1')
+                                       ->setCellValue('Y'.'1', 'MB_12M')
+                                       ->setCellValue('Z'.'1', 'MB_6M')
+                                       ->setCellValue('AA'.'1', 'MB_3M')
+                                       ->setCellValue('AB'.'1', 'MB_M3')
+                                       ->setCellValue('AC'.'1', 'MB_M2')
+                                       ->setCellValue('AD'.'1', 'MB_M1')
+                                       ->setCellValue('AE'.'1', 'PARAM_MARGEM')
+                                       ->setCellValue('AF'.'1', 'MARGEM_PRECO_ATUAL')
+                                       ->setCellValue('AG'.'1', 'PRECO_ATUAL')
+                                       ->setCellValue('AH'.'1', 'PRECO_ATUAL_MIN')
+                                       ->setCellValue('AI'.'1', 'PRECO_ATUAL_LIQ')
+                                       ->setCellValue('AJ'.'1', 'PRECO_MARGEM_PARAM');
+
+                $i=0;
+                $ix=2;
+                foreach ($resultSet as $row) {
+                    $data[] = $hydrator->extract($row);
+
+                    $codEmpresa     = $data[$i]['codEmpresa'];
+                    $nomeEmpresa    = $data[$i]['empresa'];
+                    $codTabPreco    = $data[$i]['codTabela'];
+
+                    $estoque        = $data[$i]['estoque'] >0 ? $data[$i]['estoque'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
+                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
+                    $pis            = $data[$i]['pis'] >0 ? $data[$i]['pis'] : null ;
+                    $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
+                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
+                    $percVendedor   = $data[$i]['percVendedor'] >0 ? $data[$i]['percVendedor'] : null ;
+                    $ccMed12m       = $data[$i]['ccMed12m'] >0 ? $data[$i]['ccMed12m'] : null ;
+                    $ccMed6m        = $data[$i]['ccMed6m'] >0 ? $data[$i]['ccMed6m'] : null ;
+                    $ccMed3m        = $data[$i]['ccMed3m'] >0 ? $data[$i]['ccMed3m'] : null ;
+                    $ccM3           = $data[$i]['ccM3'] >0 ? $data[$i]['ccM3'] : null ;
+                    $ccM2           = $data[$i]['ccM2'] >0 ? $data[$i]['ccM2'] : null ;
+                    $ccM1           = $data[$i]['ccM1'] >0 ? $data[$i]['ccM1'] : null ;
+                    $mb_12m         = $data[$i]['mb_12m'] >0 ? $data[$i]['mb_12m'] : null ;
+                    $mb_6m          = $data[$i]['mb_6m'] >0 ? $data[$i]['mb_6m'] : null ;
+                    $mb_3m          = $data[$i]['mb_3m'] >0 ? $data[$i]['mb_3m'] : null ;
+                    $mbM3           = $data[$i]['mbM3'] >0 ? $data[$i]['mbM3'] : null ;
+                    $mbM2           = $data[$i]['mbM2'] >0 ? $data[$i]['mbM2'] : null ;
+                    $mbM1           = $data[$i]['mbM1'] >0 ? $data[$i]['mbM1'] : null ;
+                    $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] >0 ? $data[$i]['margemPrecoAtual'] : null ;
+                    $precoAtual         = $data[$i]['precoAtual'] >0 ? $data[$i]['precoAtual'] : null ;
+                    $precoAtualMin      = $data[$i]['precoAtualMin'] >0 ? $data[$i]['precoAtualMin'] : null ;
+                    $precoAtualLiq      = $data[$i]['precoAtualLiq'] >0 ? $data[$i]['precoAtualLiq'] : null ;
+                    $precoMargemParam   = $data[$i]['precoMargemParam'] >0 ? $data[$i]['precoMargemParam'] : null ;
+
+                    $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
+                                               ->setCellValue('B'.$ix, $nomeEmpresa)
+                                               ->setCellValue('C'.$ix, $codTabPreco)
+                                               ->setCellValue('D'.$ix, $data[$i]['codProduto'])
+                                               ->setCellValue('E'.$ix, $data[$i]['descricao'])
+                                               ->setCellValue('F'.$ix, $data[$i]['marca'])
+                                               ->setCellValue('G'.$ix, $data[$i]['codNbs'])
+                                               ->setCellValue('H'.$ix, $estoque)
+                                               ->setCellValue('I'.$ix, $data[$i]['fxCusto'])
+                                               ->setCellValue('J'.$ix, $data[$i]['tipoPrecificacao'])
+                                               ->setCellValue('K'.$ix, $data[$i]['curva'])
+                                               ->setCellValue('L'.$ix, $custoMedio)
+                                               ->setCellValue('M'.$ix, $valor)
+                                               ->setCellValue('N'.$ix, $pis)
+                                               ->setCellValue('O'.$ix, $cofins)
+                                               ->setCellValue('P'.$ix, $icms)
+                                               ->setCellValue('Q'.$ix, $data[$i]['grupoDesconto'])
+                                               ->setCellValue('R'.$ix, $percVendedor)
+                                               ->setCellValue('S'.$ix, $ccMed12m)
+                                               ->setCellValue('T'.$ix, $ccMed6m)
+                                               ->setCellValue('U'.$ix, $ccMed3m)
+                                               ->setCellValue('V'.$ix, $ccM3)
+                                               ->setCellValue('W'.$ix, $ccM2)
+                                               ->setCellValue('X'.$ix, $ccM1)
+                                               ->setCellValue('Y'.$ix, $mb_12m)
+                                               ->setCellValue('Z'.$ix, $mb_6m)
+                                               ->setCellValue('AA'.$ix, $mb_3m)
+                                               ->setCellValue('AB'.$ix, $mbM3)
+                                               ->setCellValue('AC'.$ix, $mbM2)
+                                               ->setCellValue('AD'.$ix, $mbM1)
+                                               ->setCellValue('AE'.$ix, $data[$i]['paramMargem'])
+                                               ->setCellValue('AF'.$ix, $margemPrecoAtual)
+                                               ->setCellValue('AG'.$ix, $precoAtual)
+                                               ->setCellValue('AH'.$ix, $precoAtualMin)
+                                               ->setCellValue('AI'.$ix, $precoAtualLiq)
+                                               ->setCellValue('AJ'.$ix, $precoMargemParam);
+                    $i++;
+                    $ix++;
+                }
+
+            $objWriter = $sm->get('ExcelService')->createWriter($phpExcel, 'Excel5');
+
+            $response = $excelService->createHttpResponse($objWriter, 200, [
+                'Pragma' => 'public',
+                'Cache-control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Cache-control' => 'private',
+                'Expires' => '0000-00-00',
+                'Content-Type' => 'application/vnd.ms-excel; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename=' . 'JS Peças - Gerar Preço.xls',
             ]);
 
             return $response;

@@ -7,7 +7,10 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
     requires: [
         'App.view.basepreco.Toolbar',
         'App.view.basepreco.BprecoGrid',
-        'App.view.basepreco.BprecoFiltro'
+        'App.view.basepreco.BprecoFiltro',
+        'App.view.basepreco.ToolbarPreco',
+        'App.view.basepreco.GridPreco',
+        'App.view.basepreco.FiltroPreco',
     ],
     
     title: 'Base Preços',
@@ -48,7 +51,30 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
                 },
                 {
                     xtype: 'panel',
-                    title: 'Geração de Preço'
+                    title: 'Geração de Preço',
+                    layout: 'border',
+                    width: '100%',
+                    items:[
+                        {
+                            xtype: 'toolbarpreco'
+                        },
+                        {
+                            xtype: 'filtropreco'
+                        },
+                        {
+                            xtype: 'panel',
+                            itemId: 'panelcenterpreco',
+                            text: 'Base Preço',
+                            region: 'center',
+                            layout: 'fit',
+                            items:[
+                                {
+                                    xtype: 'gridpreco'
+                                }
+                            ]
+
+                        }
+                    ]
                     
                 }
 
