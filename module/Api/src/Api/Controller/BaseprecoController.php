@@ -1191,7 +1191,7 @@ class BaseprecoController extends AbstractRestfulController
                 
                 $output = 'COD_EMPRESA;NOME_EMPRESA;COD_TABELA;COD_PRODUTO;DESCRICAO'.
                           ';MARCA;COD_NBS;ESTOQUE;FX_CUSTO;TIPO_PRECIFICACAO;CURVA;CUSTO_MEDIO'.
-                          ';VALOR;PIS;COFINS;GRUPO_DESCONTO;PERC_VENDEDOR;CC_MED12M,CC_MED6M;CC_MED3M'.
+                          ';VALOR;PIS;COFINS;ICMS;GRUPO_DESCONTO;PERC_VENDEDOR;CC_MED12M;CC_MED6M;CC_MED3M'.
                           ';CC_M3;CC_M2;CC_M1;MB_12M;MB_6M;MB_3M;MB_M3;MB_M2;MB_M1'.
                           ';PARAM_MARGEM;MARGEM_PRECO_ATUAL;PRECO_ATUAL;PRECO_ATUAL_MIN;PRECO_ATUAL_LIQ'.
                           ';PRECO_MARGEM_PARAM'."\n";
@@ -1337,19 +1337,19 @@ class BaseprecoController extends AbstractRestfulController
             $phpExcel->getActiveSheet()->setCellValue('A'.'1', 'COD_EMPRESA')
                                        ->setCellValue('B'.'1', 'NOME_EMPRESA')
                                        ->setCellValue('C'.'1', 'COD_TABELA')
-                                       ->setCellValue('D'.'1', 'NOME_TAB_PRECO')
-                                       ->setCellValue('E'.'1', 'COD_PRODUTO')
-                                       ->setCellValue('F'.'1', 'DESCRICAO')
-                                       ->setCellValue('G'.'1', 'MARCA')
-                                       ->setCellValue('H'.'1', 'COD_NBS')
-                                       ->setCellValue('I'.'1', 'ESTOQUE')
-                                       ->setCellValue('J'.'1', 'FX_CUSTO')
-                                       ->setCellValue('K'.'1', 'TIPO_PRECIFICACAO')
-                                       ->setCellValue('L'.'1', 'CURVA')
-                                       ->setCellValue('M'.'1', 'CUSTO_MEDIO')
-                                       ->setCellValue('N'.'1', 'VALOR')
-                                       ->setCellValue('O'.'1', 'PIS')
-                                       ->setCellValue('P'.'1', 'COFINS')
+                                       ->setCellValue('D'.'1', 'COD_PRODUTO')
+                                       ->setCellValue('E'.'1', 'DESCRICAO')
+                                       ->setCellValue('F'.'1', 'MARCA')
+                                       ->setCellValue('G'.'1', 'COD_NBS')
+                                       ->setCellValue('H'.'1', 'ESTOQUE')
+                                       ->setCellValue('I'.'1', 'FX_CUSTO')
+                                       ->setCellValue('J'.'1', 'TIPO_PRECIFICACAO')
+                                       ->setCellValue('K'.'1', 'CURVA')
+                                       ->setCellValue('L'.'1', 'CUSTO_MEDIO')
+                                       ->setCellValue('M'.'1', 'VALOR')
+                                       ->setCellValue('N'.'1', 'PIS')
+                                       ->setCellValue('O'.'1', 'COFINS')
+                                       ->setCellValue('P'.'1', 'ICMS')
                                        ->setCellValue('Q'.'1', 'GRUPO_DESCONTO')
                                        ->setCellValue('R'.'1', 'PERC_VENDEDOR')
                                        ->setCellValue('S'.'1', 'CC_MED12M')

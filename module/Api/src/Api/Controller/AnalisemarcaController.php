@@ -308,6 +308,61 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
+    
+    public function listarcestaAction()
+    {
+        $data = array();
+        
+        try {
+
+            $pEmp    = $this->params()->fromQuery('emp',null);
+            $pCod    = $this->params()->fromQuery('codcesta',null);
+            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+
+            if(!$pCod){
+                throw new \Exception('Parâmetros não informados.');
+            }
+
+            $em = $this->getEntityManager();
+
+            if(!$tipoSql){
+                $filtroCesta = "like upper('".$pCod."%')";
+            }else{
+                $codigos =  implode("','",json_decode($pCod));
+                $filtroCesta = "= '".$codigos."'";
+            }
+            
+            $sql = "select distinct data codcesta, data descricao
+                         from tb_skprodutocesta
+                    where 1 = 1 
+                    and to_char(to_date(data),'MM/YYYY') $filtroCesta";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
     public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora)
     {
         $data1 = array();
@@ -1116,6 +1171,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $produtos       = $this->params()->fromPost('produto',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
             $montadora      = $this->params()->fromPost('montadora',null);
+            $cesta          = $this->params()->fromPost('cesta',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
                                     
             $meses = [null,
@@ -1132,7 +1188,12 @@ class AnalisemarcaController extends AbstractRestfulController
                      'Nov',
                      'Dez'];
 
+            $andSql = '';
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
             $indicadoresAdd = json_decode($indicadoresAdd);
+            $cesta = json_decode($cesta);
             if($emp){
                 $emp =  implode("','",json_decode($emp));
             }
@@ -1153,14 +1214,51 @@ class AnalisemarcaController extends AbstractRestfulController
             if($montadora){
                 $montadora = implode("','",json_decode($montadora));
             }
-            if($produtos){
-                $produtos =  implode("','",json_decode($produtos));
-            }
-            if($codProdutos){
-                $codProdutos =  implode(",",json_decode($codProdutos));
+            if($cesta){
+
+                $cesta = implode("','",$cesta);
+                // Tabela de cesta de produtos
+                $andCesta = " and data = '$cesta'";
+                if($emp){
+                    $andCesta .= " and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                }
+                $sql = " select distinct codprod
+                         from tb_skprodutocesta
+                         where 1 = 1
+                         $andCesta";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+                $hydrator = new ObjectProperty;
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $prods = array();
+                foreach ($resultSet as $row) {
+                    $prods = $hydrator->extract($row);
+                }
+
+                if(count($prods)>0){
+
+                    $codProdutos =  implode(",",$prods);
+                    
+                }else{
+                    $produtos = 'SN';
+                    $codProdutos = '0';
+                }
+
+            }else{
+
+                if($produtos){
+                    $produtos =  implode("','",json_decode($produtos));
+                }
+                if($codProdutos){
+                    $codProdutos =  implode(",",json_decode($codProdutos));
+                }
             }
 
-            $andSql = '';
+            
             if($emp){
                 $andSql = " and emp in ('$emp')";
             }
@@ -1176,11 +1274,11 @@ class AnalisemarcaController extends AbstractRestfulController
                 $andSql .= " and m.montadora in ('$montadora')";
             }
             
-            if($produtos){
+            if($produtos && $produtos != '[]'){
                 $andSql .= " and cod_nbs in ('$produtos')";
             }
 
-            if($codProdutos){
+            if($codProdutos && $codProdutos != '[]'){
                 $andSql .= " and i.cod_produto in ($codProdutos)";
             }
             
@@ -1199,7 +1297,7 @@ class AnalisemarcaController extends AbstractRestfulController
                 $andSqlPeriodo .= " and du.data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
                 $andSqlPeriodo .= " and du.data <= add_months(trunc($sysdate,'MM'),0)";
 
-            }else{
+            }else{                                                                         
                 $andSqlPeriodo .= " and du.data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
             }
             
@@ -1235,8 +1333,6 @@ class AnalisemarcaController extends AbstractRestfulController
                 }
             }
 
-            $em = $this->getEntityManager();
-            $conn = $em->getConnection();
 
             $sql = "$sqlMeses
                     select add_months(trunc($sysdate,'MM'),-11) as id from dual union all
@@ -1406,7 +1502,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     where du.data = a.data(+)
                     $andSqlPeriodo
                     order by data";
-
+                    
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();

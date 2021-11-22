@@ -321,6 +321,49 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                 elTagMontadora.setDisabled(false);
             }
         );
+        
+        var elTagCesta = Ext.create('Ext.form.field.Tag',{
+            name: 'elcesta',
+            itemId: 'elcesta',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [{ name: 'codcesta' }, { name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listarcesta',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'codcesta',
+            queryMode: 'remote',
+            displayField: 'codcesta',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',		                            
+                '{codcesta} {descricao}',
+                '</tpl>'), 
+            valueField: 'codcesta',
+            fieldLabel: 'Cesta de Produtos',
+            emptyText: 'Mês/Ano',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            listeners: {
+                
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
+        });
 
 
         Ext.applyIf(me, {
@@ -438,6 +481,23 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                     border: false,
                     items:[
                         elTagMontadora,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagCesta,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
