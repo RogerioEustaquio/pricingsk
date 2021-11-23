@@ -4,7 +4,7 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
     itemId: 'analisemarcafiltro',
     title: 'Filtro',
     region: 'west',
-    width: 290,
+    width: 314,
     hidden: true,
     scrollable: true,
     layout: 'vbox',
@@ -489,7 +489,14 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                             handler: function(form) {
                                 form.up('panel').down('tagfield').setValue(null);
                             }
-                        }
+                        },
+                        // {
+                        //     xtype: 'button',
+                        //     iconCls: 'fa fa-not-equal',
+                        //     tooltip: 'Diferente',
+                        //     margin: '1 1 1 1',
+                        // },
+                        // git
                     ]
                 },
                 {
