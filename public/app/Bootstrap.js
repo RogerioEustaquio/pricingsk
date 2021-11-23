@@ -48,22 +48,18 @@ Ext.application({
         // });
 
         if(!USUARIO && USUARIO != '""')
-        window.location.href = BASEURL + '/login';
-
-        // Recupera os dados do usuário
-        USUARIO = Ext.decode(USUARIO);
-
-        // console.log(USUARIO);
-
-        if(!USUARIO && USUARIO != '""')
 
         window.location.href = BASEURL + '/login';
+
+
 
         // Recupera os dados do usuário
 
         USUARIO = Ext.decode(USUARIO);
 
-        var acessos = ['EVERTONx'];
+
+
+        var acessos = ['EVERTONx']
 
         if(acessos.indexOf(USUARIO.usuarioSistema) === -1){
 
