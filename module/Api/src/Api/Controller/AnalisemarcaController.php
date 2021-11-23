@@ -1319,7 +1319,7 @@ class AnalisemarcaController extends AbstractRestfulController
                 $andSqlPeriodo .= " and du.data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
                 $andSqlPeriodo .= " and du.data <= add_months(trunc($sysdate,'MM'),0)";
 
-            }else{                                                                         
+            }else{
                 $andSqlPeriodo .= " and du.data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
             }
             
