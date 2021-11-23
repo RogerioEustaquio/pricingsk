@@ -103,6 +103,18 @@ Ext.define('App.controller.ApplicationController', {
             viewportTabs = viewport.down('#applicationtabs'),
             tab = viewportTabs.down(xtype);
 
+        var acessos = ['EVERTONx'];
+
+        if(acessos.indexOf(USUARIO.usuarioSistema) === -1){
+
+            alert(`Acesso negado para o usuário ${USUARIO.usuarioSistema}`)
+
+            me.redirectTo('home')
+
+            return;
+
+        }
+
         if(!tab){
             tab = viewportTabs.add({
                 closable: closable,

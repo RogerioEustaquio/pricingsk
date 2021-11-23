@@ -46,30 +46,17 @@ Ext.application({
         //     ]
             
         // });
-
-        if(!USUARIO && USUARIO != '""')
-
-        window.location.href = BASEURL + '/login';
-
-
+        
 
         // Recupera os dados do usuário
 
         USUARIO = Ext.decode(USUARIO);
 
+        
+        if(!USUARIO && USUARIO != '""')
 
+            window.location.href = BASEURL + '/login';
 
-        var acessos = ['EVERTONx']
-
-        if(acessos.indexOf(USUARIO.usuarioSistema) === -1){
-
-            alert(`Acesso negado para o usuário ${USUARIO.usuarioSistema}`)
-
-            // window.location.href = BASEURL + '/login';
-
-            me.redirectTo('home')
-
-        }
 
     }
 
