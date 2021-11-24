@@ -363,7 +363,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora)
+    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
     {
         $data1 = array();
 
@@ -377,9 +377,9 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql .= " and cod_marca in ($idMarcas)";
         }
 
-
         if($montadora){
-            $andSql .= " and m.montadora in ('$montadora')";
+            $inmont = $notmontadora == 'true' ? 'not' : '';
+            $andSql .= " and m.montadora $inmont in ('$montadora')";
         }
 
         if($codProdutos){
@@ -540,7 +540,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayFaixaCusto;
     }
     
-    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$cesta)
+    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
     {
         $data1 = array();
 
@@ -564,7 +564,8 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql .= " and m.cod_marca in ($idMarcas)";
         }
         if($montadora){
-            $andSql .= " and m2.montadora in ('$montadora')";
+            $inmont = $notmontadora == 'true' ? 'not' : '';
+            $andSql .= " and m2.montadora $inmont in ('$montadora')";
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -726,7 +727,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayEstoqueMes;
     }
 
-    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$cesta)
+    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
     {
         $data1 = array();
 
@@ -751,7 +752,8 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql .= " and marca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
         }
         if($montadora){
-            $andSql .= " and cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+            $inmont = $notmontadora == 'true' ? 'not' : '';
+            $andSql .= " and cod_produto $inmont in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -924,7 +926,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayClienteMes;
     }
 
-    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$cesta)
+    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
     {
         $data1 = array();
 
@@ -955,8 +957,9 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSqlmarca .= " and marca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
         }
         if($montadora){
-            $andSql  .= " and a.cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
-            $andSql2 .= " and cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+            $inmont = $notmontadora == 'true' ? 'not' : '';
+            $andSql  .= " and a.cod_produto $inmont in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+            $andSql2 .= " and cod_produto $inmont in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -1192,6 +1195,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $produtos       = $this->params()->fromPost('produto',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
             $montadora      = $this->params()->fromPost('montadora',null);
+            $notmontadora   = $this->params()->fromPost('notmontadora',null);
             $cesta          = $this->params()->fromPost('cesta',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
                                     
@@ -1293,7 +1297,8 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
             if($montadora){
-                $andSql .= " and m.montadora in ('$montadora')";
+                $inmont = $notmontadora == 'true' ? 'not' : '';
+                $andSql .= " and m.montadora $inmont in ('$montadora')";
             }
             
             if($produtos && $produtos != '[]'){
@@ -1455,7 +1460,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaFaixaCusto){
 
-                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora);
+                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
                 $FxCusto  = $FaixaCusto[0];
                 $FxCusto2  = $FaixaCusto[1];
             }
@@ -1468,7 +1473,7 @@ class AnalisemarcaController extends AbstractRestfulController
             
             if($consultaEstoque){
 
-                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$cesta);
+                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
                 $estoque            = $estoqueMes[0];
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
@@ -1481,7 +1486,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaCliente){
 
-                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$cesta);
+                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
                 $cc         = $clienteMes[0];
                 $nf         = $clienteMes[1];
                 $tkm        = $clienteMes[2];
@@ -1492,7 +1497,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaIndices){
 
-                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$cesta);
+                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
                 $idxestoque         = $idxMes[0];
                 $idxcompra          = $idxMes[1];
             }
@@ -2027,6 +2032,7 @@ class AnalisemarcaController extends AbstractRestfulController
         $produtos       = $this->params()->fromQuery('produto',null);
         $idMarcas       = $this->params()->fromQuery('marca',null);
         $montadora      = $this->params()->fromQuery('montadora',null);
+        $notmontadora   = $this->params()->fromQuery('notmontadora',null);
         $indicadoresAdd = $this->params()->fromQuery('indicadoresAdd',null);
 
         $inicio     = $this->params()->fromQuery('start',null);
@@ -2079,7 +2085,8 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql .= " and m.cod_marca in ($idMarcas)";
         }
         if($montadora){
-            $andSql .= " and p.cod_produto in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+            $inmont = $notmontadora == 'true' ? 'not' : '';
+            $andSql .= " and p.cod_produto $inmont in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
         }
 
         // $qtdemeses = !$qtdemeses ? 12: $qtdemeses;

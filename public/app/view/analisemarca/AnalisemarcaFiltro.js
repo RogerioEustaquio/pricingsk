@@ -4,7 +4,7 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
     itemId: 'analisemarcafiltro',
     title: 'Filtro',
     region: 'west',
-    width: 290,
+    width: 310,
     hidden: true,
     scrollable: true,
     layout: 'vbox',
@@ -490,22 +490,22 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                                 form.up('panel').down('tagfield').setValue(null);
                             }
                         },
-                        // {
-                        //     xtype: 'checkboxfield',
-                        //     margin: '1 1 1 1',
-                        //     fieldLabel: ' ≠ ',
-                        //     labelAlign: 'top',
-                        //     name :'notMontadora',
-                        //     itemId :'notMontadora',
-                        //     autoEl: {
-                        //         tag: 'div',
-                        //         'data-qtip': 'Diferente'
-                        //     }
-                        //     // style: {
-                        //     //     backgroundColor:'#EE0000 !important',
-                        //     //     fontSize: '100px !important'
-                        //     // },
-                        // }
+                        {
+                            xtype: 'checkboxfield',
+                            margin: '1 1 1 1',
+                            fieldLabel: ' ≠ ',
+                            labelAlign: 'top',
+                            name :'notmontadora',
+                            itemId :'notmontadora',
+                            autoEl: {
+                                tag: 'div',
+                                'data-qtip': 'Diferente'
+                            }
+                            // style: {
+                            //     backgroundColor:'#EE0000 !important',
+                            //     fontSize: '100px !important'
+                            // },
+                        }
                     ]
                 },
                 {

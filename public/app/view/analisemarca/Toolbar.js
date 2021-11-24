@@ -195,6 +195,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
         var produto     = me.up('container').down('#analisemarcafiltro').down('#elProduto').getValue();
         var marca       = me.up('container').down('#analisemarcafiltro').down('#elMarca').getValue();
         var montadora   = me.up('container').down('#analisemarcafiltro').down('#elMontadora').getValue();
+        var notmontadora= me.up('container').down('#analisemarcafiltro').down('#notmontadora').checked;
         var cesta       = me.up('container').down('#analisemarcafiltro').down('#elcesta').getValue();
 
         var qtdemeses = 12;
@@ -216,6 +217,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
             marca: Ext.encode(marca),
             indicadoresAdd: Ext.encode(me.indicadoresAdd),
             montadora : Ext.encode(montadora),
+            notmontadora : notmontadora,
             cesta : Ext.encode(cesta)
         };
 
