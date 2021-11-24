@@ -493,12 +493,18 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                         // {
                         //     xtype: 'checkboxfield',
                         //     margin: '1 1 1 1',
-                        //     fieldLabel: '≠  ',
+                        //     fieldLabel: ' ≠ ',
                         //     labelAlign: 'top',
+                        //     name :'notMontadora',
+                        //     itemId :'notMontadora',
                         //     autoEl: {
                         //         tag: 'div',
                         //         'data-qtip': 'Diferente'
                         //     }
+                        //     // style: {
+                        //     //     backgroundColor:'#EE0000 !important',
+                        //     //     fontSize: '100px !important'
+                        //     // },
                         // }
                     ]
                 },
