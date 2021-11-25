@@ -308,7 +308,6 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    
     public function listarcestaAction()
     {
         $data = array();
@@ -363,7 +362,62 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
+    public function listarespecialprodutoAction()
+    {
+        $data = array();
+        
+        try {
+
+            $pEmp    = $this->params()->fromQuery('emp',null);
+            $descricao    = $this->params()->fromQuery('descricao',null);
+            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+
+            if(!$descricao){
+                throw new \Exception('Parâmetros não informados.');
+            }
+
+            $em = $this->getEntityManager();
+
+            if(!$tipoSql){
+                $filtroProduto = "like upper('%".$descricao."%')";
+            }else{
+                $codigos =  implode("','",json_decode($descricao));
+                $filtroProduto = "= '".$codigos."'";
+            }
+            
+            $sql = "select distinct titulo descricao
+                         from tb_skprodutoselecaoespecial
+                    where 1 = 1 
+                    and upper(titulo) $filtroProduto";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+
+    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -540,7 +594,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayFaixaCusto;
     }
     
-    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
+    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -550,7 +604,10 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql  = " and a.emp in ('$emp')";
         }
 
-        if($cesta && $codNbs == 'SN'){
+        if($especialproduto && $codNbs == 'SN'){
+            $andSql .= " and a.cod_produto in (0)";
+
+        }elseif($cesta && $codNbs == 'SN'){
             $andSql .= " and a.cod_produto in (0)";
 
         }else{
@@ -727,7 +784,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayEstoqueMes;
     }
 
-    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
+    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -737,7 +794,10 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql  = " and emp in ('$emp')";
         }
 
-        if($cesta && $codNbs == 'SN'){
+        if($especialproduto && $codNbs == 'SN'){
+            $andSql .= " and cod_produto in (0)";
+
+        }elseif($cesta && $codNbs == 'SN'){
             $andSql .= " and cod_produto in (0)";
 
         }else{
@@ -926,7 +986,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayClienteMes;
     }
 
-    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta)
+    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -938,7 +998,11 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSqlEmp  = " and emp in ('$emp')";
         }
 
-        if($cesta && $codNbs == 'SN'){
+        if($especialproduto && $codNbs == 'SN'){
+            $andSql  .= " and a.COD_PRODUTO in (0)";
+            $andSql2 .= " and COD_PRODUTO in (0)";
+
+        }elseif($cesta && $codNbs == 'SN'){
             $andSql  .= " and a.COD_PRODUTO in (0)";
             $andSql2 .= " and COD_PRODUTO in (0)";
 
@@ -1077,7 +1141,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     where 1 = 1 
                     $andSqlData
                     group by data
-                    order by data";
+                    order by data";    
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -1197,6 +1261,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $montadora      = $this->params()->fromPost('montadora',null);
             $notmontadora   = $this->params()->fromPost('notmontadora',null);
             $cesta          = $this->params()->fromPost('cesta',null);
+            $especialproduto= $this->params()->fromPost('especialproduto',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
                                     
             $meses = [null,
@@ -1218,7 +1283,8 @@ class AnalisemarcaController extends AbstractRestfulController
             $conn = $em->getConnection();
 
             $indicadoresAdd = json_decode($indicadoresAdd);
-            $cesta = json_decode($cesta);
+            $cesta          = json_decode($cesta);
+            $especialproduto= json_decode($especialproduto);
             if($emp){
                 $emp =  implode("','",json_decode($emp));
             }
@@ -1239,7 +1305,43 @@ class AnalisemarcaController extends AbstractRestfulController
             if($montadora){
                 $montadora = implode("','",json_decode($montadora));
             }
-            if($cesta){
+            
+            if($especialproduto){
+
+                $especialproduto = implode("','",$especialproduto);
+                // Tabela de cesta de produtos
+                $and = " and upper(titulo) in upper('$especialproduto')";
+                if($emp){
+                    $and .= " and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                }
+                $sql = " select distinct codprod
+                         from tb_skprodutoselecaoespecial
+                         where 1 = 1
+                         $and";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+                $hydrator = new ObjectProperty;
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $prods = array();
+                foreach ($resultSet as $row) {
+                    $dataprod = $hydrator->extract($row);
+                    $prods[] = $dataprod['codprod'];
+                }
+
+                if(count($prods)>0){
+
+                    $codProdutos =  implode(",",$prods);
+                    
+                }else{
+                    $produtos = 'SN';
+                    $codProdutos = '0';
+                }
+
+            }elseif($cesta){
 
                 $cesta = implode("','",$cesta);
                 // Tabela de cesta de produtos
@@ -1460,7 +1562,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaFaixaCusto){
 
-                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
+                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
                 $FxCusto  = $FaixaCusto[0];
                 $FxCusto2  = $FaixaCusto[1];
             }
@@ -1473,7 +1575,7 @@ class AnalisemarcaController extends AbstractRestfulController
             
             if($consultaEstoque){
 
-                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
+                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
                 $estoque            = $estoqueMes[0];
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
@@ -1486,7 +1588,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaCliente){
 
-                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
+                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
                 $cc         = $clienteMes[0];
                 $nf         = $clienteMes[1];
                 $tkm        = $clienteMes[2];
@@ -1497,7 +1599,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaIndices){
 
-                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta);
+                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
                 $idxestoque         = $idxMes[0];
                 $idxcompra          = $idxMes[1];
             }
@@ -1529,7 +1631,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     where du.data = a.data(+)
                     $andSqlPeriodo
                     order by data";
-
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();

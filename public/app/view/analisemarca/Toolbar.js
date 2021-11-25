@@ -4,7 +4,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
     itemId: 'analisemarcatoolbar',
     region: 'north',
     requires:[
-        // 'App.view.analisegrafica.ContainerHighCharts'
+        'App.view.analisemarca.Windowcestaproduto'
     ],
     // indicadoresAdd: null,
 
@@ -149,6 +149,17 @@ Ext.define('App.view.analisemarca.Toolbar',{
                 btnConsultar,
                 btnchart,
                 btncards,
+                // {
+                //     xtype: 'button',
+                //     // text: 'Cesta',
+                //     iconCls: 'fa fa-shopping-basket',
+                //     tooltip: 'Cesta de Produtos',
+                //     margin: '1 1 1 4',
+                //     hidden: false,
+                //     handler: function(){
+                //         Ext.create('App.view.analisemarca.Windowcestaproduto').show();
+                //     }
+                // },
                 '->',
                 {
                     xtype: 'button',
@@ -179,24 +190,30 @@ Ext.define('App.view.analisemarca.Toolbar',{
     },
 
     onBtnConsultar: function(btn){
-
+        
         var me = this.up('toolbar');
+
+        var idEmpresas      = me.up('container').down('#analisemarcafiltro').down('#elEmp').getValue();
+        var regional        = me.up('container').down('#analisemarcafiltro').down('#elRegional').getValue();
+        var data            = me.up('container').down('#analisemarcafiltro').down('#data').getRawValue();
+        var meses24         = me.up('container').down('#analisemarcafiltro').down('radiofield[inputValue=24]');
+        var meses36         = me.up('container').down('#analisemarcafiltro').down('radiofield[inputValue=36]');
+        var idproduto       = me.up('container').down('#analisemarcafiltro').down('#eltagidproduto').getValue();
+        var produto         = me.up('container').down('#analisemarcafiltro').down('#elProduto').getValue();
+        var marca           = me.up('container').down('#analisemarcafiltro').down('#elMarca').getValue();
+        var montadora       = me.up('container').down('#analisemarcafiltro').down('#elMontadora').getValue();
+        var notmontadora    = me.up('container').down('#analisemarcafiltro').down('#notmontadora').checked;
+        var cesta           = me.up('container').down('#analisemarcafiltro').down('#elcesta').getValue();
+        var especialproduto = me.up('container').down('#analisemarcafiltro').down('#elespecialproduto').getValue();
+
+        if(especialproduto.length > 0 && cesta.length > 0){
+            alert('Informar no filtro somente Cesta de produto ou Seleção especial de produto!');
+            return '';
+        }
         
         var charts = me.up('container').down('#panelcenter').down('#analisemarcachart');
 
         charts.setLoading({msg: 'Carregando...'});
-
-        var idEmpresas  = me.up('container').down('#analisemarcafiltro').down('#elEmp').getValue();
-        var regional    = me.up('container').down('#analisemarcafiltro').down('#elRegional').getValue();
-        var data        = me.up('container').down('#analisemarcafiltro').down('#data').getRawValue();
-        var meses24     = me.up('container').down('#analisemarcafiltro').down('radiofield[inputValue=24]');
-        var meses36     = me.up('container').down('#analisemarcafiltro').down('radiofield[inputValue=36]');
-        var idproduto   = me.up('container').down('#analisemarcafiltro').down('#eltagidproduto').getValue();
-        var produto     = me.up('container').down('#analisemarcafiltro').down('#elProduto').getValue();
-        var marca       = me.up('container').down('#analisemarcafiltro').down('#elMarca').getValue();
-        var montadora   = me.up('container').down('#analisemarcafiltro').down('#elMontadora').getValue();
-        var notmontadora= me.up('container').down('#analisemarcafiltro').down('#notmontadora').checked;
-        var cesta       = me.up('container').down('#analisemarcafiltro').down('#elcesta').getValue();
 
         var qtdemeses = 12;
 
@@ -218,7 +235,8 @@ Ext.define('App.view.analisemarca.Toolbar',{
             indicadoresAdd: Ext.encode(me.indicadoresAdd),
             montadora : Ext.encode(montadora),
             notmontadora : notmontadora,
-            cesta : Ext.encode(cesta)
+            cesta : Ext.encode(cesta),
+            especialproduto: Ext.encode(especialproduto)
         };
 
         var seriesOrig = Array();
