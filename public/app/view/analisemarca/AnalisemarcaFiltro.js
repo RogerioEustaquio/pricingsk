@@ -365,90 +365,90 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
             }
         });
         
+        // var elTagespecial = Ext.create('Ext.form.field.Tag',{
+        //     name: 'elespecialproduto',
+        //     itemId: 'elespecialproduto',
+        //     multiSelect: true,
+        //     labelAlign: 'top',
+        //     width: 230,
+        //     labelWidth: 60,
+        //     store: Ext.data.Store({
+        //         fields: [{ name: 'descricao' }],
+        //         proxy: {
+        //             type: 'ajax',
+        //             url: BASEURL + '/api/analisemarca/listarespecialproduto',
+        //             reader: { type: 'json', root: 'data' },
+        //             extraParams: { tipoSql: 0}
+        //         }
+        //     }),
+        //     queryParam: 'descricao',
+        //     queryMode: 'remote',
+        //     displayField: 'descricao',
+        //     displayTpl: Ext.create('Ext.XTemplate',
+        //         '<tpl for=".">',		                            
+        //         '{codcesta} {descricao}',
+        //         '</tpl>'), 
+        //     valueField: 'descricao',
+        //     fieldLabel: 'Seleção Especial de Produtos',
+        //     emptyText: 'Descrição',
+        //     margin: '1 1 1 8',
+        //     filterPickList: true,
+        //     publishes: 'value',
+        //     listeners: {
+                
+        //     },
+            
+        //     // allowBlank: false,
+        //     listConfig: {
+        //         loadingText: 'Carregando...',
+        //         emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+        //         getInnerTpl: function() {
+        //             return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
+        //         }
+        //     }
+        // });
+
+        
         var elTagespecial = Ext.create('Ext.form.field.Tag',{
             name: 'elespecialproduto',
             itemId: 'elespecialproduto',
             multiSelect: true,
             labelAlign: 'top',
             width: 230,
-            labelWidth: 60,
             store: Ext.data.Store({
-                fields: [{ name: 'descricao' }],
+                fields: [
+                    { name: 'id', type: 'number' },
+                    { name: 'descricao', type: 'string' }
+                ],
                 proxy: {
                     type: 'ajax',
                     url: BASEURL + '/api/analisemarca/listarespecialproduto',
-                    reader: { type: 'json', root: 'data' },
-                    extraParams: { tipoSql: 0}
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
                 }
             }),
-            queryParam: 'descricao',
-            queryMode: 'remote',
+            queryParam: 'id',
+            queryMode: 'local',
             displayField: 'descricao',
-            displayTpl: Ext.create('Ext.XTemplate',
-                '<tpl for=".">',		                            
-                '{codcesta} {descricao}',
-                '</tpl>'), 
-            valueField: 'descricao',
-            fieldLabel: 'Seleção Especial de Produtos',
+            valueField: 'id',
             emptyText: 'Descrição',
+            fieldLabel: 'Seleção Especial de Produtos',
+            // labelWidth: 60,
             margin: '1 1 1 8',
+            // padding: 1,
+            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
-            listeners: {
-                
-            },
-            
-            // allowBlank: false,
-            listConfig: {
-                loadingText: 'Carregando...',
-                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
-                getInnerTpl: function() {
-                    return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
-                }
-            }
+            disabled: true
         });
-
-        
-        // var elTagespecial = Ext.create('Ext.form.field.Tag',{
-        //     name: 'elMontadora',
-        //     itemId: 'elMontadora',
-        //     multiSelect: true,
-        //     labelAlign: 'top',
-        //     width: 230,
-        //     store: Ext.data.Store({
-        //         fields: [
-        //             // { name: 'marca', type: 'string' },
-        //             { name: 'montadora', type: 'string' }
-        //         ],
-        //         proxy: {
-        //             type: 'ajax',
-        //             url: BASEURL + '/api/analisemarca/listarespecialproduto',
-        //             timeout: 120000,
-        //             reader: {
-        //                 type: 'json',
-        //                 root: 'data'
-        //             }
-        //         }
-        //     }),
-        //     queryParam: 'montadora',
-        //     queryMode: 'local',
-        //     displayField: 'montadora',
-        //     valueField: 'montadora',
-        //     emptyText: 'Montadora',
-        //     fieldLabel: 'Montadoras',
-        //     // labelWidth: 60,
-        //     margin: '1 1 1 8',
-        //     // padding: 1,
-        //     // plugins:'dragdroptag',
-        //     filterPickList: true,
-        //     publishes: 'value',
-        //     disabled: true
-        // });
-        // elTagespecial.store.load(
-        //     function(){
-        //         elTagMontadora.setDisabled(false);
-        //     }
-        // );
+        elTagespecial.store.load(
+            function(){
+                elTagespecial.setDisabled(false);
+            }
+        );
 
 
         Ext.applyIf(me, {

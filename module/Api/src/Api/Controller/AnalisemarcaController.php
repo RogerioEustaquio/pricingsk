@@ -425,10 +425,11 @@ class AnalisemarcaController extends AbstractRestfulController
 
             $em = $this->getEntityManager();
 
-            $sql = "select distinct titulo descricao
+            $sql = "select distinct titulo descricao, id, data
                          from tb_skprodutoselecaoespecial
-                    where 1 = 1";
-
+                    where 1 = 1
+                    order by data desc";
+  
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
             // $stmt->bindValue(1, $pEmp);
@@ -454,6 +455,7 @@ class AnalisemarcaController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
+    
     public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
@@ -649,7 +651,19 @@ class AnalisemarcaController extends AbstractRestfulController
 
         }else{
             if($codProdutos){
-                $andSql .= " and a.cod_produto in ($codProdutos)";
+
+                if($especialproduto){
+                    if($emp){
+                        $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                    }
+                    $andSql .= " and a.cod_produto in (select distinct codprod
+                                                        from tb_skprodutoselecaoespecial
+                                                        where 1 = 1
+                                                        and id in ($especialproduto) 
+                                                        $andespecial)";
+                }else{
+                    $andSql .= " and a.cod_produto in ($codProdutos)";
+                }
             }
 
         }
@@ -842,7 +856,19 @@ class AnalisemarcaController extends AbstractRestfulController
 
                 $codProdutos =  implode("','",explode(',',$codProdutos));
 
-                $andSql .= " and cod_produto in ('$codProdutos')";
+                if($especialproduto){
+                    if($emp){
+                        $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                    }
+                    $andSql .= " and cod_produto in (select distinct to_char(codprod)
+                                                        from tb_skprodutoselecaoespecial
+                                                        where 1 = 1
+                                                        and id in ($especialproduto) 
+                                                        $andespecial)";
+                }else{
+
+                    $andSql .= " and cod_produto in ('$codProdutos')";
+                }
             }
         }
         if($idMarcas){
@@ -1048,8 +1074,24 @@ class AnalisemarcaController extends AbstractRestfulController
 
                 // $codProdutos =  implode("','",explode(',',$codProdutos));
 
-                $andSql  .= " and a.COD_PRODUTO in ($codProdutos)";
-                $andSql2 .= " and COD_PRODUTO in ($codProdutos)";
+                if($especialproduto){
+                    if($emp){
+                        $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                    }
+                    $sqlprodesp = "select distinct codprod
+                                        from tb_skprodutoselecaoespecial
+                                    where 1 = 1
+                                    and id in ($especialproduto) 
+                                    $andespecial";
+
+                    $andSql  .= " and a.COD_PRODUTO in ($sqlprodesp)";
+                    $andSql2 .= " and COD_PRODUTO in ($sqlprodesp)";
+
+                }else{
+
+                    $andSql  .= " and a.COD_PRODUTO in ($codProdutos)";
+                    $andSql2 .= " and COD_PRODUTO in ($codProdutos)";
+                }
             }
         }
         $andSqlmarca = '';
@@ -1178,8 +1220,8 @@ class AnalisemarcaController extends AbstractRestfulController
                     where 1 = 1 
                     $andSqlData
                     group by data
-                    order by data";    
-
+                    order by data";
+            
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1345,17 +1387,17 @@ class AnalisemarcaController extends AbstractRestfulController
             
             if($especialproduto){
 
-                $especialproduto = implode("','",$especialproduto);
+                $especialproduto = implode(",",$especialproduto);
                 // Tabela de cesta de produtos
-                $and = " and upper(titulo) in upper('$especialproduto')";
+                $and = " and id in ($especialproduto)";
                 if($emp){
                     $and .= " and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
                 }
-                $sql = " select distinct codprod
+                $sqlprodesp = " select distinct codprod
                          from tb_skprodutoselecaoespecial
                          where 1 = 1
                          $and";
-                $stmt = $conn->prepare($sql);
+                $stmt = $conn->prepare($sqlprodesp);
                 $stmt->execute();
                 $results = $stmt->fetchAll();
                 $hydrator = new ObjectProperty;
@@ -1445,7 +1487,12 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
             if($codProdutos && $codProdutos != '[]'){
-                $andSql .= " and i.cod_produto in ($codProdutos)";
+
+                if($especialproduto){
+                    $andSql .= " and i.cod_produto in ($sqlprodesp)";
+                }else{
+                    $andSql .= " and i.cod_produto in ($codProdutos)";
+                }
             }
             
             if($data){
