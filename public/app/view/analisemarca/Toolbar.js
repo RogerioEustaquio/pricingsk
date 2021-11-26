@@ -149,17 +149,17 @@ Ext.define('App.view.analisemarca.Toolbar',{
                 btnConsultar,
                 btnchart,
                 btncards,
-                {
-                    xtype: 'button',
-                    // text: 'Cesta',
-                    iconCls: 'fa fa-shopping-basket',
-                    tooltip: 'Cesta de Produtos',
-                    margin: '1 1 1 4',
-                    hidden: false,
-                    handler: function(){
-                        Ext.create('App.view.analisemarca.Windowcestaproduto').show();
-                    }
-                },
+                // {
+                //     xtype: 'button',
+                //     // text: 'Cesta',
+                //     iconCls: 'fa fa-shopping-basket',
+                //     tooltip: 'Cesta de Produtos',
+                //     margin: '1 1 1 4',
+                //     hidden: false,
+                //     handler: function(){
+                //         Ext.create('App.view.analisemarca.Windowcestaproduto').show();
+                //     }
+                // },
                 '->',
                 {
                     xtype: 'button',
