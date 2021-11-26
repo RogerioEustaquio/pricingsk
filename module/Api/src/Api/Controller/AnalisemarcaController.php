@@ -362,7 +362,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function listarespecialprodutoAction()
+    public function listarespecialprodutoBkpAction()
     {
         $data = array();
         
@@ -417,6 +417,43 @@ class AnalisemarcaController extends AbstractRestfulController
     }
 
 
+    public function listarespecialprodutoAction()
+    {
+        $data = array();
+        
+        try {
+
+            $em = $this->getEntityManager();
+
+            $sql = "select distinct titulo descricao
+                         from tb_skprodutoselecaoespecial
+                    where 1 = 1";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
     public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();

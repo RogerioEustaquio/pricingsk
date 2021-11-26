@@ -50,12 +50,23 @@ Ext.application({
 
         // Recupera os dados do usuário
 
-        USUARIO = Ext.decode(USUARIO);
+        // // USUARIO = Ext.decode(USUARIO);
 
-        
-        if(!USUARIO && USUARIO != '""')
+        // .
+        // // if(!USUARIO && USUARIO != '""')
+
+        // //     window.location.href = BASEURL + '/login';
+
+        if(USUARIO !== ''){
+
+            USUARIO = Ext.decode(USUARIO);
+
+        } else {
 
             window.location.href = BASEURL + '/login';
+
+        }
+
 
 
     }

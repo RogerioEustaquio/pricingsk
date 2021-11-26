@@ -408,6 +408,48 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
             }
         });
 
+        
+        // var elTagespecial = Ext.create('Ext.form.field.Tag',{
+        //     name: 'elMontadora',
+        //     itemId: 'elMontadora',
+        //     multiSelect: true,
+        //     labelAlign: 'top',
+        //     width: 230,
+        //     store: Ext.data.Store({
+        //         fields: [
+        //             // { name: 'marca', type: 'string' },
+        //             { name: 'montadora', type: 'string' }
+        //         ],
+        //         proxy: {
+        //             type: 'ajax',
+        //             url: BASEURL + '/api/analisemarca/listarespecialproduto',
+        //             timeout: 120000,
+        //             reader: {
+        //                 type: 'json',
+        //                 root: 'data'
+        //             }
+        //         }
+        //     }),
+        //     queryParam: 'montadora',
+        //     queryMode: 'local',
+        //     displayField: 'montadora',
+        //     valueField: 'montadora',
+        //     emptyText: 'Montadora',
+        //     fieldLabel: 'Montadoras',
+        //     // labelWidth: 60,
+        //     margin: '1 1 1 8',
+        //     // padding: 1,
+        //     // plugins:'dragdroptag',
+        //     filterPickList: true,
+        //     publishes: 'value',
+        //     disabled: true
+        // });
+        // elTagespecial.store.load(
+        //     function(){
+        //         elTagMontadora.setDisabled(false);
+        //     }
+        // );
+
 
         Ext.applyIf(me, {
 
@@ -536,7 +578,7 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                         {
                             xtype: 'checkboxfield',
                             margin: '1 1 1 1',
-                            fieldLabel: ' ≠ ',
+                            fieldLabel: ' <> ',
                             labelAlign: 'top',
                             name :'notmontadora',
                             itemId :'notmontadora',

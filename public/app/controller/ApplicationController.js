@@ -103,15 +103,17 @@ Ext.define('App.controller.ApplicationController', {
             viewportTabs = viewport.down('#applicationtabs'),
             tab = viewportTabs.down(xtype);
 
-        var acessos = ['EVERTON','ROGERIOADM','RENATO','PEDROOPE','MAYKONRS','WELISONOPE'];
+        var acessos = ['EVERTON','ROGERIOADM','RENATO','PEDROOPE','MAYKONRS','WELISONOPE','EVERTONOPE'];
 
         if(acessos.indexOf(USUARIO.usuarioSistema) === -1){
 
-            alert(`Acesso negado para o usuário ${USUARIO.usuarioSistema}`)
+            if(USUARIO !== '')
 
-            me.redirectTo('home')
+                alert(`Acesso negado para o usuário ${USUARIO.usuarioSistema}`)
+    
+                me.redirectTo('home')
 
-            return;
+                return;
 
         }
 
