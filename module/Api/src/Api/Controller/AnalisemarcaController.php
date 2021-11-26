@@ -653,14 +653,13 @@ class AnalisemarcaController extends AbstractRestfulController
             if($codProdutos){
 
                 if($especialproduto){
-                    if($emp){
-                        $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
-                    }
-                    $andSql .= " and a.cod_produto in (select distinct codprod
+                    // if($emp){
+                    //     $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                    // }
+                    $andSql .= " and (e.cod_empresa, a.cod_produto) in (select distinct codemp, codprod
                                                         from tb_skprodutoselecaoespecial
                                                         where 1 = 1
-                                                        and id in ($especialproduto) 
-                                                        $andespecial)";
+                                                        and id in ($especialproduto))";
                 }else{
                     $andSql .= " and a.cod_produto in ($codProdutos)";
                 }
@@ -772,10 +771,12 @@ class AnalisemarcaController extends AbstractRestfulController
                            sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
                     from vw_skestoque_master a,
                          vw_skmarca m,
-                         tb_sk_produto_montadora m2
+                         tb_sk_produto_montadora m2,
+                         vw_skempresa e
                     where 1 = 1
                     and a.marca = m.descricao_marca
                     and a.cod_produto = m2.cod_produto(+)
+                    and a.emp = e.emp
                     $andSql
                     group by data
                     order by data";
