@@ -780,7 +780,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     $andSql
                     group by data
                     order by data";
-
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1490,7 +1489,12 @@ class AnalisemarcaController extends AbstractRestfulController
             if($codProdutos && $codProdutos != '[]'){
 
                 if($especialproduto){
-                    $andSql .= " and i.cod_produto in ($sqlprodesp)";
+
+                    $andSql .= " and (i.cod_emp, i.cod_produto) in (select distinct codemp, codprod
+                                                         from tb_skprodutoselecaoespecial
+                                                        where 1 = 1
+                                                        and id in ($especialproduto))";
+
                 }else{
                     $andSql .= " and i.cod_produto in ($codProdutos)";
                 }
