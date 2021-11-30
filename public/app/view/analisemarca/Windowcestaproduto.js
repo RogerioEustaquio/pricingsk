@@ -295,7 +295,7 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
                                             text: 'Cod. Emp',
                                             dataIndex: 'codemp',
                                             width: 80,
-                                            hidden: false
+                                            hidden: true
                                         },
                                         {
                                             text: 'Emp',
@@ -334,7 +334,7 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
                                         {
                                             text: 'Alterado',
                                             dataIndex: 'alterado',
-                                            width: 60,
+                                            width: 80,
                                             hidden: true
                                         },
                                         {

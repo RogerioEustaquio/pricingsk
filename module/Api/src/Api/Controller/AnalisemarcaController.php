@@ -372,7 +372,8 @@ class AnalisemarcaController extends AbstractRestfulController
             
             $sql = "select distinct data codcesta, data descricao
                          from tb_skprodutocesta
-                    where 1 = 1 ";
+                    where 1 = 1 
+                    order by data";
 
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
