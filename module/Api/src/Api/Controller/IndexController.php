@@ -105,7 +105,7 @@ class IndexController extends AbstractRestfulController
                                     'EC' as empresa,
                                     'JOSECARLOS' as usuario_sistema,
                                     to_char(sysdate,'dd/mm/yyyy') data,
-                                    02994306182 id_pessoa
+                                    2994306182 id_pessoa
                                 from dual )
                     where id_pessoa = :cpf
             ";
