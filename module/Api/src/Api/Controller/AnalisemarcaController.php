@@ -362,42 +362,71 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function listarespecialprodutoBkpAction()
+    public function listarcestadeprodutosAction()
     {
         $data = array();
         
         try {
 
-            $pEmp    = $this->params()->fromQuery('emp',null);
-            $descricao    = $this->params()->fromQuery('descricao',null);
-            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+            $pNode      = $this->params()->fromQuery('node',null);
+            $emp        = $this->params()->fromQuery('emp',null);
+            $datacesta  = $this->params()->fromQuery('datacesta',null);
+            $descproduto= $this->params()->fromQuery('descproduto',null);
+            $codproduto = $this->params()->fromQuery('codproduto',null);
 
-            if(!$descricao){
-                throw new \Exception('Parâmetros não informados.');
+            $andsql = '';
+            $datacesta= json_decode($datacesta);
+            if($datacesta){
+                $datacesta =  implode("','",$datacesta);
+                $andsql = " and c.data in ('$datacesta')";
+            }
+            $emp= json_decode($emp);
+            if($emp){
+                $emp =  implode("','",$emp);
+                $andsql .= " and e.emp in ('$emp') ";
             }
 
-            $em = $this->getEntityManager();
-
-            if(!$tipoSql){
-                $filtroProduto = "like upper('%".$descricao."%')";
-            }else{
-                $codigos =  implode("','",json_decode($descricao));
-                $filtroProduto = "= '".$codigos."'";
-            }
             
-            $sql = "select distinct titulo descricao
-                         from tb_skprodutoselecaoespecial
-                    where 1 = 1 
-                    and upper(titulo) $filtroProduto";
 
+            if($descproduto){
+                
+                $andsql .= " and upper(p.descricao) like upper('%$descproduto%') ";
+            }
+
+
+            $codproduto= json_decode($codproduto);
+            if($codproduto){
+                $codproduto =  implode(",",$codproduto);
+                $andsql .= " and c.codprod in ($codproduto) ";
+            }
+
+            $sql = "select c.data,
+                           codemp,
+                           e.emp,
+                           c.codprod,
+                           p.descricao,
+                           preco_atual,
+                           preco_sugerido,
+                           alterado,
+                           data_alteracao
+                        from tb_skprodutocesta c,
+                            VW_SKEMPRESA e,
+                            vw_skproduto p
+                    where c.codemp = e.cod_empresa
+                    and c.codprod  = p.cod_produto
+                    $andsql ";
+            // print "$sql";
+            // exit;
+            $em = $this->getEntityManager();
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
-            // $stmt->bindValue(1, $pEmp);
             
             $stmt->execute();
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('preco_atual', new ValueStrategy);
+            $hydrator->addStrategy('preco_sugerido', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -408,14 +437,15 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
             $this->setCallbackData($data);
+
+            $objReturn = $this->getCallbackModel();
             
         } catch (\Exception $e) {
-            $this->setCallbackError($e->getMessage());
+            $objReturn = $this->setCallbackError($e->getMessage());
         }
         
-        return $this->getCallbackModel();
+        return $objReturn;
     }
-
 
     public function listarespecialprodutoAction()
     {
@@ -633,7 +663,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayFaixaCusto;
     }
     
-    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -668,11 +698,19 @@ class AnalisemarcaController extends AbstractRestfulController
         }
         
         if($idMarcas){
-            $andSql .= " and m.cod_marca in ($idMarcas)";
+            $inmarca = $notmarca == 'true' ? 'not' : '';
+            $andSql .= " and m.cod_marca $inmarca in ($idMarcas)";
         }
+        $sqlMotadora = '';
+        $sqlMotadoraRelaciona = '';
         if($montadora){
             $inmont = $notmontadora == 'true' ? 'not' : '';
             $andSql .= " and m2.montadora $inmont in ('$montadora')";
+
+            $sqlMotadora = 'tb_sk_produto_montadora m2,';
+            $sqlMotadoraRelaciona = 'and a.cod_produto = m2.cod_produto(+)';
+
+            
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -771,11 +809,13 @@ class AnalisemarcaController extends AbstractRestfulController
                            sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
                     from vw_skestoque_master a,
                          vw_skmarca m,
-                         tb_sk_produto_montadora m2,
+                         --tb_sk_produto_montadora m2,
+                         $sqlMotadora
                          vw_skempresa e
                     where 1 = 1
                     and a.marca = m.descricao_marca
-                    and a.cod_produto = m2.cod_produto(+)
+                    --and a.cod_produto = m2.cod_produto(+)
+                    $sqlMotadoraRelaciona
                     and a.emp = e.emp
                     $andSql
                     group by data
@@ -835,7 +875,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayEstoqueMes;
     }
 
-    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -857,14 +897,15 @@ class AnalisemarcaController extends AbstractRestfulController
                 $codProdutos =  implode("','",explode(',',$codProdutos));
 
                 if($especialproduto){
-                    if($emp){
-                        $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
-                    }
-                    $andSql .= " and cod_produto in (select distinct to_char(codprod)
-                                                        from tb_skprodutoselecaoespecial
+                    // if($emp){
+                    //     $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                    // }
+                    $andSql .= " and (cod_produto, emp) in (select distinct to_char(p.codprod), e.emp
+                                                        from tb_skprodutoselecaoespecial p,
+                                                             VW_SKEMPRESA e
                                                         where 1 = 1
-                                                        and id in ($especialproduto) 
-                                                        $andespecial)";
+                                                        and p.codemp = e.cod_empresa
+                                                        and id in ($especialproduto) )";
                 }else{
 
                     $andSql .= " and cod_produto in ('$codProdutos')";
@@ -872,7 +913,8 @@ class AnalisemarcaController extends AbstractRestfulController
             }
         }
         if($idMarcas){
-            $andSql .= " and marca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
+            $inmarca = $notmarca == 'true' ? 'not' : '';
+            $andSql .= " and marca $inmarca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
         }
         if($montadora){
             $inmont = $notmontadora == 'true' ? 'not' : '';
@@ -997,7 +1039,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     where a.data = b.data
                     and a.data = c.data
                     order by data asc";
-
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1049,7 +1090,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayClienteMes;
     }
 
-    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -1076,16 +1117,23 @@ class AnalisemarcaController extends AbstractRestfulController
 
                 if($especialproduto){
                     if($emp){
-                        $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
+                        $andespecial = "and p.codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
                     }
-                    $sqlprodesp = "select distinct codprod
-                                        from tb_skprodutoselecaoespecial
+                    $sqlprodesp = "select distinct codprod, codemp
+                                        from tb_skprodutoselecaoespecial p
                                     where 1 = 1
-                                    and id in ($especialproduto) 
-                                    $andespecial";
+                                    and id in ($especialproduto)
+                                    $andespecial ";
 
-                    $andSql  .= " and a.COD_PRODUTO in ($sqlprodesp)";
-                    $andSql2 .= " and COD_PRODUTO in ($sqlprodesp)";
+                    $andSql  .= " and (a.COD_PRODUTO, a.emp) in (select distinct to_char(p.codprod), e.emp
+                                                                    from tb_skprodutoselecaoespecial p,
+                                                                    VW_SKEMPRESA e
+                                                                 where 1 = 1
+                                                                 and p.codemp = e.cod_empresa
+                                                                 and id in ($especialproduto)
+                                                                 $andespecial )";
+
+                    $andSql2 .= " and (COD_PRODUTO,cod_empresa) in ($sqlprodesp)";
 
                 }else{
 
@@ -1096,8 +1144,9 @@ class AnalisemarcaController extends AbstractRestfulController
         }
         $andSqlmarca = '';
         if($idMarcas){
-            $andSql  .= " and m.cod_marca in ($idMarcas)";
-            $andSqlmarca .= " and marca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
+            $inmarca = $notmarca == 'true' ? 'not' : '';
+            $andSql  .= " and m.cod_marca $inmarca in ($idMarcas)";
+            $andSqlmarca .= " and marca $inmarca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
         }
         if($montadora){
             $inmont = $notmontadora == 'true' ? 'not' : '';
@@ -1163,7 +1212,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     select add_months(trunc($sysdate,'MM'),-2) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-1) as id from dual union all
                     select add_months(trunc($sysdate,'MM'),-0) as id from dual    
-                    order by 1        
+                    order by 1
             ";
             
             $stmt = $conn->prepare($sql);
@@ -1187,7 +1236,7 @@ class AnalisemarcaController extends AbstractRestfulController
                 $mesSelecao[] = $mesesIdx[(float) substr($data1['id'], 3, 2)] .'/'. substr($data1['id'], 6, 2);
 
                 $arrayIdxEstoque[]  = 0;
-                $arrayIdxCompra[]    = 0;
+                $arrayIdxCompra[]   = 0;
 
             }
 
@@ -1337,6 +1386,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $codProdutos    = $this->params()->fromPost('idProduto',null);
             $produtos       = $this->params()->fromPost('produto',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
+            $notmarca       = $this->params()->fromPost('notmarca',null);
             $montadora      = $this->params()->fromPost('montadora',null);
             $notmontadora   = $this->params()->fromPost('notmontadora',null);
             $cesta          = $this->params()->fromPost('cesta',null);
@@ -1474,7 +1524,8 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
             if($idMarcas){
-                $andSql .= " and cod_marca in ($idMarcas)";
+                $inmarca = $notmarca == 'true' ? 'not' : '';
+                $andSql .= " and cod_marca $inmarca in ($idMarcas)";
             }
 
             if($montadora){
@@ -1664,7 +1715,7 @@ class AnalisemarcaController extends AbstractRestfulController
             
             if($consultaEstoque){
 
-                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
+                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
                 $estoque            = $estoqueMes[0];
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
@@ -1677,7 +1728,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaCliente){
 
-                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
+                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
                 $cc         = $clienteMes[0];
                 $nf         = $clienteMes[1];
                 $tkm        = $clienteMes[2];
@@ -1688,7 +1739,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaIndices){
 
-                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
+                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
                 $idxestoque         = $idxMes[0];
                 $idxcompra          = $idxMes[1];
             }

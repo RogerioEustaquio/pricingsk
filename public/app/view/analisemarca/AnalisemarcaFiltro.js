@@ -557,6 +557,18 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                             handler: function(form) {
                                 form.up('panel').down('tagfield').setValue(null);
                             }
+                        },
+                        {
+                            xtype: 'checkboxfield',
+                            margin: '1 1 1 1',
+                            fieldLabel: ' <> ',
+                            labelAlign: 'top',
+                            name :'notmarca',
+                            itemId :'notmarca',
+                            autoEl: {
+                                tag: 'div',
+                                'data-qtip': 'Diferente'
+                            }
                         }
                     ]
                 },
@@ -586,10 +598,6 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                                 tag: 'div',
                                 'data-qtip': 'Diferente'
                             }
-                            // style: {
-                            //     backgroundColor:'#EE0000 !important',
-                            //     fontSize: '100px !important'
-                            // },
                         }
                     ]
                 },

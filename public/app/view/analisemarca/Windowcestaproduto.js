@@ -15,29 +15,25 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
         var me = this;
 
         var params = {
-            idEmpresa:2
+            // idEmpresa:2
         };
 
         var myStore = Ext.create('Ext.data.Store', {
             model: Ext.create('Ext.data.Model', {
-                    fields:[{name:'idEmpresa',mapping:'idEmpresa'},
+                    fields:[{name:'data',mapping:'data'},
+                            {name:'codemp',mapping:'codemp'},
                             {name:'emp',mapping:'emp'},
-                            {name:'codItem',mapping:'codItem'},
+                            {name:'codprod',mapping:'codprod'},
                             {name:'descricao',mapping:'descricao'},
-                            {name:'marca',mapping:'marca'},
-                            {name:'estoque',mapping:'estoque'},
-                            {name:'qtdePendente',mapping:'qtdePendente'},
-                            {name:'qtdeTotal_12m',mapping:'qtdeTotal_12m'},
-                            {name:'qtdeTotal_6m',mapping:'qtdeTotal_6m'},
-                            {name:'qtdeTotal_3m',mapping:'qtdeTotal_3m'},
-                            {name:'med_12m',mapping:'med_12m', type: 'float'},
-                            {name:'med_6m',mapping:'med_6m', type: 'float'},
-                            {name:'med_3m',mapping:'med_3m', type: 'float'}
+                            {name:'precoAtual',mapping:'precoAtual', type: 'float'},
+                            {name:'precoSugerido',mapping:'precoSugerido', type: 'float'},
+                            {name:'alterado',mapping:'alterado'},
+                            {name:'dataAlteracao',mapping:'dataAlteracao'}
                            ]
             }),
             proxy: {
                 type: 'ajax',
-                url : BASEURL + '/api/vp/listaritenscategorias',
+                url : BASEURL + '/api/analisemarca/listarcestadeprodutos',
                 timeout: 240000,
                 extraParams: params,
                 reader: {
@@ -45,7 +41,140 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
                     root: 'data'
                 }
             },
-            autoLoad : true
+            autoLoad : false
+        });
+
+        var tagEmpresa = Ext.create('Ext.form.field.Tag',{
+            name: 'tagempresa',
+            itemId: 'tagempresa',
+            labelAlign: 'top',
+            multiSelect: true,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'emp', type: 'string' },
+                    { name: 'idEmpresa', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listarEmpresas',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            width: 230,
+            queryParam: 'emp',
+            queryMode: 'local',
+            displayField: 'emp',
+            valueField: 'emp',
+            emptyText: 'Empresa',
+            fieldLabel: 'Empresas',
+            labelWidth: 60,
+            margin: '1 1 1 8',
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+            disabled:true
+        });
+        tagEmpresa.store.load(
+            function(){
+                tagEmpresa.setDisabled(false);
+            }
+        );
+
+        var filtrocesta = Ext.create('Ext.form.field.Tag',{
+            name: 'filtrocesta',
+            itemId: 'filtrocesta',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [{ name: 'codcesta' }, { name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listarcesta',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'codcesta',
+            queryMode: 'remote',
+            displayField: 'codcesta',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',		                            
+                '{codcesta} {descricao}',
+                '</tpl>'), 
+            valueField: 'codcesta',
+            fieldLabel: 'Cesta de Produtos',
+            emptyText: 'Mês/Ano',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            listeners: {
+                
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
+        });
+
+        
+        var tagProduto = Ext.create('Ext.form.field.Tag',{
+            name: 'tagproduto',
+            itemId: 'tagproduto',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 2,
+            store: Ext.data.Store({
+                fields: [{ name: 'idProduto' },{ name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listaridproduto',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'idProduto',
+            queryMode: 'remote',
+            displayField: 'idProduto',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',		                            
+                '{idProduto}',
+                '</tpl>'), 
+            valueField: 'idProduto',
+            // emptyText: 'Produto',
+            fieldLabel: 'Código Produto Sankhya',
+            emptyText: 'Código Produto Sankhya',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 8',
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+
+            listeners: {
+                
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.idProduto]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
         });
 
         Ext.applyIf(me, {
@@ -59,10 +188,52 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
                         {
                             xtype : 'form',
                             region: 'north',
+                            layout: 'hbox',
                             items: [
+                                tagEmpresa,
+                                filtrocesta,
                                 {
-                                    xtype:'displayfield',
-                                    value: 'teste'
+                                    xtype: 'textfield',
+                                    name: 'descproduto',
+                                    fieldLabel: 'Produto',
+                                    labelAlign: 'top',
+                                    emptyText: 'Descrição',
+                                    labelWidth: 60,
+                                    width: 300,
+                                    margin: '1 2 4 1'
+                                },
+                                tagProduto,
+                                {
+                                    xtype:'button',
+                                    iconCls: 'fa fa-search',
+                                    tooltip: 'Consultar',
+                                    margin: '26 2 4 4',
+                                    hidden: false,
+                                    handler: function(){
+
+                                        var emp         = me.down('tagfield[name=tagempresa]').getValue();
+                                        var dataCesta   = me.down('tagfield[name=filtrocesta]').getValue();
+                                        var descProduto = me.down('textfield[name=descproduto]').getValue();
+                                        var codproduto  = me.down('tagfield[name=tagproduto]').getValue();
+
+                                        descProduto = descProduto.toLowerCase();                                                         
+                                        descProduto = descProduto.replace(new RegExp('[ÁÀÂÃ]','gi'), 'a');
+                                        descProduto = descProduto.replace(new RegExp('[ÉÈÊ]','gi'), 'e');
+                                        descProduto = descProduto.replace(new RegExp('[ÍÌÎ]','gi'), 'i');
+                                        descProduto = descProduto.replace(new RegExp('[ÓÒÔÕ]','gi'), 'o');
+                                        descProduto = descProduto.replace(new RegExp('[ÚÙÛ]','gi'), 'u');
+                                        descProduto = descProduto.replace(new RegExp('[Ç]','gi'), 'c');
+
+                                        var params = {
+                                            emp: Ext.encode(emp),
+                                            datacesta : Ext.encode(dataCesta),
+                                            descproduto : descProduto,
+                                            codproduto : Ext.encode(codproduto)
+                                        };
+
+                                        me.down('grid').getStore().getProxy().setExtraParams(params);
+                                        me.down('grid').getStore().load();
+                                    }
                                 }
                             ]
                         },
@@ -80,82 +251,61 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
                                     minHeight: 80,
                                     columns:[
                                         {
-                                            text: 'Emp',
-                                            dataIndex: 'emp',
-                                            width: 52
+                                            text: 'Data',
+                                            dataIndex: 'data',
+                                            width: 100
                                         },
                                         {
-                                            text: 'Código',
-                                            dataIndex: 'codItem',
-                                            width: 120,
+                                            text: 'Cod. Emp',
+                                            dataIndex: 'codemp',
+                                            width: 80,
                                             hidden: false
+                                        },
+                                        {
+                                            text: 'Emp',
+                                            dataIndex: 'emp',
+                                            width: 60
+                                        },
+                                        {
+                                            text: 'Cod. Produto',
+                                            dataIndex: 'codprod',
+                                            width: 140
                                         },
                                         {
                                             text: 'Descrição',
                                             dataIndex: 'descricao',
                                             flex: 1,
-                                            minWidth: 100
+                                            minWidth: 80
                                         },
                                         {
-                                            text: 'Marca',
-                                            dataIndex: 'marca',
-                                            width: 140
-                                        },
-                                        {
-                                            text: 'Estoque',
-                                            dataIndex: 'estoque',
-                                            width: 80
-                                        },
-                                        {
-                                            text: 'Qtde Pendente',
-                                            dataIndex: 'qtdePendente',
-                                            width: 114,
-                                            hidden: false
-                                        },
-                                        {
-                                            text: 'Qtde 12M',
-                                            dataIndex: 'qtdeTotal_12m',
-                                            width: 80,
-                                            hidden: false
-                                        },
-                                        {
-                                            text: 'Qtde 6M',
-                                            dataIndex: 'qtdeTotal_6m',
-                                            width: 80,
-                                            hidden: false
-                                        },
-                                        {
-                                            text: 'Qtde 3M',
-                                            dataIndex: 'qtdeTotal_3m',
-                                            width: 80,
-                                            hidden: false
-                                        },
-                                        {
-                                            text: 'Méd. 12M',
-                                            dataIndex: 'med_12m',
-                                            width: 80,
+                                            text: 'Preço Atual',
+                                            dataIndex: 'precoAtual',
+                                            width: 120,
                                             hidden: false,
                                             renderer: function (v) {
                                                 return me.Value(v);
                                             }
                                         },
                                         {
-                                            text: 'Méd. 6M',
-                                            dataIndex: 'med_6m',
-                                            width: 80,
+                                            text: 'Preço Sugerido',
+                                            dataIndex: 'precoSugerido',
+                                            width: 140,
                                             hidden: false,
                                             renderer: function (v) {
                                                 return me.Value(v);
                                             }
                                         },
                                         {
-                                            text: 'Méd. 3M',
-                                            dataIndex: 'med_3m',
-                                            width: 80,
-                                            hidden: false,
-                                            renderer: function (v) {
-                                                return me.Value(v);
-                                            }
+                                            text: 'Alterado',
+                                            dataIndex: 'alterado',
+                                            width: 60,
+                                            hidden: true
+                                        },
+                                        {
+                                            text: 'Data Alteração',
+                                            dataIndex: 'dataAlteracao',
+                                            width: 120,
+                                            hidden: true
                                         }
                                     ]
                                 }

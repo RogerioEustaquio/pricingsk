@@ -149,17 +149,17 @@ Ext.define('App.view.analisemarca.Toolbar',{
                 btnConsultar,
                 btnchart,
                 btncards,
-                // {
-                //     xtype: 'button',
-                //     // text: 'Cesta',
-                //     iconCls: 'fa fa-shopping-basket',
-                //     tooltip: 'Cesta de Produtos',
-                //     margin: '1 1 1 4',
-                //     hidden: false,
-                //     handler: function(){
-                //         Ext.create('App.view.analisemarca.Windowcestaproduto').show();
-                //     }
-                // },
+                {
+                    xtype: 'button',
+                    // text: 'Cesta',
+                    iconCls: 'fa fa-shopping-basket',
+                    tooltip: 'Cesta de Produtos',
+                    margin: '1 1 1 4',
+                    hidden: false,
+                    handler: function(){
+                        Ext.create('App.view.analisemarca.Windowcestaproduto').show();
+                    }
+                },
                 '->',
                 {
                     xtype: 'button',
@@ -201,6 +201,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
         var idproduto       = me.up('container').down('#analisemarcafiltro').down('#eltagidproduto').getValue();
         var produto         = me.up('container').down('#analisemarcafiltro').down('#elProduto').getValue();
         var marca           = me.up('container').down('#analisemarcafiltro').down('#elMarca').getValue();
+        var notmarca        = me.up('container').down('#analisemarcafiltro').down('#notmarca').checked;
         var montadora       = me.up('container').down('#analisemarcafiltro').down('#elMontadora').getValue();
         var notmontadora    = me.up('container').down('#analisemarcafiltro').down('#notmontadora').checked;
         var cesta           = me.up('container').down('#analisemarcafiltro').down('#elcesta').getValue();
@@ -232,11 +233,12 @@ Ext.define('App.view.analisemarca.Toolbar',{
             idProduto:  Ext.encode(idproduto),
             produto:  Ext.encode(produto),
             marca: Ext.encode(marca),
-            indicadoresAdd: Ext.encode(me.indicadoresAdd),
+            notmarca : notmarca,
             montadora : Ext.encode(montadora),
             notmontadora : notmontadora,
             cesta : Ext.encode(cesta),
-            especialproduto: Ext.encode(especialproduto)
+            especialproduto: Ext.encode(especialproduto),
+            indicadoresAdd: Ext.encode(me.indicadoresAdd)
         };
 
         var seriesOrig = Array();
