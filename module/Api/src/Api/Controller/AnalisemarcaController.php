@@ -361,6 +361,44 @@ class AnalisemarcaController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
+    
+    public function listarcestasAction()
+    {
+        $data = array();
+        
+        try {
+
+            $em = $this->getEntityManager();
+            
+            $sql = "select distinct data codcesta, data descricao
+                         from tb_skprodutocesta
+                    where 1 = 1 ";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
 
     public function listarcestadeprodutosAction()
     {

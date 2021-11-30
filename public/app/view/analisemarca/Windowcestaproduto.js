@@ -84,49 +84,85 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
             }
         );
 
+        // var filtrocesta = Ext.create('Ext.form.field.Tag',{
+        //     name: 'filtrocesta',
+        //     itemId: 'filtrocesta',
+        //     multiSelect: true,
+        //     labelAlign: 'top',
+        //     width: 230,
+        //     labelWidth: 60,
+        //     store: Ext.data.Store({
+        //         fields: [{ name: 'codcesta' }, { name: 'descricao' }],
+        //         proxy: {
+        //             type: 'ajax',
+        //             url: BASEURL + '/api/analisemarca/listarcestas',
+        //             reader: { type: 'json', root: 'data' },
+        //             extraParams: { tipoSql: 0}
+        //         }
+        //     }),
+        //     queryParam: 'codcesta',
+        //     queryMode: 'remote',
+        //     displayField: 'codcesta',
+        //     displayTpl: Ext.create('Ext.XTemplate',
+        //         '<tpl for=".">',		                            
+        //         '{codcesta} {descricao}',
+        //         '</tpl>'), 
+        //     valueField: 'codcesta',
+        //     fieldLabel: 'Cesta de Produtos',
+        //     emptyText: 'Mês/Ano',
+        //     margin: '1 1 1 8',
+        //     filterPickList: true,
+        //     publishes: 'value',
+        //     listeners: {
+                
+        //     },
+            
+        //     // allowBlank: false,
+        //     listConfig: {
+        //         loadingText: 'Carregando...',
+        //         emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+        //         getInnerTpl: function() {
+        //             return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
+        //         }
+        //     }
+        // });
+
         var filtrocesta = Ext.create('Ext.form.field.Tag',{
             name: 'filtrocesta',
             itemId: 'filtrocesta',
-            multiSelect: true,
             labelAlign: 'top',
-            width: 230,
-            labelWidth: 60,
+            multiSelect: true,
             store: Ext.data.Store({
                 fields: [{ name: 'codcesta' }, { name: 'descricao' }],
                 proxy: {
                     type: 'ajax',
-                    url: BASEURL + '/api/analisemarca/listarcesta',
-                    reader: { type: 'json', root: 'data' },
-                    extraParams: { tipoSql: 0}
+                    url: BASEURL + '/api/analisemarca/listarcestas',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
                 }
             }),
+            width: 230,
             queryParam: 'codcesta',
-            queryMode: 'remote',
+            queryMode: 'local',
             displayField: 'codcesta',
-            displayTpl: Ext.create('Ext.XTemplate',
-                '<tpl for=".">',		                            
-                '{codcesta} {descricao}',
-                '</tpl>'), 
             valueField: 'codcesta',
-            fieldLabel: 'Cesta de Produtos',
             emptyText: 'Mês/Ano',
+            fieldLabel: 'Cesta de Produtos',
+            labelWidth: 60,
             margin: '1 1 1 8',
+            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
-            listeners: {
-                
-            },
-            
-            // allowBlank: false,
-            listConfig: {
-                loadingText: 'Carregando...',
-                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
-                getInnerTpl: function() {
-                    return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
-                }
-            }
+            disabled:true
         });
-
+        filtrocesta.store.load(
+            function(){
+                filtrocesta.setDisabled(false);
+            }
+        );
         
         var tagProduto = Ext.create('Ext.form.field.Tag',{
             name: 'tagproduto',
