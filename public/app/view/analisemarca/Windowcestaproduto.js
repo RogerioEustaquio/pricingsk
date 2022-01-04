@@ -252,7 +252,7 @@ Ext.define('App.view.analisemarca.Windowcestaproduto', {
                                         var descProduto = me.down('textfield[name=descproduto]').getValue();
                                         var codproduto  = me.down('tagfield[name=tagproduto]').getValue();
 
-                                        descProduto = descProduto.toLowerCase();                                                         
+                                        descProduto = descProduto.toLowerCase();
                                         descProduto = descProduto.replace(new RegExp('[ÁÀÂÃ]','gi'), 'a');
                                         descProduto = descProduto.replace(new RegExp('[ÉÈÊ]','gi'), 'e');
                                         descProduto = descProduto.replace(new RegExp('[ÍÌÎ]','gi'), 'i');

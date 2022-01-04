@@ -102,6 +102,44 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             }
         );
 
+        var elTagCurva = Ext.create('Ext.form.field.Tag',{
+            name: 'elCurva',
+            itemId: 'elCurva',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'idCurvaAbc', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/basepreco/listarcurvas',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'idCurvaAbc',
+            queryMode: 'local',
+            displayField: 'idCurvaAbc',
+            valueField: 'idCurvaAbc',
+            emptyText: 'Curva',
+            fieldLabel: 'Curvas',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTagCurva.store.load(
+            function(){
+                elTagCurva.setDisabled(false);
+            }
+        );
+
         var elTagProduto = Ext.create('Ext.form.field.Tag',{
             name: 'elProduto',
             itemId: 'elProduto',
@@ -146,6 +184,69 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                 emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
                 getInnerTpl: function() {
                     return '{[ values.codItem]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
+        });
+
+        var elTagDescProduto = Ext.create('Ext.form.field.Tag',{
+            name: 'elDescProduto',
+            itemId: 'elDescProduto',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 3,
+            store: Ext.data.Store({
+                fields: [{ name: 'idProduto' }, { name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/basepreco/listardescricaoprodutos',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'descricao',
+            queryMode: 'remote',
+            displayField: 'descricao',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',		                            
+                '{idProduto} {descricao} {marca}',
+                '</tpl>'), 
+            valueField: 'idProduto',
+            fieldLabel: 'Descrição Produto',
+            emptyText: 'Descrição Produto',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 8',
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+            enableKeyEvents: true,
+            listeners: {
+                // keydown: 
+                //     function (obj,e) 
+                //     {
+                //         if(typeof(e.getKeyName()) !== "undefined" ){    
+                //             // console.log(obj.store.lastOptions.params.descricao);
+                //             var newDescricao =  e.getKeyName();
+                //             newDescricao = newDescricao.toUpperCase();
+                //             newDescricao = newDescricao.toLowerCase();
+                //             newDescricao = newDescricao.replace(new RegExp('[ÁÀÂÃ]','gi'), 'a');
+                //             newDescricao = newDescricao.replace(new RegExp('[ÉÈÊ]','gi'), 'e');
+                //             newDescricao = newDescricao.replace(new RegExp('[ÍÌÎ]','gi'), 'i');
+                //             newDescricao = newDescricao.replace(new RegExp('[ÓÒÔÕ]','gi'), 'o');
+                //             newDescricao = newDescricao.replace(new RegExp('[ÚÙÛ]','gi'), 'u');
+                //             newDescricao = newDescricao.replace(new RegExp('[Ç]','gi'), 'c');    
+                //         }
+                //     }
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.idProduto]} {[ values.descricao]} {[ values.marca]}';
                 }
             }
         });
@@ -198,6 +299,45 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                 }
             }
         });
+
+        var elTpPrecificacao = Ext.create('Ext.form.field.Tag',{
+            name: 'elTpPrecificacao',
+            itemId: 'elTpPrecificacao',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'tipoPrecificacao', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/basepreco/listartipoprecificacao',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'tipoPrecificacao',
+            queryMode: 'local',
+            displayField: 'tipoPrecificacao',
+            valueField: 'tipoPrecificacao',
+            emptyText: 'Tipo Precificaçao',
+            fieldLabel: 'Tipo Precificaçao',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTpPrecificacao.store.load(
+            function(){
+                elTpPrecificacao.setDisabled(false);
+            }
+        );
+
 
         var elTagIdProduto = Ext.create('Ext.form.field.Tag',{
             name: 'eltagidproduto',
@@ -536,6 +676,23 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    items:[
+                        elTagCurva,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
                     hidden: false,
                     items:[
                         elTagProduto,
@@ -550,6 +707,24 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                         }
                     ]
                 },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items:[
+                        elTagDescProduto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },,
                 {
                     xtype: 'panel',
                     layout: 'hbox',
@@ -574,6 +749,24 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                     hidden: false,
                     items:[
                         elTagTabPreco,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items:[
+                        elTpPrecificacao,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',

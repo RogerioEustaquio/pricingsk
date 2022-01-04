@@ -135,6 +135,67 @@ class BaseprecoController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
+    public function replaceAcentos($string){
+        return preg_replace(array("/(á|à|ã|â|ä)/","/(Á|À|Ã|Â|Ä)/","/(é|è|ê|ë)/","/(É|È|Ê|Ë)/","/(í|ì|î|ï)/","/(Í|Ì|Î|Ï)/","/(ó|ò|õ|ô|ö)/","/(Ó|Ò|Õ|Ô|Ö)/","/(ú|ù|û|ü)/","/(Ú|Ù|Û|Ü)/","/(ñ)/","/(Ñ)/"),explode(" ","a A e E i I o O u U n N"),$string);
+    }
+
+    public function listardescricaoprodutosAction()
+    {
+        $data = array();
+        
+        try {
+
+            $pEmp    = $this->params()->fromQuery('emp',null);
+            $pCod    = $this->params()->fromQuery('descricao',null);
+            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+
+            if(!$pCod){
+                throw new \Exception('Parâmetros não informados.');
+            }
+
+            $pCod = $this->replaceAcentos($pCod);
+
+            $em = $this->getEntityManager();
+
+            if(!$tipoSql){
+                $filtroProduto = "like upper('".$pCod."%')";
+            }else{
+                $produtos =  implode("','",json_decode($pCod));
+                $filtroProduto = "in ('".$produtos."')";
+            }
+            
+            $sql = "select distinct nvl(COD_PRODUTO,'') ID_PRODUTO, descricao 
+            from SK_PRODUTO_TABELA_TMP
+            where 1 =1 
+            and descricao $filtroProduto";
+
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('custo_contabil', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
     public function listartabelaprecoAction()
     {
         $data = array();
@@ -278,6 +339,88 @@ class BaseprecoController extends AbstractRestfulController
             }
 
             $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+       
+    public function listarcurvasAction()
+    {
+        $data = array();
+        
+        try {
+            $session = $this->getSession();
+            $usuario = $session['info']['usuarioSistema'];
+
+            // $idEmpresa      = $this->params()->fromQuery('idEmpresa',null);
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql = "select id_curva_abc from MS.TB_CURVA_ABC";
+
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindParam(':idEmpresa', $idEmpresa);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('id_curva_abc', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            $this->setMessage("Solicitação enviada com sucesso.");
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+    public function listartipoprecificacaoAction()
+    {
+        $data = array();
+        
+        try {
+            $session = $this->getSession();
+            $usuario = $session['info']['usuarioSistema'];
+
+            // $idEmpresa      = $this->params()->fromQuery('idEmpresa',null);
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql = "select distinct tipo_precificacao from tmp_skbase_preco_teste";
+
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindParam(':idEmpresa', $idEmpresa);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('tipo_precificacao', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            $this->setMessage("Solicitação enviada com sucesso.");
             
         } catch (\Exception $e) {
             $this->setCallbackError($e->getMessage());
@@ -902,13 +1045,15 @@ class BaseprecoController extends AbstractRestfulController
 
     public function listargprecoAction(){
 
-        $idEmpresas     = $this->params()->fromQuery('idEmpresas',null);
-        $notMarca       = $this->params()->fromQuery('notMarca',null);
-        $marcas         = $this->params()->fromQuery('idMarcas',null);
-        $produtos       = $this->params()->fromQuery('produtos',null);
-        $codTabPreco    = $this->params()->fromQuery('codTabPreco',null);
-        $idProduto      = $this->params()->fromQuery('idProduto',null);
-        $grupoDesconto  = $this->params()->fromQuery('grupoDesconto',null);
+        $idEmpresas         = $this->params()->fromQuery('idEmpresas',null);
+        $notMarca           = $this->params()->fromQuery('notMarca',null);
+        $marcas             = $this->params()->fromQuery('idMarcas',null);
+        $curvas             = $this->params()->fromQuery('idCurvaAbc',null);
+        $produtos           = $this->params()->fromQuery('produtos',null);
+        $codTabPreco        = $this->params()->fromQuery('codTabPreco',null);
+        $idProduto          = $this->params()->fromQuery('idProduto',null);
+        $tipoprecificacao   = $this->params()->fromQuery('tipoprecificacao',null);
+        $grupoDesconto      = $this->params()->fromQuery('grupoDesconto',null);
 
         $checkEstoque           = $this->params()->fromQuery('checkEstoque',null);
         $checkpreco             = $this->params()->fromQuery('checkpreco',null);
@@ -930,6 +1075,9 @@ class BaseprecoController extends AbstractRestfulController
         if($marcas){
             $marcas = implode("','",json_decode($marcas));
         }
+        if($curvas){
+            $curvas = implode("','",json_decode($curvas));
+        }
         if($produtos){
             $produtos = implode("','",json_decode($produtos));
         }
@@ -938,6 +1086,9 @@ class BaseprecoController extends AbstractRestfulController
         }
         if($idProduto){
             $idProduto = implode(",",json_decode($idProduto));
+        }
+        if($tipoprecificacao){
+            $tipoprecificacao = implode("','",json_decode($tipoprecificacao));
         }
         // if($grupoDesconto){
         //     $grupoDesconto = implode("','",json_decode($grupoDesconto));
@@ -953,6 +1104,10 @@ class BaseprecoController extends AbstractRestfulController
             $notMarca = !$notMarca? '': 'not';
             $andSqlMarca = " and marca $notMarca in ('$marcas')";
         }
+        $andSqlCurva = "";
+        if($curvas){
+            $andSqlCurva = " and curva in ('$curvas')";
+        }
         
         $andSqlProduto ='';
         if($produtos){
@@ -964,6 +1119,10 @@ class BaseprecoController extends AbstractRestfulController
         $andSqlPreco = "";
         if($codTabPreco){
             $andSqlPreco = " and nvl(cod_tabela,'') in ($codTabPreco)";
+        }
+        $andSqlTipoPrecificicao ='';
+        if($tipoprecificacao){
+            $andSqlTipoPrecificicao = " and tipo_precificacao in ('$tipoprecificacao')";
         }
         // $andSqlGrupo = "";
         // if($grupoDesconto){
@@ -1085,7 +1244,9 @@ class BaseprecoController extends AbstractRestfulController
              $andSqlEmp
              $andSqlProduto
              $andSqlMarca
+             $andSqlCurva
              $andSqlPreco
+             $andSqlTipoPrecificicao
              $andSqlCkEstoque
              $andSqlCkPreco
              $andSqlCkTbPreco

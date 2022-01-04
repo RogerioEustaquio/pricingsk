@@ -157,10 +157,13 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
         var idEmpresas      = me.up('container').down('#filtropreco').down('#elEmp').getValue();
         var notMarca        = me.up('container').down('#filtropreco').down('#notMarca').value;
         var idMarcas        = me.up('container').down('#filtropreco').down('#elMarca').getValue();
+        var idCurvaAbc      = me.up('container').down('#filtropreco').down('#elCurva').getValue();
         var produtos        = me.up('container').down('#filtropreco').down('#elProduto').getValue();
         var codTabPreco     = me.up('container').down('#filtropreco').down('#eltagtabpreco').getValue();
         var idProduto       = me.up('container').down('#filtropreco').down('#eltagidproduto').getValue();
+        var iddescProduto   = me.up('container').down('#filtropreco').down('#elDescProduto').getValue();
         var grupoDesconto   = me.up('container').down('#filtropreco').down('#eltaggrupodesconto').getValue();
+        var tipoprecificacao= me.up('container').down('#filtropreco').down('#elTpPrecificacao').getValue();
 
         var fieldset =  me.up('container').down('#filtropreco').down('fieldset').collapsed  ? '' : 1;
 
@@ -172,15 +175,26 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
         var checktabelapreco        = fieldset ? me.up('container').down('#filtropreco').down('#eltabelapreco').getValue(): '';
         var checkcustounitario      = fieldset ? me.up('container').down('#filtropreco').down('#elcustounitario').getValue(): '';
 
+        if(iddescProduto){
+
+            iddescProduto.forEach(function(record){
+
+                idProduto.push(record);
+            });
+        }
+
         var grid = me.up('container').down('#panelcenterpreco').down('grid');
         var params = {
             idEmpresas: Ext.encode(idEmpresas),
             notMarca: notMarca,
             idMarcas: Ext.encode(idMarcas),
+            idCurvaAbc: Ext.encode(idCurvaAbc),
             produtos: Ext.encode(produtos),
             codTabPreco: Ext.encode(codTabPreco),
             idProduto: Ext.encode(idProduto),
+            // descProduto: Ext.encode(descProduto),
             grupoDesconto: Ext.encode(grupoDesconto),
+            tipoprecificacao: Ext.encode(tipoprecificacao),
             checkEstoque: checkEstoque,
             checkpreco: checkpreco,
             checkmargem: checkmargem,

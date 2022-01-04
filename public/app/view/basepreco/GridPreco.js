@@ -228,7 +228,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -238,7 +238,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -248,7 +248,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -258,7 +258,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -268,7 +268,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -278,7 +278,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
