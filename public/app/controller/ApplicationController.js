@@ -103,7 +103,7 @@ Ext.define('App.controller.ApplicationController', {
             viewportTabs = viewport.down('#applicationtabs'),
             tab = viewportTabs.down(xtype);
 
-        var acessos = ['EVERTON','ROGERIOADM','RENATO','PEDROOPE','MAYKONRS','WELISONOPE','EVERTONOPE','JOSECARLOS'];
+        var acessos = ['EVERTON','ROGERIOADM','RENATO','PEDROOPE','MAYKONRS','WELISONOPE','EVERTONOPE','JOSECARLOS','ESTEFANIA'];
 
         if(acessos.indexOf(USUARIO.usuarioSistema) === -1){
 
