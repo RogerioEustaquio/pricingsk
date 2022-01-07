@@ -360,7 +360,7 @@ class BaseprecoController extends AbstractRestfulController
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
 
-            $sql = "select id_curva_abc from MS.TB_CURVA_ABC";
+            $sql = "select distinct curva id_curva_abc from vm_skestoque where curva is not null order by curva";
 
             $stmt = $conn->prepare($sql);
             // $stmt->bindParam(':idEmpresa', $idEmpresa);
@@ -428,6 +428,61 @@ class BaseprecoController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
+
+    
+    public function listarfaixacustoAction()
+    {
+        $data = array();
+
+        $emp = $this->params()->fromQuery('emp',null);
+
+        try {
+
+            $session = $this->getSession();
+            $usuario = $session['info'];
+
+            // $em = $this->getEntityManager();
+
+            // $sql = 'select distinct marca as id_marca, marca 
+            // from SK_PRODUTO_TABELA_TMP order by marca';
+            
+            // $conn = $em->getConnection();
+            // $stmt = $conn->prepare($sql);
+            
+            // $stmt->execute();
+            // $results = $stmt->fetchAll();
+
+            // $hydrator = new ObjectProperty;
+            // $stdClass = new StdClass;
+            // $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            // $resultSet->initialize($results);
+
+            // $data = array();
+            // foreach ($resultSet as $row) {
+            //     $data[] = $hydrator->extract($row);
+            // }
+
+            $data[] = ['fxCusto'=> '10001-X'];
+            $data[] = ['fxCusto'=> '5001-10000'];
+            $data[] = ['fxCusto'=> '1001-5000'];
+            $data[] = ['fxCusto'=> '501-1000'];
+            $data[] = ['fxCusto'=> '251-500'];
+            $data[] = ['fxCusto'=> '101-250'];
+            $data[] = ['fxCusto'=> '51-100'];
+            $data[] = ['fxCusto'=> '26-50'];
+            $data[] = ['fxCusto'=> '11-25'];
+            $data[] = ['fxCusto'=> '6-10'];
+            $data[] = ['fxCusto'=> '1-5'];
+            $data[] = ['fxCusto'=> '0'];
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
     
     public function listargrupodescontoAction()
     {
@@ -440,8 +495,9 @@ class BaseprecoController extends AbstractRestfulController
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
 
-            $sql = "select distinct nvl(grupo_desconto,'') grupo_desconto
-                from SK_PRODUTO_TABELA_TMP";
+            $sql = "select distinct grupo_desconto
+                         from VW_SKPRODUTO_DESCONTO_GRUPO
+                    order by grupo_desconto";
 
             $stmt = $conn->prepare($sql);
             // $stmt->bindParam(':idEmpresa', $idEmpresa);
@@ -1053,7 +1109,9 @@ class BaseprecoController extends AbstractRestfulController
         $codTabPreco        = $this->params()->fromQuery('codTabPreco',null);
         $idProduto          = $this->params()->fromQuery('idProduto',null);
         $tipoprecificacao   = $this->params()->fromQuery('tipoprecificacao',null);
+        $faixaCusto         = $this->params()->fromQuery('faixaCusto',null);
         $grupoDesconto      = $this->params()->fromQuery('grupoDesconto',null);
+        $slidMargem         = $this->params()->fromQuery('slidMargem',null);
 
         $checkEstoque           = $this->params()->fromQuery('checkEstoque',null);
         $checkpreco             = $this->params()->fromQuery('checkpreco',null);
@@ -1090,9 +1148,12 @@ class BaseprecoController extends AbstractRestfulController
         if($tipoprecificacao){
             $tipoprecificacao = implode("','",json_decode($tipoprecificacao));
         }
-        // if($grupoDesconto){
-        //     $grupoDesconto = implode("','",json_decode($grupoDesconto));
-        // }
+        if($faixaCusto){
+            $faixaCusto = implode("','",json_decode($faixaCusto));
+        }
+        if($grupoDesconto){
+            $grupoDesconto = implode("','",json_decode($grupoDesconto));
+        }
 
         $andSql = '';
         $andSqlEmp = "";
@@ -1124,10 +1185,25 @@ class BaseprecoController extends AbstractRestfulController
         if($tipoprecificacao){
             $andSqlTipoPrecificicao = " and tipo_precificacao in ('$tipoprecificacao')";
         }
-        // $andSqlGrupo = "";
-        // if($grupoDesconto){
-        //     $andSqlGrupo = " and pd.grupo_desconto in ('$grupoDesconto')";
-        // }
+        $andSqlFxcusto = "";
+        if($faixaCusto){
+            $andSqlFxcusto = " and to_char(fx_custo) in ('$faixaCusto')";
+        }
+        $andSqlGrupo = "";
+        if($grupoDesconto){
+            $andSqlGrupo = " and grupo_desconto in ('$grupoDesconto')";
+        }
+        
+        if($slidMargem){
+            $slidMargem =  json_decode($slidMargem);
+        }
+        $andSlidMargem = '';
+        if($slidMargem){
+            $andSlidMargem = "and param_margem >= $slidMargem[0] and param_margem <= $slidMargem[1]";
+        }else{
+            $andSlidMargem = "and param_margem >= 0 and param_margem <= 80";
+        }
+
         $andSqlCkEstoque = "";
         switch ($checkEstoque) {
             case 'Com':
@@ -1247,6 +1323,9 @@ class BaseprecoController extends AbstractRestfulController
              $andSqlCurva
              $andSqlPreco
              $andSqlTipoPrecificicao
+             $andSqlFxcusto
+             $andSqlGrupo
+             $andSlidMargem
              $andSqlCkEstoque
              $andSqlCkPreco
              $andSqlCkTbPreco

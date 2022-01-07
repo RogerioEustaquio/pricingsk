@@ -338,7 +338,6 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             }
         );
 
-
         var elTagIdProduto = Ext.create('Ext.form.field.Tag',{
             name: 'eltagidproduto',
             itemId: 'eltagidproduto',
@@ -388,6 +387,46 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             }
         });
 
+        var elTagFaixaCusto = Ext.create('Ext.form.field.Tag',{
+            name: 'eltagfaixacusto',
+            itemId: 'eltagfaixacusto',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'fxCusto', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/basepreco/listarfaixacusto',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'fxCusto',
+            queryMode: 'local',
+            displayField: 'fxCusto',
+            valueField: 'fxCusto',
+            emptyText: 'Faixa de Custo',
+            fieldLabel: 'Faixa de Custo',
+            // labelWidth: 60,
+            margin: '1 1 1 8',
+            // padding: 1,
+            // plugins:'dragdroptag',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTagFaixaCusto.store.load(
+            function(){
+                elTagFaixaCusto.setDisabled(false);
+            }
+        );
+
         var elTagGrupodesconto = Ext.create('Ext.form.field.Tag',{
             name: 'eltaggrupodesconto',
             itemId: 'eltaggrupodesconto',
@@ -427,6 +466,23 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                 elTagGrupodesconto.setDisabled(false);
             }
         );
+
+        var elSlidMargem = Ext.create('Ext.slider.Multi', {
+            itemId: 'slidmargem',
+            name: 'slidmargem',
+            labelAlign: 'top',
+            width: 230,
+            margin: '1 1 1 8',
+            values: [0, 80],
+            increment: 1,
+            minValue: 0,
+            maxValue: 100,
+            fieldLabel: 'Margem',
+            valueField: 'slidmargem',
+            // this defaults to true, setting to false allows the thumbs to pass each other
+            constrainThumbs: false,
+            // tipText: 'tipText'
+        });
 
         var elEstoque = Ext.create('Ext.form.field.ComboBox',{
             name: 'elestoque',
@@ -782,7 +838,25 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
-                    hidden: true,
+                    hidden: false,
+                    items:[
+                        elTagFaixaCusto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
                     items: [
                         elTagGrupodesconto,
                         {
@@ -792,6 +866,24 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                             margin: '26 1 10 1',
                             handler: function(form) {
                                 form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items: [
+                        elSlidMargem,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 10 1',
+                            handler: function(form) {
+                                form.up('panel').down('multislider').setValue([0,80]);
                             }
                         }
                     ]

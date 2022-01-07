@@ -162,8 +162,10 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
         var codTabPreco     = me.up('container').down('#filtropreco').down('#eltagtabpreco').getValue();
         var idProduto       = me.up('container').down('#filtropreco').down('#eltagidproduto').getValue();
         var iddescProduto   = me.up('container').down('#filtropreco').down('#elDescProduto').getValue();
-        var grupoDesconto   = me.up('container').down('#filtropreco').down('#eltaggrupodesconto').getValue();
         var tipoprecificacao= me.up('container').down('#filtropreco').down('#elTpPrecificacao').getValue();
+        var faixaCusto      = me.up('container').down('#filtropreco').down('#eltagfaixacusto').getValue();
+        var grupoDesconto   = me.up('container').down('#filtropreco').down('#eltaggrupodesconto').getValue();
+        var slidMargem      = me.up('container').down('#filtropreco').down('#slidmargem').getValue();
 
         var fieldset =  me.up('container').down('#filtropreco').down('fieldset').collapsed  ? '' : 1;
 
@@ -193,8 +195,10 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
             codTabPreco: Ext.encode(codTabPreco),
             idProduto: Ext.encode(idProduto),
             // descProduto: Ext.encode(descProduto),
-            grupoDesconto: Ext.encode(grupoDesconto),
             tipoprecificacao: Ext.encode(tipoprecificacao),
+            faixaCusto: Ext.encode(faixaCusto),
+            grupoDesconto: Ext.encode(grupoDesconto),
+            slidMargem: Ext.encode(slidMargem),
             checkEstoque: checkEstoque,
             checkpreco: checkpreco,
             checkmargem: checkmargem,
@@ -205,9 +209,7 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
         };
     
         grid.getStore().getProxy().setExtraParams(params);
-        grid.getStore().loadPage(1);
-
-        
+        grid.getStore().loadPage(1);        
 
     }
 

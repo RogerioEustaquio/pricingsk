@@ -54,7 +54,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                                 {name:'mbM3', type: 'number' },
                                 {name:'mbM2', type: 'number' },
                                 {name:'mbM1', type: 'number' },
-                                {name:'paramMargem', type: 'string' },
+                                {name:'paramMargem', type: 'number' },
                                 {name:'margemPrecoAtual', type: 'number' },
                                 {name:'precoAtual', type: 'number' },
                                 {name:'precoAtualMin', type: 'number' },
@@ -89,7 +89,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     text: 'Filial',
                     dataIndex: 'empresa',
                     width: 68,
-                    align: 'right'
+                    align: 'center'
                 },
                 {
                     text: 'Cód. Tab. Preço',
@@ -345,8 +345,13 @@ Ext.define('App.view.basepreco.GridPreco', {
                 {
                     text: 'Parametro Margem',
                     dataIndex: 'paramMargem',
-                    width: 140,
-                    hidden: false
+                    width: 150,
+                    hidden: false,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
                 },
                 {
                     text: 'Margem Preço Atual',
