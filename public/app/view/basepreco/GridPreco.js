@@ -374,26 +374,6 @@ Ext.define('App.view.basepreco.GridPreco', {
                     }
                 },
                 {
-                    text: 'Preço Atual',
-                    dataIndex: 'precoAtual',
-                    width: 120,
-                    align: 'right',
-                    renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    }
-                },
-                {
-                    text: 'Preço Atual Min.',
-                    dataIndex: 'precoAtualMin',
-                    width: 130,
-                    align: 'right',
-                    renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
-                        return v;
-                    }
-                },
-                {
                     text: 'Preço Atual Min.',
                     dataIndex: 'precoAtualMin',
                     width: 130,
