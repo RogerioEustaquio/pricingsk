@@ -176,6 +176,7 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
         var checkgrupodesconto      = fieldset ? me.up('container').down('#filtropreco').down('#elgrupodesconto').getValue(): '';
         var checktabelapreco        = fieldset ? me.up('container').down('#filtropreco').down('#eltabelapreco').getValue(): '';
         var checkcustounitario      = fieldset ? me.up('container').down('#filtropreco').down('#elcustounitario').getValue(): '';
+        var checkparammargem        = fieldset ? me.up('container').down('#filtropreco').down('#elparammargem').getValue(): '';
 
         if(iddescProduto){
 
@@ -205,7 +206,8 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
             checktipoprecificacao: checktipoprecificacao,
             checkgrupodesconto: checkgrupodesconto,
             checktabelapreco: checktabelapreco,
-            checkcustounitario: checkcustounitario
+            checkcustounitario: checkcustounitario,
+            checkparammargem: checkparammargem
         };
     
         grid.getStore().getProxy().setExtraParams(params);

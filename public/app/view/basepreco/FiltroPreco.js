@@ -655,7 +655,7 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             emptyText: '',
             fieldLabel: 'Grupo Desconto',
             labelWidth: 110,
-            margin: '1 1 10 0',
+            margin: '1 1 1 0',
             filterPickList: true,
             disabled: false
         });
@@ -684,6 +684,65 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             valueField: 'elcustounitario',
             emptyText: '',
             fieldLabel: 'Custo Unitário',
+            labelWidth: 110,
+            margin: '1 1 1 0',
+            filterPickList: true,
+            disabled: false
+        });
+
+        var elCustoUnitario = Ext.create('Ext.form.field.ComboBox',{
+            name: 'elcustounitario',
+            itemId: 'elcustounitario',
+            multiSelect: false,
+            // labelAlign: 'top',
+            width: 230,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'elcustounitario', type: 'string' },
+                    { name: 'name', type: 'string' }
+                ],
+                
+                data : [
+                    {"elcustounitario":"", "name":""},
+                    {"elcustounitario":"Com", "name":"Com"},
+                    {"elcustounitario":"Sem", "name":"Sem"},
+                    {"elcustounitario":"c<p", "name":"Custo < Preço"}
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'elcustounitario',
+            emptyText: '',
+            fieldLabel: 'Custo Unitário',
+            labelWidth: 110,
+            margin: '1 1 1 0',
+            filterPickList: true,
+            disabled: false
+        });
+        
+        var elparamMargem = Ext.create('Ext.form.field.ComboBox',{
+            name: 'elparammargem',
+            itemId: 'elparammargem',
+            multiSelect: false,
+            // labelAlign: 'top',
+            width: 230,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'parametromargem', type: 'string' },
+                    { name: 'name', type: 'string' }
+                ],
+                
+                data : [
+                    {"parametromargem":"", "name":""},
+                    {"parametromargem":"Com", "name":"Com"},
+                    {"parametromargem":"Sem", "name":"Sem"}
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'parametromargem',
+            emptyText: '',
+            fieldLabel: 'Param. Margem',
             labelWidth: 110,
             margin: '1 1 10 0',
             filterPickList: true,
@@ -1021,6 +1080,24 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                                     }
                                 }
                             ]
+                        },
+                        {
+                            xtype: 'panel',
+                            layout: 'hbox',
+                            border: false,
+                            hidden: false,
+                            items:[
+                                elparamMargem,
+                                {
+                                    xtype: 'button',
+                                    iconCls: 'fa fa-file',
+                                    tooltip: 'Limpar',
+                                    margin: '1 1 1 1',
+                                    handler: function(form) {
+                                        form.up('panel').down('combobox').setValue(null);
+                                    }
+                                }
+                            ]
                         }
                     ]
                 },
@@ -1044,6 +1121,9 @@ Ext.define('App.view.basepreco.FiltroPreco',{
                                 form.up('toolbar').up('panel').down('tagfield[name=eltagtabpreco]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=eltagidproduto]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=eltaggrupodesconto]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=elTpPrecificacao]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=eltagfaixacusto]').setValue(null);
+                                form.up('toolbar').up('panel').down('multislider[name=slidmargem]').setValue([0,80]);
                                 form.up('toolbar').up('panel').down('fieldset').setCollapsed(true);
                             }
                         }

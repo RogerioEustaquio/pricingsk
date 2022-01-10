@@ -1120,6 +1120,7 @@ class BaseprecoController extends AbstractRestfulController
         $checkgrupodesconto     = $this->params()->fromQuery('checkgrupodesconto',null);
         $checktabelapreco       = $this->params()->fromQuery('checktabelapreco',null);
         $checkcustounitario     = $this->params()->fromQuery('checkcustounitario',null);
+        $checkparammargem       = $this->params()->fromQuery('checkparammargem',null);
 
         $inicio     = $this->params()->fromQuery('start',null);
         $final      = $this->params()->fromQuery('limit',null);
@@ -1199,9 +1200,9 @@ class BaseprecoController extends AbstractRestfulController
         }
         $andSlidMargem = '';
         if($slidMargem){
-            $andSlidMargem = "and param_margem >= $slidMargem[0] and param_margem <= $slidMargem[1]";
+            $andSlidMargem = "and nvl(margem_preco_atual,0) >= $slidMargem[0] and nvl(margem_preco_atual,0) <= $slidMargem[1]";
         }else{
-            $andSlidMargem = "and param_margem >= 0 and param_margem <= 80";
+            $andSlidMargem = "and nvl(margem_preco_atual,0) >= 0 and nvl(margem_preco_atual,0) <= 80";
         }
 
         $andSqlCkEstoque = "";
@@ -1264,6 +1265,15 @@ class BaseprecoController extends AbstractRestfulController
                 break;
             case 'Sem':
                 $andSqlCkGdesc = " and trim(grupo_desconto) is null";
+                break;
+        }
+        $andSqlCkParamMargem = "";
+        switch ($checkparammargem) {
+            case 'Com':
+                $andSqlCkParamMargem = " and trim(param_margem) is not null";
+                break;
+            case 'Sem':
+                $andSqlCkParamMargem = " and trim(param_margem) is null";
                 break;
         }
         // $andSqlCkUnitario = "";
@@ -1331,6 +1341,7 @@ class BaseprecoController extends AbstractRestfulController
              $andSqlCkTbPreco
              $andSqlTpPrecificacao
              $andSqlCkGdesc
+             $andSqlCkParamMargem
           ";
 
         $session = $this->getSession();
@@ -1376,6 +1387,7 @@ class BaseprecoController extends AbstractRestfulController
         $hydrator->addStrategy('mb_m3', new ValueStrategy);
         $hydrator->addStrategy('mb_m2', new ValueStrategy);
         $hydrator->addStrategy('mb_m1', new ValueStrategy);
+        $hydrator->addStrategy('param_margem', new ValueStrategy);
         $hydrator->addStrategy('margem_preco_atual', new ValueStrategy);
         $hydrator->addStrategy('preco_atual', new ValueStrategy);
         $hydrator->addStrategy('preco_atual_min', new ValueStrategy);
