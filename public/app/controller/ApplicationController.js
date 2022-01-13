@@ -11,6 +11,7 @@ Ext.define('App.controller.ApplicationController', {
         'App.view.grupodesconto.GrupodescontoPanel',
         'App.view.analisegrafica.AnalisegraficaPanel',
         'App.view.analisemarca.AnalisemarcaPanel',
+        'App.view.acompanhamentovenda.AcompanhaVendaPanel'
     ],
 
     control: {
@@ -25,7 +26,8 @@ Ext.define('App.controller.ApplicationController', {
         'configmarcaempresa': { action: 'configmarcaempresaAction' },
         'grupodesconto': { action: 'grupodescontoAction' },
         'analisegrafica': { action: 'analisegraficaAction' },
-        'analisemarca': { action: 'analisemarcaAction' }
+        'analisemarca': { action: 'analisemarcaAction' },
+        'acompanhavenda': { action: 'acompanhavendaAction' }
     },
 
     controllerEvent: function(){
@@ -83,6 +85,10 @@ Ext.define('App.controller.ApplicationController', {
         this.goActionMasterTab('analisemarca', true)
     },
 
+    acompanhavendaAction: function(){
+        this.goActionMasterTab('acompanhavenda', true)
+    },
+
     configViewport: function(){
         var me = this,
             viewport = me.getViewport();
@@ -103,7 +109,7 @@ Ext.define('App.controller.ApplicationController', {
             viewportTabs = viewport.down('#applicationtabs'),
             tab = viewportTabs.down(xtype);
 
-        var acessos = ['EVERTON','ROGERIOADM','RENATO','PEDROOPE','MAYKONRS','WELISONOPE','EVERTONOPE','JOSECARLOS','ESTEFANIA'];
+        var acessos = ['EVERTON','ROGERIOADM','RENATO','PEDROOPE','MAYKONRS','WELISONOPE','EVERTONOPE','JOSECARLOS','ESTEFANIA','DEBORA'];
 
         if(acessos.indexOf(USUARIO.usuarioSistema) === -1){
 
