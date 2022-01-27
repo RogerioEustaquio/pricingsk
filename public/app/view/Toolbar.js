@@ -70,13 +70,13 @@ Ext.define('App.view.Toolbar', {
                         window.document.location= BASEURL +'/#analisemarca';
                     }
                 },
-                // {
-                //     xtype: 'button',
-                //     text: 'Acompanhamento Venda',
-                //     handler: function(){
-                //         window.document.location= BASEURL +'/#acompanhavenda';
-                //     }
-                // }
+                {
+                    xtype: 'button',
+                    text: 'Acompanhamento Venda',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#acompanhavenda';
+                    }
+                }
             ]
         });
 

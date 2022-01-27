@@ -168,7 +168,48 @@ class AnalisemarcaController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
+       
+    public function listarcurvasAction()
+    {
+        $data = array();
+        
+        try {
+            $session = $this->getSession();
+            $usuario = $session['info']['usuarioSistema'];
 
+            // $idEmpresa      = $this->params()->fromQuery('idEmpresa',null);
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+
+            $sql = "select distinct curva id_curva_abc from vm_skestoque where curva is not null order by curva";
+
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindParam(':idEmpresa', $idEmpresa);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('id_curva_abc', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            $this->setMessage("Solicitação enviada com sucesso.");
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+    
     public function listaridprodutoAction()
     {
         $data = array();
@@ -525,7 +566,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
     
-    public function faixacusto($idEmpresas,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function faixacusto($idEmpresas,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -702,7 +743,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayFaixaCusto;
     }
     
-    public function estoquemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function estoquemes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -711,7 +752,16 @@ class AnalisemarcaController extends AbstractRestfulController
         if($emp){
             $andSql  = " and a.emp in ('$emp')";
         }
-
+        $andSqlCurva = "";
+        $andSqltCurva = "";
+        if($curvas){
+            // $andSqltCurva = ",vw_skproduto_curva_exp c";
+            // $andSqlCurva = "and a.cod_empresa = c.codemp
+            //                 and c.codprod = a.cod_produto 
+            //                 and c.curva in ('$curvas')";
+            $andSqlCurva = "AND (a.cod_empresa, a.cod_produto)
+             IN (SELECT codemp, codprod FROM vw_skproduto_curva_exp WHERE codprod = a.cod_produto AND curva IN ('$curvas'))";
+        }
         if($especialproduto && $codNbs == 'SN'){
             $andSql .= " and a.cod_produto in (0)";
 
@@ -738,7 +788,8 @@ class AnalisemarcaController extends AbstractRestfulController
         
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
-            $andSql .= " and m.cod_marca $inmarca in ($idMarcas)";
+            // $andSql .= " and m.cod_marca $inmarca in ($idMarcas)";
+            $andSql .= "AND a.marca IN ( SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas) )";
         }
         $sqlMotadora = '';
         $sqlMotadoraRelaciona = '';
@@ -841,24 +892,21 @@ class AnalisemarcaController extends AbstractRestfulController
 
             }
 
-            $sql = "select data,
+            $sql = "select a.data,
                            round(sum(estoque),2) estoque,
                            case when sum(estoque) > 0 and sum(valor) > 0 then round(sum(valor)/sum(estoque),2) else 0 end custo_medio,
                            round(sum(valor),2) valor,
                            sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
-                    from vw_skestoque_master a,
-                         vw_skmarca m,
-                         --tb_sk_produto_montadora m2,
+                    from vw_skestoque_master a
                          $sqlMotadora
-                         vw_skempresa e
+                         $andSqltCurva
                     where 1 = 1
-                    and a.marca = m.descricao_marca
-                    --and a.cod_produto = m2.cod_produto(+)
                     $sqlMotadoraRelaciona
-                    and a.emp = e.emp
                     $andSql
-                    group by data
-                    order by data";
+                    $andSqlCurva
+                    group by a.data
+                    order by a.data";
+            
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -914,7 +962,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayEstoqueMes;
     }
 
-    public function clientemes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function clientemes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -922,6 +970,20 @@ class AnalisemarcaController extends AbstractRestfulController
         $andSql2 = '';
         if($emp){
             $andSql  = " and emp in ('$emp')";
+        }
+        $andSqlCurva = "";
+        $andSqltCurva = "";
+        if($curvas){
+            // $andSqltCurva = ",vw_skproduto_curva_exp c";
+            // $andSqlCurva = "and v.emp in ( select emp from VW_SKEMPRESA where cod_empresa in (c.codemp))
+            //                 and to_char(c.codprod) = v.cod_produto 
+            //                 and c.curva in ('$curvas')";
+            $andSqlCurva = "AND (v.emp, v.cod_produto) IN (SELECT e.emp, to_char(codprod)
+                                                            FROM vw_skproduto_curva_exp c,
+                                                                    VW_SKEMPRESA e
+                                                           WHERE  c.codemp = e.cod_empresa
+                                                           AND to_char(codprod) = v.cod_produto
+                                                           AND curva IN ('$curvas'))";
         }
 
         if($especialproduto && $codNbs == 'SN'){
@@ -971,10 +1033,10 @@ class AnalisemarcaController extends AbstractRestfulController
 
         $andSqlData = '';
         if($data){
-            $andSqlData .= " and data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
-            $andSqlData .= " and data <= add_months(trunc($sysdate,'MM'),0)";
+            $andSqlData .= " and v.data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlData .= " and v.data <= add_months(trunc($sysdate,'MM'),0)";
         }else{
-            $andSqlData .= " and data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlData .= " and v.data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
         }
 
         if($qtdemeses>12){
@@ -1058,21 +1120,25 @@ class AnalisemarcaController extends AbstractRestfulController
                             where 1=1
                             group by data) a,
                             (select data, count(*) as cc
-                            from (select data, emp, cnpj_parceiro, sum(xrol) as rol  
-                                    from vm_skbi_venda3
+                            from (select v.data, emp, cnpj_parceiro, sum(xrol) as rol 
+                                    from vm_skbi_venda3 v
+                                         $andSqltCurva
                                     where 1=1
                                     $andSql
                                     $andSqlData
-                                    group by data, emp, cnpj_parceiro)
+                                    $andSqlCurva
+                                    group by v.data, emp, cnpj_parceiro)
                             where rol > 0
                             group by data) b,
                             (select data, count(*) as nota
-                            from (select data, emp, nota, sum(xrol) as rol  
-                                    from vm_skbi_venda3
+                            from (select v.data, emp, nota, sum(xrol) as rol 
+                                    from vm_skbi_venda3 v
+                                         $andSqltCurva
                                     where 1=1
                                     $andSql
                                     $andSqlData
-                                    group by data, emp, nota)
+                                    $andSqlCurva
+                                    group by v.data, emp, nota)
                             where rol > 0
                             group by data) c
                     where a.data = b.data
@@ -1129,7 +1195,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayClienteMes;
     }
 
-    public function indicesmes($emp,$data,$qtdemeses,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function indicesmes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
     {
         $data1 = array();
 
@@ -1139,6 +1205,19 @@ class AnalisemarcaController extends AbstractRestfulController
         if($emp){
             $andSql  = " and a.emp in ('$emp')";
             $andSqlEmp  = " and emp in ('$emp')";
+        }
+        
+        $andSqlCurva = "";
+        $andSqltCurva = "";
+        if($curvas){
+            // $andSqltCurva = ",vw_skproduto_curva_exp c";
+            // $andSqlCurva = "and a.emp in ( select emp from VW_SKEMPRESA where cod_empresa in (c.codemp))
+            //                 and c.codprod = a.cod_produto 
+            //                 and c.curva in ('$curvas')";
+            $andSqlCurva = "AND (a.cod_empresa, a.cod_produto) IN (SELECT c.codemp, c.codprod
+                                            FROM vw_skproduto_curva_exp c
+                                            WHERE codprod = a.cod_produto
+                                            AND curva IN ('$curvas'))";
         }
 
         if($especialproduto && $codNbs == 'SN'){
@@ -1204,10 +1283,10 @@ class AnalisemarcaController extends AbstractRestfulController
 
         $andSqlData = '';
         if($data){
-            $andSqlData .= " and data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
-            $andSqlData .= " and data <= add_months(trunc($sysdate,'MM'),0)";
+            $andSqlData .= " and a.data >= add_months(trunc($sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlData .= " and a.data <= add_months(trunc($sysdate,'MM'),0)";
         }else{
-            $andSqlData .= " and data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
+            $andSqlData .= " and a.data >= add_months(trunc(sysdate,'MM'),-".($qtdemeses-1).")";
         }
 
         if($qtdemeses>12){
@@ -1280,36 +1359,38 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
             $sql = "select data,
-                            sum(valor) as estoque_valor, 
-                            sum(valor2) as estoque_valor_custo_anterior,
-                            --sum(valor2)/sum(valor) as idx,
-                            round((sum(valor)/sum(valor2)-1)*100,2) as idx
+                           sum(valor) as estoque_valor, 
+                           sum(valor2) as estoque_valor_custo_anterior,
+                           --sum(valor2)/sum(valor) as idx,
+                           round((sum(valor)/sum(valor2)-1)*100,2) as idx
                     from ( select a.data,
-                                    a.estoque as estoque,
-                                    round(a.valor/a.estoque,2) custo_medio,
-                                    round(a.estoque*a.custo_medio,2) valor,
-                                    round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
+                                  a.estoque as estoque,
+                                  round(a.valor/a.estoque,2) custo_medio,
+                                  round(a.estoque*a.custo_medio,2) valor,
+                                  round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
                             from vw_skestoque_master a,
                                  vw_skmarca m,
                                  (select data, emp, cod_produto, estoque, custo_medio, valor
                                     from vw_skestoque_master
                                  where data = '01/12/2020') a2
+                                 $andSqltCurva
                             where 1=1
                             and a.marca = m.descricao_marca
                             and a.emp = a2.emp(+)
                             and a.cod_produto = a2.cod_produto(+)
                             and a.data >= '01/01/2021' -- Não alterar essa data
                             $andSql
+                            $andSqlCurva
                             -- Aplicar filtro de produtos / marcas / lojas
                             --and a.COD_PRODUTO = 397
                             --and a.emp = 'SA'
                             order by a.data
-                            )
+                            ) a
                     where 1 = 1 
                     $andSqlData
                     group by data
                     order by data";
-            
+                    // print "$sql ";
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1349,23 +1430,24 @@ class AnalisemarcaController extends AbstractRestfulController
             $andSql2;
             $andSqlData;
 
-            $sql = "select data,
-                            sum(qtd_operacao) as qtd_operacao,
-                            round(sum(custo_operacao_pon_u)/sum(qtd_operacao),2) as custo_operacao_med_u,
-                            round(sum(custo_operacao_pon_n)/sum(qtd_operacao),2) as custo_operacao_med_n,
-                            round(sum(custo_operacao_pon_u),2) as custo_operacao_pon_u,
-                            round(sum(custo_operacao_pon_n),2) as custo_operacao_pon_n,
-                            round((sum(custo_operacao_pon_n)/sum(custo_operacao_pon_u)-1)*100,2) as idx
-                        from vm_idx_inflacao_compra_item
+            $sql = "select a.data,
+                           sum(qtd_operacao) as qtd_operacao,
+                           round(sum(custo_operacao_pon_u)/sum(qtd_operacao),2) as custo_operacao_med_u,
+                           round(sum(custo_operacao_pon_n)/sum(qtd_operacao),2) as custo_operacao_med_n,
+                           round(sum(custo_operacao_pon_u),2) as custo_operacao_pon_u,
+                           round(sum(custo_operacao_pon_n),2) as custo_operacao_pon_n,
+                           round((sum(custo_operacao_pon_n)/sum(custo_operacao_pon_u)-1)*100,2) as idx
+                        from vm_idx_inflacao_compra_item a
+                             $andSqltCurva
                     where custo_operacao_pon_u is not null
                     -- Aplicar filtro de produtos / marcas / lojas
                     $andSqlEmp
                     $andSqlmarca
                     $andSql2
                     $andSqlData
-                    group by data
-                    order by data asc";
-
+                    $andSqlCurva
+                    group by a.data
+                    order by a.data asc";
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1422,6 +1504,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $regional       = $this->params()->fromPost('regional',null);
             $data           = $this->params()->fromPost('data',null);
             $qtdemeses      = $this->params()->fromPost('qtdemeses',null);
+            $curvas         = $this->params()->fromPost('curva',null);
             $codProdutos    = $this->params()->fromPost('idProduto',null);
             $produtos       = $this->params()->fromPost('produto',null);
             $idMarcas       = $this->params()->fromPost('marca',null);
@@ -1472,6 +1555,10 @@ class AnalisemarcaController extends AbstractRestfulController
             }
             if($montadora){
                 $montadora = implode("','",json_decode($montadora));
+            }
+
+            if($curvas){
+                $curvas = implode("','",json_decode($curvas));
             }
             
             if($especialproduto){
@@ -1570,6 +1657,15 @@ class AnalisemarcaController extends AbstractRestfulController
             if($montadora){
                 $inmont = $notmontadora == 'true' ? 'not' : '';
                 $andSql .= " and m.montadora $inmont in ('$montadora')";
+            }
+
+            $andSqlCurva = "";
+            $andSqltCurva = "";
+            if($curvas){
+                $andSqltCurva = " , vw_skproduto_curva_exp c";
+                $andSqlCurva = " and i.cod_emp = c.codemp
+                                 and c.codprod = m.cod_produto 
+                                 and c.curva in ('$curvas')";
             }
             
             if($produtos && $produtos != '[]'){
@@ -1741,7 +1837,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaFaixaCusto){
 
-                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
+                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
                 $FxCusto  = $FaixaCusto[0];
                 $FxCusto2  = $FaixaCusto[1];
             }
@@ -1754,7 +1850,7 @@ class AnalisemarcaController extends AbstractRestfulController
             
             if($consultaEstoque){
 
-                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
+                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
                 $estoque            = $estoqueMes[0];
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
@@ -1767,7 +1863,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaCliente){
 
-                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
+                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
                 $cc         = $clienteMes[0];
                 $nf         = $clienteMes[1];
                 $tkm        = $clienteMes[2];
@@ -1778,7 +1874,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaIndices){
 
-                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
+                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
                 $idxestoque         = $idxMes[0];
                 $idxcompra          = $idxMes[1];
             }
@@ -1795,7 +1891,7 @@ class AnalisemarcaController extends AbstractRestfulController
                         round(a.qtde / du.dias, 0) as qtde_dia,
                         round(a.cmv / du.dias, 2) as cmv_dia
                     from VM_SKDIAS_UTEIS du,
-                        (select trunc(data, 'MM') as data,
+                        (select trunc(i.data, 'MM') as data,
                                 round(sum(rol),2) as rol,
                                 round(sum(lb),2) as lb,
                                 sum(qtde) as qtde,
@@ -1803,13 +1899,16 @@ class AnalisemarcaController extends AbstractRestfulController
                                 round((sum(lb) / sum(rol)) * 100, 2) as mb
                         from vm_skvendaitem_master i,
                              tb_sk_produto_montadora m
+                             $andSqltCurva
                         where 1 = 1
                         $andSql
+                        $andSqlCurva
                         and i.cod_produto = m.cod_produto(+)
-                        group by trunc(data, 'MM')) a
+                        group by trunc(i.data, 'MM')) a
                     where du.data = a.data(+)
                     $andSqlPeriodo
                     order by data";
+
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -2308,6 +2407,7 @@ class AnalisemarcaController extends AbstractRestfulController
         $regional       = $this->params()->fromQuery('regional',null);
         $data           = $this->params()->fromQuery('data',null);
         $qtdemeses      = $this->params()->fromQuery('qtdemeses',null);
+        $curvas         = $this->params()->fromQuery('curva',null);
         $codProdutos    = $this->params()->fromQuery('idProduto',null);
         $produtos       = $this->params()->fromQuery('produto',null);
         $idMarcas       = $this->params()->fromQuery('marca',null);
@@ -2342,6 +2442,9 @@ class AnalisemarcaController extends AbstractRestfulController
         if($montadora){
             $montadora = implode("','",json_decode($montadora));
         }
+        if($curvas){
+            $curvas = implode("','",json_decode($curvas));
+        }
         if($produtos){
             $produtos =  implode("','",json_decode($produtos));
         }
@@ -2355,6 +2458,10 @@ class AnalisemarcaController extends AbstractRestfulController
         $andSql2 = '';
         if($emp){
             $andSql  = " and es.emp in ('$emp')";
+        }
+        $andSqlCurva = "";
+        if($curvas){
+            $andSqlCurva = " and es.curva in ('$curvas')";
         }
         if($codProdutos){
 
@@ -2403,18 +2510,17 @@ class AnalisemarcaController extends AbstractRestfulController
                             es.CURVA,
                             es.CLIENTES
                     from vw_skestoque es,
-                        vw_skproduto p,
-                        vw_skmarca m
+                         vw_skproduto p,
+                         vw_skmarca m
                     where es.COD_PRODUTO = p.COD_PRODUTO
                     and p.COD_MARCA = m.COD_MARCA
                     --and es.cod_produto = 397
                     --and es.emp not in ('SA')
                     $andSql
+                    $andSqlCurva
                     and round(es.VALOR,2) > 0
-                    and rownum < 100
+                    --and rownum < 100
                     ";
-                    // print "$sql";
-                    // exit;
 
             $session = $this->getSession();
             $session['exportprodutorank'] = "$sql";

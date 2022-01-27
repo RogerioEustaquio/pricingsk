@@ -428,7 +428,6 @@ class AcompanhamentoVendaController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
-
     
     public function listarfaixacustoAction()
     {

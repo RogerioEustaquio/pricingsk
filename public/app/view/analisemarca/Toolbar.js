@@ -198,6 +198,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
         var data            = me.up('container').down('#analisemarcafiltro').down('#data').getRawValue();
         var meses24         = me.up('container').down('#analisemarcafiltro').down('radiofield[inputValue=24]');
         var meses36         = me.up('container').down('#analisemarcafiltro').down('radiofield[inputValue=36]');
+        var curva           = me.up('container').down('#analisemarcafiltro').down('#elCurva').getValue();
         var idproduto       = me.up('container').down('#analisemarcafiltro').down('#eltagidproduto').getValue();
         var produto         = me.up('container').down('#analisemarcafiltro').down('#elProduto').getValue();
         var marca           = me.up('container').down('#analisemarcafiltro').down('#elMarca').getValue();
@@ -230,6 +231,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
             regional: Ext.encode(regional),
             data: data,
             qtdemeses : qtdemeses,
+            curva:  Ext.encode(curva),
             idProduto:  Ext.encode(idproduto),
             produto:  Ext.encode(produto),
             marca: Ext.encode(marca),
@@ -269,7 +271,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
             method: 'POST',
             params: params,
             async: true,
-            timeout: 240000,
+            timeout: 480000,
             success: function (response) {
                 var result = Ext.decode(response.responseText);
 

@@ -148,6 +148,44 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                     ]
                 });
 
+        var elTagCurva = Ext.create('Ext.form.field.Tag',{
+            name: 'elCurva',
+            itemId: 'elCurva',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'idCurvaAbc', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listarcurvas',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'idCurvaAbc',
+            queryMode: 'local',
+            displayField: 'idCurvaAbc',
+            valueField: 'idCurvaAbc',
+            emptyText: 'Curva',
+            fieldLabel: 'Curvas',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTagCurva.store.load(
+            function(){
+                elTagCurva.setDisabled(false);
+            }
+        );
+
         var elTagIdProduto = Ext.create('Ext.form.field.Tag',{
             name: 'eltagidproduto',
             itemId: 'eltagidproduto',
@@ -515,6 +553,23 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                     hidden: true,
                     items:[
                         elTagProduto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagCurva,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',

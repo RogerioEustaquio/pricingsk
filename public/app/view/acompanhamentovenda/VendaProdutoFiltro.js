@@ -85,6 +85,98 @@ Ext.define('App.view.acompanhamentovenda.VendaProdutoFiltro',{
             // value: sysdate
         });
 
+        var elTagParceiro = Ext.create('Ext.form.field.Tag',{
+            name: 'elparceiro',
+            itemId: 'elparceiro',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 3,
+            store: Ext.data.Store({
+                fields: [{ name: 'idParceiro' }, { name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/acompanhamentovenda/listardescricaoprodutos',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'descricao',
+            queryMode: 'remote',
+            displayField: 'descricao',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',
+                '{idParceiro} {descricao}',
+                '</tpl>'),
+            valueField: 'idParceiro',
+            fieldLabel: 'Parceiro',
+            emptyText: 'Código/Descrição',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            enableKeyEvents: true,
+            listeners: {
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.idProduto]} {[ values.descricao]} {[ values.marca]}';
+                }
+            }
+        });
+
+        var elTagVendedor = Ext.create('Ext.form.field.Tag',{
+            name: 'elvendedor',
+            itemId: 'elvendedor',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 3,
+            store: Ext.data.Store({
+                fields: [{ name: 'idVendedor' }, { name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/acompanhamentovenda/listardescricaoprodutos',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'descricao',
+            queryMode: 'remote',
+            displayField: 'descricao',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',
+                '{idVendedor} {descricao}',
+                '</tpl>'),
+            valueField: 'idVendedor',
+            fieldLabel: 'Vendedor',
+            emptyText: 'Código/Descrição',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            enableKeyEvents: true,
+            listeners: {
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.idVendedor]} {[ values.descricao]}';
+                }
+            }
+        });
+
         var elTagMarca = Ext.create('Ext.form.field.Tag',{
             name: 'elMarca',
             itemId: 'elMarca',
@@ -125,6 +217,52 @@ Ext.define('App.view.acompanhamentovenda.VendaProdutoFiltro',{
                 elTagMarca.setDisabled(false);
             }
         );
+        
+        var elTagUsuDesconto = Ext.create('Ext.form.field.Tag',{
+            name: 'elusudecondo',
+            itemId: 'elusudecondo',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            minChars: 3,
+            store: Ext.data.Store({
+                fields: [{ name: 'idUsuario' }, { name: 'descricao' }],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/acompanhamentovenda/listardescricaoprodutos',
+                    reader: { type: 'json', root: 'data' },
+                    extraParams: { tipoSql: 0}
+                }
+            }),
+            queryParam: 'descricao',
+            queryMode: 'remote',
+            displayField: 'descricao',
+            displayTpl: Ext.create('Ext.XTemplate',
+                '<tpl for=".">',
+                '{idUsuario} {descricao}',
+                '</tpl>'),
+            valueField: 'idUsuario',
+            fieldLabel: 'Usuário Desconto',
+            emptyText: 'Código/Descrição',
+            // matchFieldWidth: false,
+            // padding: 1,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            enableKeyEvents: true,
+            listeners: {
+            },
+            
+            // allowBlank: false,
+            listConfig: {
+                loadingText: 'Carregando...',
+                emptyText: '<div class="notificacao-red">Nenhuma produto encontrado!</div>',
+                getInnerTpl: function() {
+                    return '{[ values.idVendedor]} {[ values.descricao]}';
+                }
+            }
+        });
 
         var elTagCurva = Ext.create('Ext.form.field.Tag',{
             name: 'elCurva',
@@ -491,6 +629,23 @@ Ext.define('App.view.acompanhamentovenda.VendaProdutoFiltro',{
             // tipText: 'tipText'
         });
 
+        var elSlidDesconto = Ext.create('Ext.slider.Multi', {
+            itemId: 'sliddesconto',
+            name: 'sliddesconto',
+            labelAlign: 'top',
+            width: 230,
+            margin: '1 1 1 8',
+            values: [0, 80],
+            increment: 1,
+            minValue: 0,
+            maxValue: 100,
+            fieldLabel: 'Desconto',
+            valueField: 'sliddesconto',
+            // this defaults to true, setting to false allows the thumbs to pass each other
+            constrainThumbs: false,
+            // tipText: 'tipText'
+        });
+
         var elEstoque = Ext.create('Ext.form.field.ComboBox',{
             name: 'elestoque',
             itemId: 'elestoque',
@@ -502,7 +657,6 @@ Ext.define('App.view.acompanhamentovenda.VendaProdutoFiltro',{
                     { name: 'elestoque', type: 'string' },
                     { name: 'name', type: 'string' }
                 ],
-                
                 data : [
                     {"elestoque":"", "name":""},
                     {"elestoque":"Com", "name":"Com"},
@@ -815,6 +969,68 @@ Ext.define('App.view.acompanhamentovenda.VendaProdutoFiltro',{
                     layout: 'hbox',
                     border: false,
                     items:[
+                        {
+                            xtype: 'textfield',
+                            name: 'nronota',
+                            itemId: 'nronota',
+                            fieldLabel: 'Número Nota',
+                            labelAlign: 'top',
+                            emptyText: 'Número Nota',
+                            margin: '1 1 1 8',
+                            padding: 1,
+                            width: 230,
+                            labelWidth: 60
+                        },
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagParceiro,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagVendedor,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
                         elTagMarca,
                         {
                             xtype: 'button',
@@ -976,6 +1192,41 @@ Ext.define('App.view.acompanhamentovenda.VendaProdutoFiltro',{
                     hidden: false,
                     items: [
                         elSlidMargem,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 10 1',
+                            handler: function(form) {
+                                form.up('panel').down('multislider').setValue([0,80]);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagUsuDesconto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items: [
+                        elSlidDesconto,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
