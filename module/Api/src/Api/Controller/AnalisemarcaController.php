@@ -789,7 +789,7 @@ class AnalisemarcaController extends AbstractRestfulController
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
             // $andSql .= " and m.cod_marca $inmarca in ($idMarcas)";
-            $andSql .= "AND a.marca IN ( SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas) )";
+            $andSql .= "AND a.marca $inmarca IN ( SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas) )";
         }
         $sqlMotadora = '';
         $sqlMotadoraRelaciona = '';
