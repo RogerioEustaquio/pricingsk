@@ -797,7 +797,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $inmont = $notmontadora == 'true' ? 'not' : '';
             $andSql .= " and m2.montadora $inmont in ('$montadora')";
 
-            $sqlMotadora = 'tb_sk_produto_montadora m2,';
+            $sqlMotadora = ',tb_sk_produto_montadora m2';
             $sqlMotadoraRelaciona = 'and a.cod_produto = m2.cod_produto(+)';
 
             
@@ -906,7 +906,8 @@ class AnalisemarcaController extends AbstractRestfulController
                     $andSqlCurva
                     group by a.data
                     order by a.data";
-            
+            print "$sql";
+            exit;
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
