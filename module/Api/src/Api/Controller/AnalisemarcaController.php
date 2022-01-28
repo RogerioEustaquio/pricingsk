@@ -906,8 +906,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     $andSqlCurva
                     group by a.data
                     order by a.data";
-            print "$sql";
-            exit;
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
