@@ -755,10 +755,7 @@ class AnalisemarcaController extends AbstractRestfulController
         $andSqlCurva = "";
         $andSqltCurva = "";
         if($curvas){
-            // $andSqltCurva = ",vw_skproduto_curva_exp c";
-            // $andSqlCurva = "and a.cod_empresa = c.codemp
-            //                 and c.codprod = a.cod_produto 
-            //                 and c.curva in ('$curvas')";
+
             $andSqlCurva = "AND (a.cod_empresa, a.cod_produto)
              IN (SELECT codemp, codprod FROM vw_skproduto_curva_exp WHERE codprod = a.cod_produto AND curva IN ('$curvas'))";
         }
@@ -772,10 +769,8 @@ class AnalisemarcaController extends AbstractRestfulController
             if($codProdutos){
 
                 if($especialproduto){
-                    // if($emp){
-                    //     $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
-                    // }
-                    $andSql .= " and (e.cod_empresa, a.cod_produto) in (select distinct codemp, codprod
+
+                    $andSql .= " and (a.cod_empresa, a.cod_produto) in (select distinct codemp, codprod
                                                         from tb_skprodutoselecaoespecial
                                                         where 1 = 1
                                                         and id in ($especialproduto))";
@@ -788,7 +783,7 @@ class AnalisemarcaController extends AbstractRestfulController
         
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
-            // $andSql .= " and m.cod_marca $inmarca in ($idMarcas)";
+
             $andSql .= "AND a.marca $inmarca IN ( SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas) )";
         }
         $sqlMotadora = '';
@@ -890,7 +885,7 @@ class AnalisemarcaController extends AbstractRestfulController
                 $EstoqueSkud[]          = 0;
 
             }
-
+            
             $sql = "select a.data,
                            round(sum(estoque),2) estoque,
                            case when sum(estoque) > 0 and sum(valor) > 0 then round(sum(valor)/sum(estoque),2) else 0 end custo_medio,
