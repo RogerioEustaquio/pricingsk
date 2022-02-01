@@ -271,7 +271,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
             method: 'POST',
             params: params,
             async: true,
-            timeout: 480000,
+            timeout: 1080000,
             success: function (response) {
                 var result = Ext.decode(response.responseText);
 

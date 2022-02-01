@@ -800,7 +800,6 @@ class AnalisemarcaController extends AbstractRestfulController
             $sqlMotadora = ',tb_sk_produto_montadora m2';
             $sqlMotadoraRelaciona = 'and a.cod_produto = m2.cod_produto(+)';
 
-            
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -973,16 +972,12 @@ class AnalisemarcaController extends AbstractRestfulController
         $andSqlCurva = "";
         $andSqltCurva = "";
         if($curvas){
-            // $andSqltCurva = ",vw_skproduto_curva_exp c";
-            // $andSqlCurva = "and v.emp in ( select emp from VW_SKEMPRESA where cod_empresa in (c.codemp))
-            //                 and to_char(c.codprod) = v.cod_produto 
-            //                 and c.curva in ('$curvas')";
-            $andSqlCurva = "AND (v.emp, v.cod_produto) IN (SELECT e.emp, to_char(codprod)
-                                                            FROM vw_skproduto_curva_exp c,
-                                                                    VW_SKEMPRESA e
-                                                           WHERE  c.codemp = e.cod_empresa
-                                                           AND to_char(codprod) = v.cod_produto
-                                                           AND curva IN ('$curvas'))";
+
+            $andSqlCurva = "AND (v.cod_empresa, v.cod_produto) IN (SELECT c.codemp, to_char(codprod)
+                                                                    FROM vw_skproduto_curva_exp c
+                                                                   WHERE c.codemp = v.cod_empresa
+                                                                   AND to_char(codprod) = v.cod_produto
+                                                                   AND curva IN ('$curvas'))";
         }
 
         if($especialproduto && $codNbs == 'SN'){
@@ -997,15 +992,13 @@ class AnalisemarcaController extends AbstractRestfulController
                 $codProdutos =  implode("','",explode(',',$codProdutos));
 
                 if($especialproduto){
-                    // if($emp){
-                    //     $andespecial = "and codemp in (select cod_empresa from VW_SKEMPRESA where emp  in ('$emp'))";
-                    // }
-                    $andSql .= " and (cod_produto, emp) in (select distinct to_char(p.codprod), e.emp
-                                                        from tb_skprodutoselecaoespecial p,
-                                                             VW_SKEMPRESA e
-                                                        where 1 = 1
-                                                        and p.codemp = e.cod_empresa
-                                                        and id in ($especialproduto) )";
+
+                    $andSql .= " and (cod_produto, v.cod_empresa) in (select distinct to_char(p.codprod), p.codemp
+                                                                        from tb_skprodutoselecaoespecial p
+                                                                      where 1 = 1
+                                                                      and p.codemp = v.cod_empresa
+                                                                      and to_char(codprod) = v.cod_produto
+                                                                      and id in ($especialproduto) )";
                 }else{
 
                     $andSql .= " and cod_produto in ('$codProdutos')";
@@ -1018,7 +1011,7 @@ class AnalisemarcaController extends AbstractRestfulController
         }
         if($montadora){
             $inmont = $notmontadora == 'true' ? 'not' : '';
-            $andSql .= " and cod_produto $inmont in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where montadora in ('$montadora'))";
+            $andSql .= " and cod_produto $inmont in (select distinct to_char(cod_produto) from tb_sk_produto_montadora where to_char(cod_produto) = v.cod_produto and montadora in ('$montadora'))";
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -1209,10 +1202,7 @@ class AnalisemarcaController extends AbstractRestfulController
         $andSqlCurva = "";
         $andSqltCurva = "";
         if($curvas){
-            // $andSqltCurva = ",vw_skproduto_curva_exp c";
-            // $andSqlCurva = "and a.emp in ( select emp from VW_SKEMPRESA where cod_empresa in (c.codemp))
-            //                 and c.codprod = a.cod_produto 
-            //                 and c.curva in ('$curvas')";
+
             $andSqlCurva = "AND (a.cod_empresa, a.cod_produto) IN (SELECT c.codemp, c.codprod
                                             FROM vw_skproduto_curva_exp c
                                             WHERE codprod = a.cod_produto
@@ -1229,8 +1219,6 @@ class AnalisemarcaController extends AbstractRestfulController
 
         }else{
             if($codProdutos){
-
-                // $codProdutos =  implode("','",explode(',',$codProdutos));
 
                 if($especialproduto){
                     if($emp){
@@ -1389,7 +1377,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     $andSqlData
                     group by data
                     order by data";
-                    // print "$sql ";
+            
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -2497,17 +2485,17 @@ class AnalisemarcaController extends AbstractRestfulController
             $pNode = $this->params()->fromQuery('node',null);
 
             $sql = "select es.COD_EMPRESA,
-                            es.emp,
-                            es.COD_PRODUTO,
-                            p.DESCRICAO,
-                            p.COD_MARCA,
-                            m.DESCRICAO_MARCA,
-                            to_char(es.fx_custo) fx_custo,
-                            round(es.ESTOQUE,2) estoque,
-                            round(es.CUSTO_MEDIO,2) custo_medio,
-                            round(es.VALOR,2) valor,
-                            es.CURVA,
-                            es.CLIENTES
+                           es.emp,
+                           es.COD_PRODUTO,
+                           p.DESCRICAO,
+                           p.COD_MARCA,
+                           m.DESCRICAO_MARCA,
+                           to_char(es.fx_custo) fx_custo,
+                           round(es.ESTOQUE,2) estoque,
+                           round(es.CUSTO_MEDIO,2) custo_medio,
+                           round(es.VALOR,2) valor,
+                           es.CURVA,
+                           es.CLIENTES
                     from vw_skestoque es,
                          vw_skproduto p,
                          vw_skmarca m
