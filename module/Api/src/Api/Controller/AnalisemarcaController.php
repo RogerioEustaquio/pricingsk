@@ -911,6 +911,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $hydrator->addStrategy('sku_disp', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
+
             $resultSet->initialize($results);
 
             $data2 = array();
@@ -1102,13 +1103,13 @@ class AnalisemarcaController extends AbstractRestfulController
                             c.nota as nf,
                             round(a.rol/b.cc,2) tkm
                             -- incluir cc dia por fora no php
-                    from (select data, sum(xrol) as rol 
-                            from vm_skbi_venda3 
+                    from (select data, sum(rol) as rol 
+                            from vm_skvendanota 
                             where 1=1
                             group by data) a,
                             (select data, count(*) as cc
-                            from (select v.data, emp, cnpj_parceiro, sum(xrol) as rol 
-                                    from vm_skbi_venda3 v
+                            from (select v.data, emp, cnpj_parceiro, sum(rol) as rol 
+                                    from vm_skvendanota v
                                          $andSqltCurva
                                     where 1=1
                                     $andSql
@@ -1118,8 +1119,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             where rol > 0
                             group by data) b,
                             (select data, count(*) as nota
-                            from (select v.data, emp, nota, sum(xrol) as rol 
-                                    from vm_skbi_venda3 v
+                            from (select v.data, emp, nota, sum(rol) as rol 
+                                    from vm_skvendanota v
                                          $andSqltCurva
                                     where 1=1
                                     $andSql
