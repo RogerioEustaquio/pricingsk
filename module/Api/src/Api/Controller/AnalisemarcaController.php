@@ -1098,10 +1098,10 @@ class AnalisemarcaController extends AbstractRestfulController
 
             }
 
-            $sql = "select  a.data, 
-                            b.cc as cc, 
-                            c.nota as nf,
-                            round(a.rol/b.cc,2) tkm
+            $sql = "select  to_date('01'||to_char(a.data,'/mm/yyyy')) as data, 
+                            sum(b.cc) as cc, 
+                            sum(c.nota ) as nf,
+                            sum(round(a.rol/b.cc,2)) tkm
                             -- incluir cc dia por fora no php
                     from (select data, sum(rol) as rol 
                             from vm_skvendanota 
@@ -1131,7 +1131,10 @@ class AnalisemarcaController extends AbstractRestfulController
                             group by data) c
                     where a.data = b.data
                     and a.data = c.data
+                    group by '01'||to_char(a.data,'/mm/yyyy')
                     order by data asc";
+// print" $sql";
+// exit;
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1152,6 +1155,10 @@ class AnalisemarcaController extends AbstractRestfulController
                 $elementos = $hydrator->extract($row);
 
                 $elementos['data'] = $mesesCliente[(float) substr($elementos['data'], 3, 2)] .'/'. substr($elementos['data'], 6, 2);
+                
+                // var_dump($elementos['data'] );
+                // var_dump($mesSelecao[$contMes]);
+                // exit;
 
                 while($mesSelecao[$contMes] != $elementos['data'] && $contMes< $qtdemeses){
                     $contMes++;
