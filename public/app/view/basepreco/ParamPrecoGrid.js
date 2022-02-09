@@ -1,7 +1,7 @@
-Ext.define('App.view.basepreco.BprecoGrid', {
+Ext.define('App.view.basepreco.ParamPrecoGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'bprecogrid',
-    itemId: 'bprecogrid',
+    xtype: 'paramprecogrid',
+    itemId: 'paramprecogrid',
     columnLines: true,
     margin: '1 1 1 1',
     requires: [

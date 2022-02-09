@@ -1886,7 +1886,8 @@ class AnalisemarcaController extends AbstractRestfulController
                                 round(sum(lb),2) as lb,
                                 sum(qtde) as qtde,
                                 round(sum(custo),2) as cmv,
-                                round((sum(lb) / sum(rol)) * 100, 2) as mb
+                                --round((sum(lb) / sum(rol)) * 100, 2) as mb
+                                case when sum(rol) <> 0 then round((sum(lb) / sum(rol)) * 100, 2) else 0 end as mb
                         from vm_skvendaitem_master i,
                              tb_sk_produto_montadora m
                              $andSqltCurva

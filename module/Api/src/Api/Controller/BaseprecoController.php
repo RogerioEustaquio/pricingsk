@@ -1099,7 +1099,7 @@ class BaseprecoController extends AbstractRestfulController
         
     }
 
-    public function listargprecoAction(){
+    public function listargeraprecoAction(){
 
         $idEmpresas         = $this->params()->fromQuery('idEmpresas',null);
         $notMarca           = $this->params()->fromQuery('notMarca',null);
@@ -1159,40 +1159,45 @@ class BaseprecoController extends AbstractRestfulController
         $andSql = '';
         $andSqlEmp = "";
         if($idEmpresas){
-            $andSqlEmp = " and cod_empresa in ($idEmpresas)";
+            $andSqlEmp = " and vx.cod_empresa in ($idEmpresas)";
         }
         $andSqlMarca = "";
         if($marcas){
             $notMarca = !$notMarca? '': 'not';
-            $andSqlMarca = " and marca $notMarca in ('$marcas')";
+            $andSqlMarca = " and vx.marca $notMarca in ('$marcas')";
         }
         $andSqlCurva = "";
         if($curvas){
-            $andSqlCurva = " and curva in ('$curvas')";
+            // $andSqlCurva = " and curva in ('$curvas')";
+            $andSqlCurva = "\n AND (vx.cod_empresa, vx.cod_produto) IN (SELECT c.codemp, c.codprod
+                                                                            FROM vw_skproduto_curva_exp c
+                                                                        WHERE vx.cod_empresa = c.codemp
+                                                                        and codprod = vx.cod_produto
+                                                                        AND curva IN ('$curvas'))";
         }
         
         $andSqlProduto ='';
         if($produtos){
-            $andSqlProduto = " and cod_nbs in ('$produtos')";
+            $andSqlProduto = " and vx.cod_nbs in ('$produtos')";
         }
         if($idProduto){
-            $andSqlProduto .= " and nvl(cod_produto,'') in ($idProduto)";
+            $andSqlProduto .= " and nvl(vx.cod_produto,'') in ($idProduto)";
         }
         $andSqlPreco = "";
         if($codTabPreco){
-            $andSqlPreco = " and nvl(cod_tabela,'') in ($codTabPreco)";
+            $andSqlPreco = " and nvl(vx.cod_tabela,'') in ($codTabPreco)";
         }
         $andSqlTipoPrecificicao ='';
         if($tipoprecificacao){
-            $andSqlTipoPrecificicao = " and tipo_precificacao in ('$tipoprecificacao')";
+            $andSqlTipoPrecificicao = " and vx.tipo_precificacao in ('$tipoprecificacao')";
         }
         $andSqlFxcusto = "";
         if($faixaCusto){
-            $andSqlFxcusto = " and to_char(fx_custo) in ('$faixaCusto')";
+            $andSqlFxcusto = " and to_char(vx.fx_custo) in ('$faixaCusto')";
         }
         $andSqlGrupo = "";
         if($grupoDesconto){
-            $andSqlGrupo = " and grupo_desconto in ('$grupoDesconto')";
+            $andSqlGrupo = " and vx.grupo_desconto in ('$grupoDesconto')";
         }
         
         if($slidMargem){
@@ -1200,18 +1205,18 @@ class BaseprecoController extends AbstractRestfulController
         }
         $andSlidMargem = '';
         if($slidMargem){
-            $andSlidMargem = "and nvl(margem_preco_atual,0) >= $slidMargem[0] and nvl(margem_preco_atual,0) <= $slidMargem[1]";
+            $andSlidMargem = "and nvl(vx.margem_preco_atual,0) >= $slidMargem[0] and nvl(vx.margem_preco_atual,0) <= $slidMargem[1]";
         }else{
-            $andSlidMargem = "and nvl(margem_preco_atual,0) >= 0 and nvl(margem_preco_atual,0) <= 80";
+            $andSlidMargem = "and nvl(vx.margem_preco_atual,0) >= 0 and nvl(vx.margem_preco_atual,0) <= 80";
         }
 
         $andSqlCkEstoque = "";
         switch ($checkEstoque) {
             case 'Com':
-                $andSqlCkEstoque = " and nvl(ESTOQUE,0) > 0";
+                $andSqlCkEstoque = " and nvl(vx.estoque,0) > 0";
                 break;
             case 'Sem':
-                $andSqlCkEstoque = " and nvl(ESTOQUE,0) = 0";
+                $andSqlCkEstoque = " and nvl(vx.estoque,0) = 0";
                 break;
             default:
                break;
@@ -1219,19 +1224,19 @@ class BaseprecoController extends AbstractRestfulController
         $andSqlCkPreco = "";
         switch ($checkpreco) {
             case 'Com':
-                $andSqlCkPreco = " and nvl(preco_atual,0) > 0";
+                $andSqlCkPreco = " and nvl(vx.preco_atual,0) > 0";
                 break;
             case 'Sem':
-                $andSqlCkPreco = " and nvl(preco_atual,0) = 0";
+                $andSqlCkPreco = " and nvl(vx.preco_atual,0) = 0";
                 break;
         }
         $andSqlCkTbPreco = "";
         switch ($checktabelapreco) {
             case 'Com':
-                $andSqlCkTbPreco = " and trim(cod_tabela) is not null";
+                $andSqlCkTbPreco = " and trim(vx.cod_tabela) is not null";
                 break;
             case 'Sem':
-                $andSqlCkTbPreco = " and trim(cod_tabela) is null";
+                $andSqlCkTbPreco = " and trim(vx.cod_tabela) is null";
                 break;
         }
         // $andSqlCkMb = "";
@@ -1252,28 +1257,28 @@ class BaseprecoController extends AbstractRestfulController
         $andSqlTpPrecificacao = '';
         switch ($checktipoprecificacao) {
             case 'Com':
-                $andSqlTpPrecificacao = " and trim(TIPO_PRECIFICACAO) is not null";
+                $andSqlTpPrecificacao = " and trim(vx.tipo_precificacao) is not null";
                 break;
             case 'Sem':
-                $andSqlTpPrecificacao = " and trim(TIPO_PRECIFICACAO) is null";
+                $andSqlTpPrecificacao = " and trim(vx.tipo_precificacao) is null";
                 break;
         }
         $andSqlCkGdesc = "";
         switch ($checkgrupodesconto) {
             case 'Com':
-                $andSqlCkGdesc = " and trim(grupo_desconto) is not null";
+                $andSqlCkGdesc = " and trim(vx.grupo_desconto) is not null";
                 break;
             case 'Sem':
-                $andSqlCkGdesc = " and trim(grupo_desconto) is null";
+                $andSqlCkGdesc = " and trim(vx.grupo_desconto) is null";
                 break;
         }
         $andSqlCkParamMargem = "";
         switch ($checkparammargem) {
             case 'Com':
-                $andSqlCkParamMargem = " and trim(param_margem) is not null";
+                $andSqlCkParamMargem = " and trim(vx.param_margem) is not null";
                 break;
             case 'Sem':
-                $andSqlCkParamMargem = " and trim(param_margem) is null";
+                $andSqlCkParamMargem = " and trim(vx.param_margem) is null";
                 break;
         }
         // $andSqlCkUnitario = "";
@@ -1289,59 +1294,276 @@ class BaseprecoController extends AbstractRestfulController
         //         break;
         // }
 
-        $sql = "select cod_empresa,
-                        empresa,
-                        cod_tabela,
-                        cod_produto,
-                        descricao,
-                        marca,
-                        cod_nbs,
-                        estoque,
-                        fx_custo,
-                        tipo_precificacao,
-                        curva,
-                        custo_medio,
-                        valor,
-                        pis,
-                        cofins,
-                        icms,
-                        grupo_desconto,
-                        perc_vendedor,
-                        cc_med12m,
-                        cc_med6m,
-                        cc_med3m,
-                        cc_m3,
-                        cc_m2,
-                        cc_m1,
-                        mb_12m,
-                        mb_6m,
-                        mb_3m,
-                        mb_m3,
-                        mb_m2,
-                        mb_m1,
-                        param_margem,
-                        margem_preco_atual,
-                        preco_atual,
-                        preco_atual_min,
-                        preco_atual_liq,
-                        preco_margem_param
-                from tmp_skbase_preco_teste
-             where 1= 1 
-             $andSqlEmp
-             $andSqlProduto
-             $andSqlMarca
-             $andSqlCurva
-             $andSqlPreco
-             $andSqlTipoPrecificicao
-             $andSqlFxcusto
-             $andSqlGrupo
-             $andSlidMargem
-             $andSqlCkEstoque
-             $andSqlCkPreco
-             $andSqlCkTbPreco
-             $andSqlTpPrecificacao
-             $andSqlCkGdesc
-             $andSqlCkParamMargem
+        $sql = "WITH
+        
+                -- Empresa marca
+                emm AS (
+                        SELECT cod_empresa, marca,
+                            CASE WHEN cc_med12m > 0 THEN cc_med12m END AS cc_med12m,
+                            CASE WHEN cc_med6m > 0 THEN cc_med6m END AS cc_med6m,
+                            CASE WHEN cc_med3m > 0 THEN cc_med3m END AS cc_med3m,
+                            cc_m3, cc_m2, cc_m1,
+                            (CASE WHEN NVL(rol_12m,0) > 0 AND NVL(lb_12m,0) > 0 THEN ROUND((lb_12m/rol_12m)*100,2) END) AS mb_12m,
+                            (CASE WHEN NVL(rol_6m,0) > 0 AND NVL(lb_6m,0) > 0 THEN ROUND((lb_6m/rol_6m)*100,2) END) AS mb_6m,
+                            (CASE WHEN NVL(rol_3m,0) > 0 AND NVL(lb_3m,0) > 0 THEN ROUND((lb_3m/rol_3m)*100,2) END) AS mb_3m,
+                            (CASE WHEN NVL(rol_m3,0) > 0 AND NVL(lb_m3,0) > 0 THEN ROUND((lb_m3/rol_m3)*100,2) END) AS mb_m3,
+                            (CASE WHEN NVL(rol_m2,0) > 0 AND NVL(lb_m2,0) > 0 THEN ROUND((lb_m2/rol_m2)*100,2) END) AS mb_m2,
+                            (CASE WHEN NVL(rol_m1,0) > 0 AND NVL(lb_m1,0) > 0 THEN ROUND((lb_m1/rol_m1)*100,2) END) AS mb_m1
+                        FROM (SELECT cod_empresa, marca,
+                                    ROUND(SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END)/12) AS cc_med12m,
+                                    ROUND(SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-6) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END)/6) AS cc_med6m,
+                                    ROUND(SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END)/3) AS cc_med3m,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) THEN 1 END) AS cc_m3,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-2) THEN 1 END) AS cc_m2,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END) AS cc_m1,
+                                    SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_12m,
+                                    SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-6) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_6m,
+                                    SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_3m,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) THEN rol END) AS rol_m3,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-2) THEN rol END) AS rol_m2,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_m1,
+                                    SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_12m,
+                                    SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-6) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_6m,
+                                    SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_3m,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) THEN lb END) AS lb_m3,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-2) THEN lb END) AS lb_m2,
+                                    SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_m1
+                                FROM (SELECT TRUNC(data,'MM') AS data, cod_empresa, marca, cnpj_parceiro, SUM(rol) AS rol, SUM(lb) AS lb
+                                        FROM vm_skvendanota
+                                        WHERE data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12)
+                                        GROUP BY TRUNC(data,'MM'), cod_empresa, marca, cnpj_parceiro)
+                              GROUP BY cod_empresa, marca)
+                ),
+                -- Produto rede
+                pdr AS (
+                    SELECT cod_produto,
+                        CASE WHEN cc_med12m > 0 THEN cc_med12m END AS cc_med12m,
+                        CASE WHEN cc_med6m > 0 THEN cc_med6m END AS cc_med6m,
+                        CASE WHEN cc_med3m > 0 THEN cc_med3m END AS cc_med3m,
+                        cc_m3, cc_m2, cc_m1,
+                        (CASE WHEN NVL(rol_12m,0) > 0 AND NVL(lb_12m,0) > 0 THEN ROUND((lb_12m/rol_12m)*100,2) END) AS mb_12m,
+                        (CASE WHEN NVL(rol_6m,0) > 0 AND NVL(lb_6m,0) > 0 THEN ROUND((lb_6m/rol_6m)*100,2) END) AS mb_6m,
+                        (CASE WHEN NVL(rol_3m,0) > 0 AND NVL(lb_3m,0) > 0 THEN ROUND((lb_3m/rol_3m)*100,2) END) AS mb_3m,
+                        (CASE WHEN NVL(rol_m3,0) > 0 AND NVL(lb_m3,0) > 0 THEN ROUND((lb_m3/rol_m3)*100,2) END) AS mb_m3,
+                        (CASE WHEN NVL(rol_m2,0) > 0 AND NVL(lb_m2,0) > 0 THEN ROUND((lb_m2/rol_m2)*100,2) END) AS mb_m2,
+                        (CASE WHEN NVL(rol_m1,0) > 0 AND NVL(lb_m1,0) > 0 THEN ROUND((lb_m1/rol_m1)*100,2) END) AS mb_m1
+                    FROM (SELECT cod_produto,
+                                ROUND(SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END)/12) AS cc_med12m,
+                                ROUND(SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-6) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END)/6) AS cc_med6m,
+                                ROUND(SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END)/3) AS cc_med3m,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) THEN 1 END) AS cc_m3,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-2) THEN 1 END) AS cc_m2,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN 1 END) AS cc_m1,
+                                SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_12m,
+                                SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-6) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_6m,
+                                SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_3m,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) THEN rol END) AS rol_m3,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-2) THEN rol END) AS rol_m2,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN rol END) AS rol_m1,
+                                SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_12m,
+                                SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-6) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_6m,
+                                SUM(CASE WHEN data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_3m,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3) THEN lb END) AS lb_m3,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-2) THEN lb END) AS lb_m2,
+                                SUM(CASE WHEN data = ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) THEN lb END) AS lb_m1
+                            FROM (SELECT TRUNC(data,'MM') AS data, cod_produto, cnpj_parceiro, SUM(rol) AS rol, SUM(lb) AS lb
+                                    FROM vm_skvendanota
+                                    WHERE data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-12)
+                                    --and emp = 'SA' and cod_produto = 397
+                                    GROUP BY TRUNC(data,'MM'), cod_produto, cnpj_parceiro)
+                          GROUP BY cod_produto)
+                ),
+                -- Produto mediana rede
+                pdr2 AS (
+                    SELECT cod_produto, median(mb) AS mb_3m_median
+                    FROM (SELECT emp, cod_produto, (CASE WHEN NVL(rol,0) > 0 AND NVL(lb,0) > 0 THEN ROUND((lb/rol)*100,2) END) AS mb
+                            FROM (SELECT emp, cod_produto, SUM(rol) AS rol, SUM(lb) AS lb
+                                    FROM vm_skvendanota
+                                    WHERE data >= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-3)
+                                    AND data <= ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1)
+                                    --and cod_produto = 397
+                                    GROUP BY emp, cod_produto))
+                    GROUP BY cod_produto
+                ),
+                -- Dados base
+                vx AS (
+                    SELECT cod_empresa, empresa, cod_tabela, cod_produto, descricao, marca, cod_nbs,
+                           estoque,
+                           fx_custo,
+                           tipo_precificacao,
+                           custo_medio,
+                           valor,
+                           pis, cofins, icms,
+                           grupo_desconto,
+                           perc_vendedor,
+                           cc_med12m,
+                           cc_med6m,
+                           cc_med3m,
+                           cc_m3,
+                           cc_m2,
+                           cc_m1,
+                           mb_12m,
+                           mb_6m,
+                           mb_3m,
+                           mb_m3,
+                           mb_m2,
+                           mb_m1,
+                           param_margem,
+                           ROUND((preco_liq - custo_medio) / preco_liq *100,2) AS margem_preco_atual,
+                           preco AS preco_atual,
+                           preco_min AS preco_atual_min,
+                           preco_liq AS preco_atual_liq,
+                           ROUND(((custo_medio/(1-(param_margem/100)))/(1-((NVL(pis,0)+NVL(cofins,0)+NVL(icms,0))/100)))/(1-(perc_vendedor/100)), 2) AS preco_margem_param
+                    FROM (SELECT a.cod_empresa, a.empresa, a.cod_tabela, a.cod_produto, a.descricao, a.marca, a.cod_nbs,
+                                 a.estoque,
+                                 get_fx_custo(a.custo_medio) AS fx_custo,
+                                 a.tipo_precificacao,
+                                 ROUND(a.margem,2) AS param_margem,
+                                 a.custo_medio,
+                                 a.valor,
+                                 a.pis, a.cofins, a.icms,
+                                 a.grupo_desconto,
+                                 ad.perc_vendedor,
+                                 pd.cc_med12m,
+                                 pd.cc_med6m,
+                                 pd.cc_med3m,
+                                 pd.cc_m3,
+                                 pd.cc_m2,
+                                 pd.cc_m1,
+                                 pd.mb_12m,
+                                 pd.mb_6m,
+                                 pd.mb_3m,
+                                 pd.mb_m3,
+                                 pd.mb_m2,
+                                 pd.mb_m1,
+                                 ROUND(pv.preco,2) AS preco,
+                                 ROUND(pv.preco*(1-(ad.perc_vendedor/100)),2) AS preco_min, -- Preço vendedor desconto
+                                 ROUND((pv.preco*(1-(ad.perc_vendedor/100)))*(1-((NVL(a.pis,0)+NVL(a.cofins,0)+NVL(a.icms,0))/100)),2) AS preco_liq -- Preço final sem impostos
+                            FROM (SELECT es.cod_empresa, es.empresa, bs.cod_tabela, es.cod_produto, es.descricao, es.marca, es.cod_nbs,
+                                         es.estoque,
+                                         es.custo_medio,
+                                         es.valor,
+                                         es.pis, es.cofins, es.icms,
+                                         es.grupo_desconto,
+                                         es.margem,
+                                         es.tipo_precificacao
+                                    FROM (SELECT es.cod_empresa, e.emp AS empresa, es.cod_produto, p.descricao, m.descricao_marca AS marca, p.partnumber, p.cod_nbs AS cod_nbs,
+                                                 es.estoque,
+                                                 ROUND(es.custo_medio,2) AS custo_medio,
+                                                 ROUND(es.estoque*es.custo_medio,2) AS valor,
+                                                 pi.pis, pi.cofins, pi.icms,
+                                                 NVL(pd.grupo_desconto,'GERAL') AS grupo_desconto,
+                                                 pe.margem,
+                                                 pe.tipo_precificacao
+                                            FROM vw_skestoque_base es,
+                                                vw_skempresa e,
+                                                vw_skproduto p,
+                                                vw_skmarca m,
+                                                vw_skproduto_desconto_grupo pd,
+                                                vw_skproduto_imposto pi,
+                                                vw_skproduto_param_empresa pe
+                                          WHERE es.cod_empresa = e.cod_empresa
+                                          AND es.cod_produto = p.cod_produto
+                                          AND p.cod_marca = m.cod_marca
+                                          AND es.cod_empresa = pd.cod_empresa(+)
+                                          AND es.cod_produto = pd.cod_produto(+)
+                                          AND es.cod_empresa = pi.cod_empresa
+                                          AND es.cod_produto = pi.cod_produto
+                                          AND es.cod_empresa = pe.cod_empresa(+)
+                                          AND es.cod_produto = pe.cod_produto(+)
+                                         ) es,
+                                         vw_sktabela_config_base bs
+                                 WHERE es.cod_empresa = bs.cod_empresa(+)) a,
+                                vw_skalcada_desconto ad,
+                                vw_sktabela_preco2 pv,
+                                VW_SKBI_PRODUTO_DEMANDA pd
+                          WHERE a.cod_tabela = ad.cod_tabela(+)
+                          AND a.grupo_desconto = ad.agrupamento_produto(+)
+                          AND a.cod_tabela = pv.cod_tabela(+)
+                          AND a.cod_produto = pv.cod_produto(+)
+                          AND a.cod_empresa = pd.cod_empresa(+)
+                          AND a.cod_produto = pd.cod_produto(+)
+                          AND a.marca NOT IN ('MWM','MWM IESA','MWM OPCIONAL','CASCO BATERIA','CASCO EATON CX.CAMBIO','CASCO OUTROS','CASCO EATON EMB.', 'EMERGENCIAL')
+                          AND a.cod_empresa NOT IN (28/*LE*/ ,25/*CD*/ ,27/*TL*/)
+                          --and a.cod_empresa = 5
+                        )
+                )
+                
+                SELECT vx.cod_empresa, 
+                       vx.empresa, 
+                       vx.cod_tabela, 
+                       vx.cod_produto, 
+                       vx.descricao, 
+                       vx.marca, 
+                       vx.cod_nbs, 
+                       vx.estoque,
+                       vx.fx_custo,
+                       vx.tipo_precificacao,
+                       '' curva,
+                       vx.custo_medio, 
+                       vx.valor,
+                       vx.pis, vx.cofins, icms,
+                       vx.grupo_desconto,
+                       vx.perc_vendedor, 
+                       pdr.cc_med12m AS cc_med12m_rd,
+                       pdr.cc_med6m AS cc_med6m_rd,
+                       pdr.cc_med3m AS cc_med3m_rd,
+                       pdr.cc_m3 AS cc_m3_rd,
+                       pdr.cc_m2 AS cc_m2_rd,
+                       pdr.cc_m1 AS cc_m1_rd,
+                       vx.cc_med12m,
+                       vx.cc_med6m,
+                       vx.cc_med3m,
+                       vx.cc_m3,
+                       vx.cc_m2,
+                       vx.cc_m1,
+                       pdr2.mb_3m_median AS mb_3m_median_rd,
+                       pdr.mb_12m AS mb_12m_rd,
+                       pdr.mb_6m AS mb_6m_rd,
+                       pdr.mb_3m AS mb_3m_rd,
+                       pdr.mb_m3 AS mb_m3_rd,
+                       pdr.mb_m2 AS mb_m2_rd,
+                       pdr.mb_m1 AS mb_m1_rd,
+                       emm.mb_12m AS mb_12m_mc,
+                       emm.mb_6m AS mb_6m_mc,
+                       emm.mb_3m AS mb_3m_mc,
+                       vx.mb_12m,
+                       vx.mb_6m,
+                       vx.mb_3m,
+                       vx.mb_m3,
+                       vx.mb_m2,
+                       vx.mb_m1,
+                       vx.param_margem,
+                       vx.margem_preco_atual,
+                       vx.preco_atual,
+                       vx.preco_atual_min,
+                       vx.preco_atual_liq,
+                       vx.preco_margem_param
+                        
+                    FROM vx,
+                         pdr,
+                         pdr2,
+                         emm
+                WHERE vx.cod_produto = pdr.cod_produto(+)
+                AND vx.cod_produto = pdr2.cod_produto(+)
+                AND vx.cod_empresa = emm.cod_empresa(+)
+                AND vx.marca = emm.marca(+)
+                $andSqlEmp
+                $andSqlProduto
+                $andSqlMarca
+                $andSqlCurva
+                $andSqlPreco
+                $andSqlTipoPrecificicao
+                $andSqlFxcusto
+                $andSqlGrupo
+                $andSlidMargem
+                $andSqlCkEstoque
+                $andSqlCkPreco
+                $andSqlCkTbPreco
+                $andSqlTpPrecificacao
+                $andSqlCkGdesc
+                $andSqlCkParamMargem
+                ORDER BY cod_empresa, cod_tabela, grupo_desconto
           ";
 
         $session = $this->getSession();
@@ -1387,11 +1609,30 @@ class BaseprecoController extends AbstractRestfulController
         $hydrator->addStrategy('mb_m3', new ValueStrategy);
         $hydrator->addStrategy('mb_m2', new ValueStrategy);
         $hydrator->addStrategy('mb_m1', new ValueStrategy);
+
+        $hydrator->addStrategy('mb_3m_median_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_12m_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_6m_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_3m_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_m3_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_m2_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_m1_rd', new ValueStrategy);
+        $hydrator->addStrategy('mb_12m_mc', new ValueStrategy);
+        $hydrator->addStrategy('mb_6m_mc', new ValueStrategy);
+        $hydrator->addStrategy('mb_3m_mc', new ValueStrategy);
+        $hydrator->addStrategy('mb_12m', new ValueStrategy);
+        $hydrator->addStrategy('mb_6m', new ValueStrategy);
+        $hydrator->addStrategy('mb_3m', new ValueStrategy);
+        $hydrator->addStrategy('mb_m3', new ValueStrategy);
+        $hydrator->addStrategy('mb_m2', new ValueStrategy);
+        $hydrator->addStrategy('mb_m1', new ValueStrategy);
+
         $hydrator->addStrategy('param_margem', new ValueStrategy);
         $hydrator->addStrategy('margem_preco_atual', new ValueStrategy);
         $hydrator->addStrategy('preco_atual', new ValueStrategy);
         $hydrator->addStrategy('preco_atual_min', new ValueStrategy);
         $hydrator->addStrategy('preco_atual_liq', new ValueStrategy);
+        $hydrator->addStrategy('preco_margem_param', new ValueStrategy);
         $stdClass = new StdClass;
         $resultSet = new HydratingResultSet($hydrator, $stdClass);
         $resultSet->initialize($results);
@@ -1443,8 +1684,16 @@ class BaseprecoController extends AbstractRestfulController
                 
                 $output = 'COD_EMPRESA;NOME_EMPRESA;COD_TABELA;COD_PRODUTO;DESCRICAO'.
                           ';MARCA;COD_NBS;ESTOQUE;FX_CUSTO;TIPO_PRECIFICACAO;CURVA;CUSTO_MEDIO'.
-                          ';VALOR;PIS;COFINS;ICMS;GRUPO_DESCONTO;PERC_VENDEDOR;CC_MED12M;CC_MED6M;CC_MED3M'.
-                          ';CC_M3;CC_M2;CC_M1;MB_12M;MB_6M;MB_3M;MB_M3;MB_M2;MB_M1'.
+                          ';VALOR;PIS;COFINS;ICMS;GRUPO_DESCONTO;PERC_VENDEDOR'.
+                          ';CC_MED12M_RD;CC_MED6M_RD;CC_MED3M_RD'.
+                          ';CC_M3_RD;CC_M2_RD;CC_M1_RD'.
+                          ';CC_MED12M;CC_MED6M;CC_MED3M'.
+                          ';CC_M3;CC_M2;CC_M1'.
+                          ';MB_12M_RD;MB_6M_RD;MB_3M_RD'.
+                          ';MB_M3_RD;MB_M2_RD;MB_M1_RD'.
+                          ';MB_12M_MC;MB_6M_MC;MB_3M_MC'.
+                          ';MB_12M;MB_6M;MB_3M'.
+                          ';MB_M3;MB_M2;MB_M1'.
                           ';PARAM_MARGEM;MARGEM_PRECO_ATUAL;PRECO_ATUAL;PRECO_ATUAL_MIN;PRECO_ATUAL_LIQ'.
                           ';PRECO_MARGEM_PARAM'."\n";
 
@@ -1463,18 +1712,37 @@ class BaseprecoController extends AbstractRestfulController
                     $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
                     $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
                     $percVendedor   = $data[$i]['percVendedor'] >0 ? $data[$i]['percVendedor'] : null ;
+
+                    $ccMed12mRd     = $data[$i]['ccMed12mRd'] >0 ? $data[$i]['ccMed12mRd'] : null ;
+                    $ccMed6mRd      = $data[$i]['ccMed6mRd'] >0 ? $data[$i]['ccMed6mRd'] : null ;
+                    $ccMed3mRd      = $data[$i]['ccMed3mRd'] >0 ? $data[$i]['ccMed3mRd'] : null ;
+                    $ccM3Rd         = $data[$i]['ccM3Rd'] >0 ? $data[$i]['ccM3Rd'] : null ;
+                    $ccM2Rd         = $data[$i]['ccM2Rd'] >0 ? $data[$i]['ccM2Rd'] : null ;
+                    $ccM1Rd         = $data[$i]['ccM1Rd'] >0 ? $data[$i]['ccM1Rd'] : null ;
                     $ccMed12m       = $data[$i]['ccMed12m'] >0 ? $data[$i]['ccMed12m'] : null ;
                     $ccMed6m        = $data[$i]['ccMed6m'] >0 ? $data[$i]['ccMed6m'] : null ;
                     $ccMed3m        = $data[$i]['ccMed3m'] >0 ? $data[$i]['ccMed3m'] : null ;
                     $ccM3           = $data[$i]['ccM3'] >0 ? $data[$i]['ccM3'] : null ;
                     $ccM2           = $data[$i]['ccM2'] >0 ? $data[$i]['ccM2'] : null ;
                     $ccM1           = $data[$i]['ccM1'] >0 ? $data[$i]['ccM1'] : null ;
+
+                    $mb_12mRd       = $data[$i]['mb_12mRd'] >0 ? $data[$i]['mb_12mRd'] : null ;
+                    $mb_6mRd        = $data[$i]['mb_6mRd'] >0 ? $data[$i]['mb_6mRd'] : null ;
+                    $mb_3mRd        = $data[$i]['mb_3mRd'] >0 ? $data[$i]['mb_3mRd'] : null ;
+                    $mbM3Rd         = $data[$i]['mbM3Rd'] >0 ? $data[$i]['mbM3Rd'] : null ;
+                    $mbM2Rd         = $data[$i]['mbM2Rd'] >0 ? $data[$i]['mbM2Rd'] : null ;
+                    $mbM1Rd         = $data[$i]['mbM1Rd'] >0 ? $data[$i]['mbM1Rd'] : null ;
+
+                    $mb_12mMc       = $data[$i]['mb_12mMc'] >0 ? $data[$i]['mb_12mMc'] : null ;
+                    $mb_6mMc        = $data[$i]['mb_6mMc'] >0 ? $data[$i]['mb_6mMc'] : null ;
+                    $mb_3mMc        = $data[$i]['mb_3mMc'] >0 ? $data[$i]['mb_3mMc'] : null ;
                     $mb_12m         = $data[$i]['mb_12m'] >0 ? $data[$i]['mb_12m'] : null ;
                     $mb_6m          = $data[$i]['mb_6m'] >0 ? $data[$i]['mb_6m'] : null ;
                     $mb_3m          = $data[$i]['mb_3m'] >0 ? $data[$i]['mb_3m'] : null ;
                     $mbM3           = $data[$i]['mbM3'] >0 ? $data[$i]['mbM3'] : null ;
                     $mbM2           = $data[$i]['mbM2'] >0 ? $data[$i]['mbM2'] : null ;
                     $mbM1           = $data[$i]['mbM1'] >0 ? $data[$i]['mbM1'] : null ;
+
                     $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] >0 ? $data[$i]['margemPrecoAtual'] : null ;
                     $precoAtual         = $data[$i]['precoAtual'] >0 ? $data[$i]['precoAtual'] : null ;
                     $precoAtualMin      = $data[$i]['precoAtualMin'] >0 ? $data[$i]['precoAtualMin'] : null ;
@@ -1500,18 +1768,37 @@ class BaseprecoController extends AbstractRestfulController
                                 $icms.';'.
                                 $data[$i]['grupoDesconto'].';'.
                                 $percVendedor.';'.
+
+                                $ccMed12mRd.';'.
+                                $ccMed6mRd.';'.
+                                $ccMed3mRd.';'.
+                                $ccM3Rd.';'.
+                                $ccM2Rd.';'.
+                                $ccM1Rd.';'.
                                 $ccMed12m.';'.
                                 $ccMed6m.';'.
                                 $ccMed3m.';'.
                                 $ccM3.';'.
                                 $ccM2.';'.
                                 $ccM1.';'.
+
+                                $mb_12mRd.';'.
+                                $mb_6mRd.';'.
+                                $mb_3mRd.';'.
+                                $mbM3Rd.';'.
+                                $mbM2Rd.';'.
+                                $mbM1Rd.';'.
+
+                                $mb_12mMc.';'.
+                                $mb_6mMc.';'.
+                                $mb_3mMc.';'.
                                 $mb_12m.';'.
                                 $mb_6m.';'.
                                 $mb_3m.';'.
                                 $mbM3.';'.
                                 $mbM2.';'.
                                 $mbM1.';'.
+
                                 $data[$i]['paramMargem'].';'.
                                 $margemPrecoAtual.';'.
                                 $precoAtual.';'.
@@ -1604,24 +1891,39 @@ class BaseprecoController extends AbstractRestfulController
                                        ->setCellValue('P'.'1', 'ICMS')
                                        ->setCellValue('Q'.'1', 'GRUPO_DESCONTO')
                                        ->setCellValue('R'.'1', 'PERC_VENDEDOR')
-                                       ->setCellValue('S'.'1', 'CC_MED12M')
-                                       ->setCellValue('T'.'1', 'CC_MED6M')
-                                       ->setCellValue('U'.'1', 'CC_MED3M')
-                                       ->setCellValue('V'.'1', 'CC_M3')
-                                       ->setCellValue('W'.'1', 'CC_M2')
-                                       ->setCellValue('X'.'1', 'CC_M1')
-                                       ->setCellValue('Y'.'1', 'MB_12M')
-                                       ->setCellValue('Z'.'1', 'MB_6M')
-                                       ->setCellValue('AA'.'1', 'MB_3M')
-                                       ->setCellValue('AB'.'1', 'MB_M3')
-                                       ->setCellValue('AC'.'1', 'MB_M2')
-                                       ->setCellValue('AD'.'1', 'MB_M1')
-                                       ->setCellValue('AE'.'1', 'PARAM_MARGEM')
-                                       ->setCellValue('AF'.'1', 'MARGEM_PRECO_ATUAL')
-                                       ->setCellValue('AG'.'1', 'PRECO_ATUAL')
-                                       ->setCellValue('AH'.'1', 'PRECO_ATUAL_MIN')
-                                       ->setCellValue('AI'.'1', 'PRECO_ATUAL_LIQ')
-                                       ->setCellValue('AJ'.'1', 'PRECO_MARGEM_PARAM');
+                                       ->setCellValue('S'.'1', 'CC_MED12M_RD')
+                                       ->setCellValue('T'.'1', 'CC_MED6M_RD')
+                                       ->setCellValue('U'.'1', 'CC_MED3M_RD')
+                                       ->setCellValue('V'.'1', 'CC_M3_RD')
+                                       ->setCellValue('W'.'1', 'CC_M2_RD')
+                                       ->setCellValue('X'.'1', 'CC_M1_RD')
+                                       ->setCellValue('Y'.'1', 'CC_MED12M')
+                                       ->setCellValue('Z'.'1', 'CC_MED6M')
+                                       ->setCellValue('AA'.'1', 'CC_MED3M')
+                                       ->setCellValue('AB'.'1', 'CC_M3')
+                                       ->setCellValue('AC'.'1', 'CC_M2')
+                                       ->setCellValue('AD'.'1', 'CC_M1')
+                                       ->setCellValue('AE'.'1', 'MB_12M_RD')
+                                       ->setCellValue('AF'.'1', 'MB_6M_RD')
+                                       ->setCellValue('AG'.'1', 'MB_3M_RD')
+                                       ->setCellValue('AH'.'1', 'MB_M3_RD')
+                                       ->setCellValue('AI'.'1', 'MB_M2_RD')
+                                       ->setCellValue('AJ'.'1', 'MB_M1_RD')
+                                       ->setCellValue('AK'.'1', 'MB_12M_MC')
+                                       ->setCellValue('AL'.'1', 'MB_6M_MC')
+                                       ->setCellValue('AM'.'1', 'MB_3M_MC')
+                                       ->setCellValue('AN'.'1', 'MB_12M')
+                                       ->setCellValue('AO'.'1', 'MB_6M')
+                                       ->setCellValue('AP'.'1', 'MB_3M')
+                                       ->setCellValue('AQ'.'1', 'MB_M3')
+                                       ->setCellValue('AR'.'1', 'MB_M2')
+                                       ->setCellValue('AS'.'1', 'MB_M1')
+                                       ->setCellValue('AT'.'1', 'PARAM_MARGEM')
+                                       ->setCellValue('AU'.'1', 'MARGEM_PRECO_ATUAL')
+                                       ->setCellValue('AV'.'1', 'PRECO_ATUAL')
+                                       ->setCellValue('AW'.'1', 'PRECO_ATUAL_MIN')
+                                       ->setCellValue('AX'.'1', 'PRECO_ATUAL_LIQ')
+                                       ->setCellValue('AY'.'1', 'PRECO_MARGEM_PARAM');
 
                 $i=0;
                 $ix=2;
@@ -1639,12 +1941,30 @@ class BaseprecoController extends AbstractRestfulController
                     $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
                     $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
                     $percVendedor   = $data[$i]['percVendedor'] >0 ? $data[$i]['percVendedor'] : null ;
+
+                    $ccMed12mRd     = $data[$i]['ccMed12mRd'] >0 ? $data[$i]['ccMed12mRd'] : null ;
+                    $ccMed6mRd      = $data[$i]['ccMed6mRd'] >0 ? $data[$i]['ccMed6mRd'] : null ;
+                    $ccMed3mRd      = $data[$i]['ccMed3mRd'] >0 ? $data[$i]['ccMed3mRd'] : null ;
+                    $ccM3Rd         = $data[$i]['ccM3Rd'] >0 ? $data[$i]['ccM3Rd'] : null ;
+                    $ccM2Rd         = $data[$i]['ccM2Rd'] >0 ? $data[$i]['ccM2Rd'] : null ;
+                    $ccM1Rd         = $data[$i]['ccM1Rd'] >0 ? $data[$i]['ccM1Rd'] : null ;
                     $ccMed12m       = $data[$i]['ccMed12m'] >0 ? $data[$i]['ccMed12m'] : null ;
                     $ccMed6m        = $data[$i]['ccMed6m'] >0 ? $data[$i]['ccMed6m'] : null ;
                     $ccMed3m        = $data[$i]['ccMed3m'] >0 ? $data[$i]['ccMed3m'] : null ;
                     $ccM3           = $data[$i]['ccM3'] >0 ? $data[$i]['ccM3'] : null ;
                     $ccM2           = $data[$i]['ccM2'] >0 ? $data[$i]['ccM2'] : null ;
                     $ccM1           = $data[$i]['ccM1'] >0 ? $data[$i]['ccM1'] : null ;
+
+                    $mb_12mRd       = $data[$i]['mb_12mRd'] >0 ? $data[$i]['mb_12mRd'] : null ;
+                    $mb_6mRd        = $data[$i]['mb_6mRd'] >0 ? $data[$i]['mb_6mRd'] : null ;
+                    $mb_3mRd        = $data[$i]['mb_3mRd'] >0 ? $data[$i]['mb_3mRd'] : null ;
+                    $mbM3Rd         = $data[$i]['mbM3Rd'] >0 ? $data[$i]['mbM3Rd'] : null ;
+                    $mbM2Rd         = $data[$i]['mbM2Rd'] >0 ? $data[$i]['mbM2Rd'] : null ;
+                    $mbM1Rd         = $data[$i]['mbM1Rd'] >0 ? $data[$i]['mbM1Rd'] : null ;
+
+                    $mb_12mMc       = $data[$i]['mb_12mMc'] >0 ? $data[$i]['mb_12mMc'] : null ;
+                    $mb_6mMc        = $data[$i]['mb_6mMc'] >0 ? $data[$i]['mb_6mMc'] : null ;
+                    $mb_3mMc        = $data[$i]['mb_3mMc'] >0 ? $data[$i]['mb_3mMc'] : null ;
                     $mb_12m         = $data[$i]['mb_12m'] >0 ? $data[$i]['mb_12m'] : null ;
                     $mb_6m          = $data[$i]['mb_6m'] >0 ? $data[$i]['mb_6m'] : null ;
                     $mb_3m          = $data[$i]['mb_3m'] >0 ? $data[$i]['mb_3m'] : null ;
@@ -1675,24 +1995,39 @@ class BaseprecoController extends AbstractRestfulController
                                                ->setCellValue('P'.$ix, $icms)
                                                ->setCellValue('Q'.$ix, $data[$i]['grupoDesconto'])
                                                ->setCellValue('R'.$ix, $percVendedor)
-                                               ->setCellValue('S'.$ix, $ccMed12m)
-                                               ->setCellValue('T'.$ix, $ccMed6m)
-                                               ->setCellValue('U'.$ix, $ccMed3m)
-                                               ->setCellValue('V'.$ix, $ccM3)
-                                               ->setCellValue('W'.$ix, $ccM2)
-                                               ->setCellValue('X'.$ix, $ccM1)
-                                               ->setCellValue('Y'.$ix, $mb_12m)
-                                               ->setCellValue('Z'.$ix, $mb_6m)
-                                               ->setCellValue('AA'.$ix, $mb_3m)
-                                               ->setCellValue('AB'.$ix, $mbM3)
-                                               ->setCellValue('AC'.$ix, $mbM2)
-                                               ->setCellValue('AD'.$ix, $mbM1)
-                                               ->setCellValue('AE'.$ix, $data[$i]['paramMargem'])
-                                               ->setCellValue('AF'.$ix, $margemPrecoAtual)
-                                               ->setCellValue('AG'.$ix, $precoAtual)
-                                               ->setCellValue('AH'.$ix, $precoAtualMin)
-                                               ->setCellValue('AI'.$ix, $precoAtualLiq)
-                                               ->setCellValue('AJ'.$ix, $precoMargemParam);
+                                               ->setCellValue('S'.$ix, $ccMed12mRd)
+                                               ->setCellValue('T'.$ix, $ccMed6mRd)
+                                               ->setCellValue('U'.$ix, $ccMed3mRd)
+                                               ->setCellValue('V'.$ix, $ccM3Rd)
+                                               ->setCellValue('W'.$ix, $ccM2Rd)
+                                               ->setCellValue('X'.$ix, $ccM1Rd)
+                                               ->setCellValue('Y'.$ix, $ccMed12m)
+                                               ->setCellValue('Z'.$ix, $ccMed6m)
+                                               ->setCellValue('AA'.$ix, $ccMed3m)
+                                               ->setCellValue('AB'.$ix, $ccM3)
+                                               ->setCellValue('AC'.$ix, $ccM2)
+                                               ->setCellValue('AD'.$ix, $ccM1)
+                                               ->setCellValue('AE'.$ix, $mb_12mRd)
+                                               ->setCellValue('AF'.$ix, $mb_6mRd)
+                                               ->setCellValue('AG'.$ix, $mb_3mRd)
+                                               ->setCellValue('AH'.$ix, $mbM3Rd)
+                                               ->setCellValue('AI'.$ix, $mbM2Rd)
+                                               ->setCellValue('AJ'.$ix, $mbM1Rd)
+                                               ->setCellValue('AK'.$ix, $mb_12mMc)
+                                               ->setCellValue('AL'.$ix, $mb_6mMc)
+                                               ->setCellValue('AM'.$ix, $mb_3mMc)
+                                               ->setCellValue('AN'.$ix, $mb_12m)
+                                               ->setCellValue('AO'.$ix, $mb_6m)
+                                               ->setCellValue('AP'.$ix, $mb_3m)
+                                               ->setCellValue('AQ'.$ix, $mbM3)
+                                               ->setCellValue('AR'.$ix, $mbM2)
+                                               ->setCellValue('AS'.$ix, $mbM1)
+                                               ->setCellValue('AT'.$ix, $data[$i]['paramMargem'])
+                                               ->setCellValue('AU'.$ix, $margemPrecoAtual)
+                                               ->setCellValue('AV'.$ix, $precoAtual)
+                                               ->setCellValue('AW'.$ix, $precoAtualMin)
+                                               ->setCellValue('AX'.$ix, $precoAtualLiq)
+                                               ->setCellValue('AY'.$ix, $precoMargemParam);
                     $i++;
                     $ix++;
                 }

@@ -1,7 +1,7 @@
-Ext.define('App.view.basepreco.FiltroPreco',{
+Ext.define('App.view.basepreco.GeraPrecoFiltro',{
     extend: 'Ext.panel.Panel',
-    xtype: 'filtropreco',
-    itemId: 'filtropreco',
+    xtype: 'geraprecofiltro',
+    itemId: 'geraprecofiltro',
     title: 'Filtro',
     region: 'west',
     width: 290,
@@ -9,7 +9,6 @@ Ext.define('App.view.basepreco.FiltroPreco',{
     scrollable: true,
     layout: 'vbox',
     requires:[
-        // 'App.view.basepreco.PluginToggle'
     ],
 
     initComponent: function() {
@@ -44,7 +43,6 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             fieldLabel: 'Empresas',
             labelWidth: 60,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             disabled:true
@@ -90,8 +88,6 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             fieldLabel: 'Marcas',
             // labelWidth: 60,
             margin: '1 1 1 8',
-            // padding: 1,
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             disabled: true
@@ -167,10 +163,7 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             // emptyText: 'Produto',
             fieldLabel: 'Código Produto NBS',
             emptyText: 'Código Produto NBS',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
 
@@ -215,30 +208,11 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             valueField: 'idProduto',
             fieldLabel: 'Descrição Produto',
             emptyText: 'Descrição Produto',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             enableKeyEvents: true,
             listeners: {
-                // keydown: 
-                //     function (obj,e) 
-                //     {
-                //         if(typeof(e.getKeyName()) !== "undefined" ){    
-                //             // console.log(obj.store.lastOptions.params.descricao);
-                //             var newDescricao =  e.getKeyName();
-                //             newDescricao = newDescricao.toUpperCase();
-                //             newDescricao = newDescricao.toLowerCase();
-                //             newDescricao = newDescricao.replace(new RegExp('[ÁÀÂÃ]','gi'), 'a');
-                //             newDescricao = newDescricao.replace(new RegExp('[ÉÈÊ]','gi'), 'e');
-                //             newDescricao = newDescricao.replace(new RegExp('[ÍÌÎ]','gi'), 'i');
-                //             newDescricao = newDescricao.replace(new RegExp('[ÓÒÔÕ]','gi'), 'o');
-                //             newDescricao = newDescricao.replace(new RegExp('[ÚÙÛ]','gi'), 'u');
-                //             newDescricao = newDescricao.replace(new RegExp('[Ç]','gi'), 'c');    
-                //         }
-                //     }
             },
             
             // allowBlank: false,
@@ -279,10 +253,7 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             // emptyText: 'Produto',
             fieldLabel: 'Código Table Preço',
             emptyText: 'Código Table Preço',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
 
@@ -366,10 +337,7 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             // emptyText: 'Produto',
             fieldLabel: 'Código Produto Sankhya',
             emptyText: 'Código Produto Sankhya',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
 
@@ -415,8 +383,6 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             fieldLabel: 'Faixa de Custo',
             // labelWidth: 60,
             margin: '1 1 1 8',
-            // padding: 1,
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             disabled: true
@@ -455,8 +421,6 @@ Ext.define('App.view.basepreco.FiltroPreco',{
             fieldLabel: 'Grupo Desconto',
             // labelWidth: 60,
             margin: '1 1 1 8',
-            // padding: 1,
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             disabled: true
@@ -1139,10 +1103,10 @@ Ext.define('App.view.basepreco.FiltroPreco',{
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
 
-        if(me.up('container').down('#bprecofiltro').hidden){
-            me.up('container').down('#bprecofiltro').setHidden(false);
+        if(me.up('container').down('#geraprecofiltro').hidden){
+            me.up('container').down('#geraprecofiltro').setHidden(false);
         }else{
-            me.up('container').down('#bprecofiltro').setHidden(true);
+            me.up('container').down('#geraprecofiltro').setHidden(true);
         }
 
     },

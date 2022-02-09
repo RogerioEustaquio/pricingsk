@@ -5,12 +5,12 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
     // height: Ext.getBody().getHeight() * 0.9,
     // width: Ext.getBody().getWidth() * 0.9,
     requires: [
-        'App.view.basepreco.Toolbar',
-        'App.view.basepreco.BprecoGrid',
-        'App.view.basepreco.BprecoFiltro',
-        'App.view.basepreco.ToolbarPreco',
-        'App.view.basepreco.GridPreco',
-        'App.view.basepreco.FiltroPreco',
+        'App.view.basepreco.ParamPrecoToolbar',
+        'App.view.basepreco.ParamPrecoGrid',
+        'App.view.basepreco.ParamPrecoFiltro',
+        'App.view.basepreco.GeraPrecoToolbar',
+        'App.view.basepreco.GeraPrecoGrid',
+        'App.view.basepreco.GeraPrecoFiltro',
     ],
     
     title: 'Base Preços',
@@ -29,20 +29,19 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
                     title: 'Parâmetros de Preço',
                     items:[
                         {
-                            xtype: 'bprecotoolbar'
+                            xtype: 'paramprecotoolbar'
                         },
                         {
-                            xtype: 'bprecofiltro'
+                            xtype: 'paramprecofiltro'
                         },
                         {
                             xtype: 'panel',
                             itemId: 'panelcenter',
-                            text: 'Base Preço',
                             region: 'center',
                             layout: 'fit',
                             items:[
                                 {
-                                    xtype: 'bprecogrid'
+                                    xtype: 'paramprecogrid'
                                 }
                             ]
 
@@ -56,20 +55,19 @@ Ext.define('App.view.basepreco.BaseprecoPanel', {
                     width: '100%',
                     items:[
                         {
-                            xtype: 'toolbarpreco'
+                            xtype: 'geraprecotoolbar'
                         },
                         {
-                            xtype: 'filtropreco'
+                            xtype: 'geraprecofiltro'
                         },
                         {
                             xtype: 'panel',
                             itemId: 'panelcenterpreco',
-                            text: 'Base Preço',
                             region: 'center',
                             layout: 'fit',
                             items:[
                                 {
-                                    xtype: 'gridpreco'
+                                    xtype: 'geraprecogrid'
                                 }
                             ]
 

@@ -1,7 +1,7 @@
-Ext.define('App.view.basepreco.BprecoFiltro',{
+Ext.define('App.view.basepreco.ParamPrecoFiltro',{
     extend: 'Ext.panel.Panel',
-    xtype: 'bprecofiltro',
-    itemId: 'bprecofiltro',
+    xtype: 'paramprecofiltro',
+    itemId: 'paramprecofiltro',
     title: 'Filtro',
     region: 'west',
     width: 290,
@@ -9,7 +9,6 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
     scrollable: true,
     layout: 'vbox',
     requires:[
-        // 'App.view.basepreco.PluginToggle'
     ],
 
     initComponent: function() {
@@ -44,7 +43,6 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             fieldLabel: 'Empresas',
             labelWidth: 60,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             disabled:true
@@ -178,10 +176,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             // emptyText: 'Produto',
             fieldLabel: 'Código Table Preço',
             emptyText: 'Código Table Preço',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
 
@@ -227,10 +222,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             // emptyText: 'Produto',
             fieldLabel: 'Código Produto Sankhya',
             emptyText: 'Código Produto Sankhya',
-            // matchFieldWidth: false,
-            // padding: 1,
             margin: '1 1 1 8',
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
 
@@ -274,10 +266,7 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
             valueField: 'grupoDesconto',
             emptyText: 'Grupo Desconto',
             fieldLabel: 'Grupo Desconto',
-            // labelWidth: 60,
             margin: '1 1 1 8',
-            // padding: 1,
-            // plugins:'dragdroptag',
             filterPickList: true,
             publishes: 'value',
             disabled: true
@@ -764,10 +753,10 @@ Ext.define('App.view.basepreco.BprecoFiltro',{
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
 
-        if(me.up('container').down('#bprecofiltro').hidden){
-            me.up('container').down('#bprecofiltro').setHidden(false);
+        if(me.up('container').down('#paramprecofiltro').hidden){
+            me.up('container').down('#paramprecofiltro').setHidden(false);
         }else{
-            me.up('container').down('#bprecofiltro').setHidden(true);
+            me.up('container').down('#paramprecofiltro').setHidden(true);
         }
 
     },

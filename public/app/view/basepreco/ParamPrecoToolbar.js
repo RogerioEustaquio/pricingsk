@@ -1,7 +1,7 @@
-Ext.define('App.view.basepreco.Toolbar',{
+Ext.define('App.view.basepreco.ParamPrecoToolbar',{
     extend: 'Ext.Toolbar',
-    xtype: 'bprecotoolbar',
-    itemId: 'bprecotoolbar',
+    xtype: 'paramprecotoolbar',
+    itemId: 'paramprecotoolbar',
     region: 'north',
     requires:[
         // 'App.view.fii.ContainerHighCharts'
@@ -36,7 +36,7 @@ Ext.define('App.view.basepreco.Toolbar',{
             margin: '1 1 1 4',
             handler: function(){
 
-                var v = me.up('container').down('#bprecofiltro').down('#notMarca').value;
+                var v = me.up('container').down('#paramprecofiltro').down('#notMarca').value;
                 btnNotmarga.value = v;
 
                 objWindow = Ext.create('Ext.window.Window',{
@@ -58,7 +58,7 @@ Ext.define('App.view.basepreco.Toolbar',{
 
                                 vnotmarca = this.checked ? 1 : 0;
                                 btnNotmarga.value = vnotmarca;
-                                me.up('container').down('#bprecofiltro').down('#notMarca').value = vnotmarca;
+                                me.up('container').down('#paramprecofiltro').down('#notMarca').value = vnotmarca;
                                
                                 setTimeout(function(){
                                     objWindow.close();
@@ -140,12 +140,12 @@ Ext.define('App.view.basepreco.Toolbar',{
 
         var vnotmarca = me.down('#btnnotmarca').value ? 1 : 0 ;
         // console.log(vnotmarca);
-        me.up('container').down('#bprecofiltro').down('#notMarca').value = vnotmarca;
+        me.up('container').down('#paramprecofiltro').down('#notMarca').value = vnotmarca;
 
-        if(me.up('container').down('#bprecofiltro').hidden){
-            me.up('container').down('#bprecofiltro').setHidden(false);
+        if(me.up('container').down('#paramprecofiltro').hidden){
+            me.up('container').down('#paramprecofiltro').setHidden(false);
         }else{
-            me.up('container').down('#bprecofiltro').setHidden(true);
+            me.up('container').down('#paramprecofiltro').setHidden(true);
         }
         
     },
@@ -154,23 +154,23 @@ Ext.define('App.view.basepreco.Toolbar',{
 
         var me = this.up('toolbar');
 
-        var idEmpresas      = me.up('container').down('#bprecofiltro').down('#elEmp').getValue();
-        var notMarca        = me.up('container').down('#bprecofiltro').down('#notMarca').value;
-        var idMarcas        = me.up('container').down('#bprecofiltro').down('#elMarca').getValue();
-        var produtos        = me.up('container').down('#bprecofiltro').down('#elProduto').getValue();
-        var codTabPreco     = me.up('container').down('#bprecofiltro').down('#eltagtabpreco').getValue();
-        var idProduto       = me.up('container').down('#bprecofiltro').down('#eltagidproduto').getValue();
-        var grupoDesconto   = me.up('container').down('#bprecofiltro').down('#eltaggrupodesconto').getValue();
+        var idEmpresas      = me.up('container').down('#paramprecofiltro').down('#elEmp').getValue();
+        var notMarca        = me.up('container').down('#paramprecofiltro').down('#notMarca').value;
+        var idMarcas        = me.up('container').down('#paramprecofiltro').down('#elMarca').getValue();
+        var produtos        = me.up('container').down('#paramprecofiltro').down('#elProduto').getValue();
+        var codTabPreco     = me.up('container').down('#paramprecofiltro').down('#eltagtabpreco').getValue();
+        var idProduto       = me.up('container').down('#paramprecofiltro').down('#eltagidproduto').getValue();
+        var grupoDesconto   = me.up('container').down('#paramprecofiltro').down('#eltaggrupodesconto').getValue();
 
-        var fieldset =  me.up('container').down('#bprecofiltro').down('fieldset').collapsed  ? '' : 1;
+        var fieldset =  me.up('container').down('#paramprecofiltro').down('fieldset').collapsed  ? '' : 1;
 
-        var checkEstoque    = fieldset ? me.up('container').down('#bprecofiltro').down('#elestoque').getValue() : '';
-        var checkpreco      = fieldset ? me.up('container').down('#bprecofiltro').down('#elpreco').getValue(): '';
-        var checkmargem     = fieldset ? me.up('container').down('#bprecofiltro').down('#elmargem').getValue(): '';
-        var checktipoprecificacao   = fieldset ? me.up('container').down('#bprecofiltro').down('#eltipoprecificacao').getValue(): '';
-        var checkgrupodesconto      = fieldset ? me.up('container').down('#bprecofiltro').down('#elgrupodesconto').getValue(): '';
-        var checktabelapreco        = fieldset ? me.up('container').down('#bprecofiltro').down('#eltabelapreco').getValue(): '';
-        var checkcustounitario      = fieldset ? me.up('container').down('#bprecofiltro').down('#elcustounitario').getValue(): '';
+        var checkEstoque    = fieldset ? me.up('container').down('#paramprecofiltro').down('#elestoque').getValue() : '';
+        var checkpreco      = fieldset ? me.up('container').down('#paramprecofiltro').down('#elpreco').getValue(): '';
+        var checkmargem     = fieldset ? me.up('container').down('#paramprecofiltro').down('#elmargem').getValue(): '';
+        var checktipoprecificacao   = fieldset ? me.up('container').down('#paramprecofiltro').down('#eltipoprecificacao').getValue(): '';
+        var checkgrupodesconto      = fieldset ? me.up('container').down('#paramprecofiltro').down('#elgrupodesconto').getValue(): '';
+        var checktabelapreco        = fieldset ? me.up('container').down('#paramprecofiltro').down('#eltabelapreco').getValue(): '';
+        var checkcustounitario      = fieldset ? me.up('container').down('#paramprecofiltro').down('#elcustounitario').getValue(): '';
 
         var grid = me.up('container').down('#panelcenter').down('grid');
         var params = {

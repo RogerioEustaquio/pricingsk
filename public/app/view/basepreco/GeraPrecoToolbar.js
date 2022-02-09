@@ -1,12 +1,11 @@
-Ext.define('App.view.basepreco.ToolbarPreco',{
+Ext.define('App.view.basepreco.GeraPrecoToolbar',{
     extend: 'Ext.Toolbar',
-    xtype: 'toolbarpreco',
-    itemId: 'toolbarpreco',
+    xtype: 'geraprecotoolbar',
+    itemId: 'geraprecotoolbar',
     region: 'north',
     requires:[
-        // 'App.view.fii.ContainerHighCharts'
+        
     ],
-    // indicadoresAdd: null,
 
     initComponent: function() {
         var me = this;
@@ -36,7 +35,7 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
             margin: '1 1 1 4',
             handler: function(){
 
-                var v = me.up('container').down('#filtropreco').down('#notMarca').value;
+                var v = me.up('container').down('#geraprecofiltro').down('#notMarca').value;
                 btnNotmarga.value = v;
 
                 objWindow = Ext.create('Ext.window.Window',{
@@ -58,7 +57,7 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
 
                                 vnotmarca = this.checked ? 1 : 0;
                                 btnNotmarga.value = vnotmarca;
-                                me.up('container').down('#filtropreco').down('#notMarca').value = vnotmarca;
+                                me.up('container').down('#geraprecofiltro').down('#notMarca').value = vnotmarca;
                                
                                 setTimeout(function(){
                                     objWindow.close();
@@ -140,12 +139,12 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
 
         var vnotmarca = me.down('#btnnotmarca').value ? 1 : 0 ;
         // console.log(vnotmarca);
-        me.up('container').down('#filtropreco').down('#notMarca').value = vnotmarca;
+        me.up('container').down('#geraprecofiltro').down('#notMarca').value = vnotmarca;
 
-        if(me.up('container').down('#filtropreco').hidden){
-            me.up('container').down('#filtropreco').setHidden(false);
+        if(me.up('container').down('#geraprecofiltro').hidden){
+            me.up('container').down('#geraprecofiltro').setHidden(false);
         }else{
-            me.up('container').down('#filtropreco').setHidden(true);
+            me.up('container').down('#geraprecofiltro').setHidden(true);
         }
         
     },
@@ -154,29 +153,29 @@ Ext.define('App.view.basepreco.ToolbarPreco',{
 
         var me = this.up('toolbar');
 
-        var idEmpresas      = me.up('container').down('#filtropreco').down('#elEmp').getValue();
-        var notMarca        = me.up('container').down('#filtropreco').down('#notMarca').value;
-        var idMarcas        = me.up('container').down('#filtropreco').down('#elMarca').getValue();
-        var idCurvaAbc      = me.up('container').down('#filtropreco').down('#elCurva').getValue();
-        var produtos        = me.up('container').down('#filtropreco').down('#elProduto').getValue();
-        var codTabPreco     = me.up('container').down('#filtropreco').down('#eltagtabpreco').getValue();
-        var idProduto       = me.up('container').down('#filtropreco').down('#eltagidproduto').getValue();
-        var iddescProduto   = me.up('container').down('#filtropreco').down('#elDescProduto').getValue();
-        var tipoprecificacao= me.up('container').down('#filtropreco').down('#elTpPrecificacao').getValue();
-        var faixaCusto      = me.up('container').down('#filtropreco').down('#eltagfaixacusto').getValue();
-        var grupoDesconto   = me.up('container').down('#filtropreco').down('#eltaggrupodesconto').getValue();
-        var slidMargem      = me.up('container').down('#filtropreco').down('#slidmargem').getValue();
+        var idEmpresas      = me.up('container').down('#geraprecofiltro').down('#elEmp').getValue();
+        var notMarca        = me.up('container').down('#geraprecofiltro').down('#notMarca').value;
+        var idMarcas        = me.up('container').down('#geraprecofiltro').down('#elMarca').getValue();
+        var idCurvaAbc      = me.up('container').down('#geraprecofiltro').down('#elCurva').getValue();
+        var produtos        = me.up('container').down('#geraprecofiltro').down('#elProduto').getValue();
+        var codTabPreco     = me.up('container').down('#geraprecofiltro').down('#eltagtabpreco').getValue();
+        var idProduto       = me.up('container').down('#geraprecofiltro').down('#eltagidproduto').getValue();
+        var iddescProduto   = me.up('container').down('#geraprecofiltro').down('#elDescProduto').getValue();
+        var tipoprecificacao= me.up('container').down('#geraprecofiltro').down('#elTpPrecificacao').getValue();
+        var faixaCusto      = me.up('container').down('#geraprecofiltro').down('#eltagfaixacusto').getValue();
+        var grupoDesconto   = me.up('container').down('#geraprecofiltro').down('#eltaggrupodesconto').getValue();
+        var slidMargem      = me.up('container').down('#geraprecofiltro').down('#slidmargem').getValue();
 
-        var fieldset =  me.up('container').down('#filtropreco').down('fieldset').collapsed  ? '' : 1;
+        var fieldset =  me.up('container').down('#geraprecofiltro').down('fieldset').collapsed  ? '' : 1;
 
-        var checkEstoque    = fieldset ? me.up('container').down('#filtropreco').down('#elestoque').getValue() : '';
-        var checkpreco      = fieldset ? me.up('container').down('#filtropreco').down('#elpreco').getValue(): '';
-        var checkmargem     = fieldset ? me.up('container').down('#filtropreco').down('#elmargem').getValue(): '';
-        var checktipoprecificacao   = fieldset ? me.up('container').down('#filtropreco').down('#eltipoprecificacao').getValue(): '';
-        var checkgrupodesconto      = fieldset ? me.up('container').down('#filtropreco').down('#elgrupodesconto').getValue(): '';
-        var checktabelapreco        = fieldset ? me.up('container').down('#filtropreco').down('#eltabelapreco').getValue(): '';
-        var checkcustounitario      = fieldset ? me.up('container').down('#filtropreco').down('#elcustounitario').getValue(): '';
-        var checkparammargem        = fieldset ? me.up('container').down('#filtropreco').down('#elparammargem').getValue(): '';
+        var checkEstoque    = fieldset ? me.up('container').down('#geraprecofiltro').down('#elestoque').getValue() : '';
+        var checkpreco      = fieldset ? me.up('container').down('#geraprecofiltro').down('#elpreco').getValue(): '';
+        var checkmargem     = fieldset ? me.up('container').down('#geraprecofiltro').down('#elmargem').getValue(): '';
+        var checktipoprecificacao   = fieldset ? me.up('container').down('#geraprecofiltro').down('#eltipoprecificacao').getValue(): '';
+        var checkgrupodesconto      = fieldset ? me.up('container').down('#geraprecofiltro').down('#elgrupodesconto').getValue(): '';
+        var checktabelapreco        = fieldset ? me.up('container').down('#geraprecofiltro').down('#eltabelapreco').getValue(): '';
+        var checkcustounitario      = fieldset ? me.up('container').down('#geraprecofiltro').down('#elcustounitario').getValue(): '';
+        var checkparammargem        = fieldset ? me.up('container').down('#geraprecofiltro').down('#elparammargem').getValue(): '';
 
         if(iddescProduto){
 

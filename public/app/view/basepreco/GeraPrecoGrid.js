@@ -1,7 +1,7 @@
-Ext.define('App.view.basepreco.GridPreco', {
+Ext.define('App.view.basepreco.GeraPrecoGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'gridpreco',
-    itemId: 'gridpreco',
+    xtype: 'geraprecogrid',
+    itemId: 'geraprecogrid',
     columnLines: true,
     margin: '1 1 1 1',
     requires: [
@@ -41,19 +41,35 @@ Ext.define('App.view.basepreco.GridPreco', {
                                 {name:'cofins', type: 'number' },
                                 {name:'icms', type: 'number' },
                                 {name:'grupoDesconto', type: 'string' },
-                                {name:'precVendedor', type: 'number' },
+                                {name:'percVendedor', type: 'number' },
+                                {name:'ccMed12mRd', type: 'number' },
+                                {name:'ccMed6mRd', type: 'number' },
+                                {name:'ccMed3mRd', type: 'number' },
+                                {name:'ccM3Rd', type: 'number' },
+                                {name:'ccM2Rd', type: 'number' },
+                                {name:'ccM1Rd', type: 'number' },
                                 {name:'ccMed12m', type: 'number' },
                                 {name:'ccMed6m', type: 'number' },
                                 {name:'ccMed3m', type: 'number' },
                                 {name:'ccM3', type: 'number' },
                                 {name:'ccM2', type: 'number' },
                                 {name:'ccM1', type: 'number' },
+                                {name:'mb_12mRd', type: 'number' },
+                                {name:'mb_6mRd', type: 'number' },
+                                {name:'mb_3mRd', type: 'number' },
+                                {name:'mbM3Rd', type: 'number' },
+                                {name:'mbM2Rd', type: 'number' },
+                                {name:'mbM1Rd', type: 'number' },
+                                {name:'mb_12mMc', type: 'number' },
+                                {name:'mb_6mMc', type: 'number' },
+                                {name:'mb_3mMc', type: 'number' },
                                 {name:'mb_12m', type: 'number' },
                                 {name:'mb_6m', type: 'number' },
                                 {name:'mb_3m', type: 'number' },
                                 {name:'mbM3', type: 'number' },
                                 {name:'mbM2', type: 'number' },
                                 {name:'mbM1', type: 'number' },
+
                                 {name:'paramMargem', type: 'number' },
                                 {name:'margemPrecoAtual', type: 'number' },
                                 {name:'precoAtual', type: 'number' },
@@ -67,7 +83,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                         proxy: {
                             type: 'ajax',
                             method:'POST',
-                            url : BASEURL + '/api/basepreco/listargpreco',
+                            url : BASEURL + '/api/basepreco/listargerapreco',
                             encode: true,
                             timeout: 240000,
                             format: 'json',
@@ -214,11 +230,71 @@ Ext.define('App.view.basepreco.GridPreco', {
                 },
                 {
                     text: 'Prec. Vendedor',
-                    dataIndex: 'precVendedor',
+                    dataIndex: 'percVendedor',
                     width: 126,
                     align: 'right',
                     renderer: function (v) {
                         v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'CC. M. 12M RD',
+                    dataIndex: 'ccMed12mRd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'CC. M. 6M RD',
+                    dataIndex: 'ccMed6mRd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'CC. M. 3M RD',
+                    dataIndex: 'ccMed3mRd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'CC. 3M RD',
+                    dataIndex: 'ccM3Rd',
+                    width: 110,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'CC. 2M RD',
+                    dataIndex: 'ccM2Rd',
+                    width: 110,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'CC. 1M RD',
+                    dataIndex: 'ccM1Rd',
+                    width: 110,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -228,7 +304,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -238,47 +314,137 @@ Ext.define('App.view.basepreco.GridPreco', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
                 {
                     text: 'CC. M. 3M',
                     dataIndex: 'ccMed3m',
-                    width: 120,
+                    width: 110,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
                 {
-                    text: 'CC. 3M',
+                    text: 'CC. M3',
                     dataIndex: 'ccM3',
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
                 {
-                    text: 'CC. 2M',
+                    text: 'CC. M2',
                     dataIndex: 'ccM2',
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
                 {
-                    text: 'CC. 1M',
+                    text: 'CC. M1',
                     dataIndex: 'ccM1',
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB 12M RD',
+                    dataIndex: 'mb_12mRd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB 6M RD',
+                    dataIndex: 'mb_6mRd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB 3M RD',
+                    dataIndex: 'mb_3mRd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB M. 3M RD',
+                    dataIndex: 'mbM3Rd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB M. 2M RD',
+                    dataIndex: 'mbM2Rd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB M. 1M RD',
+                    dataIndex: 'mbM1Rd',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB 12M MC',
+                    dataIndex: 'mb_12mMc',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB 6M MC',
+                    dataIndex: 'mb_6mMc',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        return v;
+                    }
+                },
+                {
+                    text: 'MB 3M MC',
+                    dataIndex: 'mb_3mMc',
+                    width: 120,
+                    align: 'right',
+                    renderer: function (v) {
+                        v = v > 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -315,6 +481,7 @@ Ext.define('App.view.basepreco.GridPreco', {
                 {
                     text: 'MB M3',
                     dataIndex: 'mbM3',
+
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
