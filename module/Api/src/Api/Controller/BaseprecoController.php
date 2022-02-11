@@ -1638,8 +1638,54 @@ class BaseprecoController extends AbstractRestfulController
         $resultSet->initialize($results);
 
         $data = array();
+        $cont = 0;
         foreach ($resultSet as $row) {
             $data[] = $hydrator->extract($row);
+
+            $data[$cont]['estoque'] = (float) $data[$cont]['estoque'];
+
+            $data[$cont]['ccMed12mRd'] = (float) $data[$cont]['ccMed12mRd'];
+            $data[$cont]['ccMed6mRd'] = (float) $data[$cont]['ccMed6mRd'];
+            $data[$cont]['ccMed3mRd'] = (float) $data[$cont]['ccMed3mRd'];
+            $data[$cont]['ccM3Rd'] = (float) $data[$cont]['ccM3Rd'];
+            $data[$cont]['ccM2Rd'] = (float) $data[$cont]['ccM2Rd'];
+            $data[$cont]['ccM1Rd'] = (float) $data[$cont]['ccM1Rd'];
+            $data[$cont]['ccMed12m'] = (float) $data[$cont]['ccMed12m'];
+            $data[$cont]['ccMed6m'] = (float) $data[$cont]['ccMed6m'];
+            $data[$cont]['ccMed3m'] = (float) $data[$cont]['ccMed3m'];
+            $data[$cont]['ccM3'] = (float) $data[$cont]['ccM3'];
+            $data[$cont]['ccM2'] = (float) $data[$cont]['ccM2'];
+            $data[$cont]['ccM1'] = (float) $data[$cont]['ccM1'];
+            $data[$cont]['mb_12mRd'] = (float) $data[$cont]['mb_12mRd'];
+            $data[$cont]['mb_6mRd'] = (float) $data[$cont]['mb_6mRd'];
+            $data[$cont]['mb_3mRd'] = (float) $data[$cont]['mb_3mRd'];
+            $data[$cont]['mbM3Rd'] = (float) $data[$cont]['mbM3Rd'];
+            $data[$cont]['mbM2Rd'] = (float) $data[$cont]['mbM2Rd'];
+            $data[$cont]['mbM1Rd'] = (float) $data[$cont]['mbM1Rd'];
+
+            $data[$cont]['mb_12mMc'] = (float) $data[$cont]['mb_12mMc'];
+            $data[$cont]['mb_6mMc'] = (float) $data[$cont]['mb_6mMc'];
+            $data[$cont]['mb_3mMc'] = (float) $data[$cont]['mb_3mMc'];
+            $data[$cont]['mb_12m'] = (float) $data[$cont]['mb_12m'];
+            $data[$cont]['mb_6m'] = (float) $data[$cont]['mb_6m'];
+            $data[$cont]['mb_3m'] = (float) $data[$cont]['mb_3m'];
+            $data[$cont]['mbM3'] = (float) $data[$cont]['mbM3'];
+            $data[$cont]['mbM2'] = (float) $data[$cont]['mbM2'];
+            $data[$cont]['mbM1'] = (float) $data[$cont]['mbM1'];
+
+            $data[$cont]['custoMedio'] = (float) $data[$cont]['custoMedio'];
+            $data[$cont]['valor'] = (float) $data[$cont]['valor'];
+            $data[$cont]['pis'] = (float) $data[$cont]['pis'];
+            $data[$cont]['cofins'] = (float) $data[$cont]['cofins'];
+            $data[$cont]['icms'] = (float) $data[$cont]['icms'];
+            $data[$cont]['paramMargem'] = (float) $data[$cont]['paramMargem'];
+            $data[$cont]['margemPrecoAtual'] = (float) $data[$cont]['margemPrecoAtual'];
+            $data[$cont]['precoAtual'] = (float) $data[$cont]['precoAtual'];
+            $data[$cont]['precoAtualMin'] = (float) $data[$cont]['precoAtualMin'];
+            $data[$cont]['precoAtualLiq'] = (float) $data[$cont]['precoAtualLiq'];
+            $data[$cont]['precoMargemParam'] = (float) $data[$cont]['precoMargemParam'];
+
+            $cont++;
         }
 
         $this->setCallbackData($data);

@@ -31,7 +31,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                                 {name:'descricao', type: 'string' },
                                 {name:'marca', type: 'string' },
                                 {name:'codNbs', type: 'string' },
-                                {name:'estoque', type: 'number' },
+                                {name:'estoque', type: 'float'},
                                 {name:'fxCusto', type: 'string' },
                                 {name:'tipoPrecificacao', type: 'string' },
                                 {name:'curva', type: 'string' },
@@ -149,9 +149,11 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     dataIndex: 'estoque',
                     width: 90,
                     align: 'right',
+                    // xtype: 'numbercolumn',
+                    // // format:'0.000,00',
                     renderer: function (v) {
 
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v > 0 ? utilFormat.Value2(v,2) : null;
                         return v;
                     },
                 },
