@@ -1099,6 +1099,65 @@ class BaseprecoController extends AbstractRestfulController
         
     }
 
+    public function camposgerapreco(){
+
+        $campos['codEmpresa'] ='vx.cod_empresa ';
+        $campos['empresa'] ='vx.empresa ';
+        $campos['codTabela'] ='vx.cod_tabela ';
+        $campos['codProduto'] ='vx.cod_produto ';
+        $campos['descricao'] ='vx.descricao ';
+        $campos['marca'] ='vx.marca ';
+        $campos['codNbs'] ='vx.cod_nbs ';
+        $campos['estoque'] ='vx.estoque';
+        $campos['fxCusto'] ='vx.fx_custo';
+        $campos['tipoPrecificacao'] ='vx.tipo_precificacao';
+        $campos['curva'] ='curva';
+        $campos['custoMedio'] ='vx.custo_medio ';
+        $campos['valor'] ='vx.valor';
+        $campos['pis'] ='vx.pis';
+        $campos['cofins'] =' vx.cofins';
+        $campos['icms'] =' icms';
+        $campos['grupoDesconto'] ='vx.grupo_desconto';
+        $campos['percVendedor'] ='vx.perc_vendedor ';
+        $campos['ccMed12mRd'] ='pdr.cc_med12m';
+        $campos['ccMed6mRd'] ='pdr.cc_med6m';
+        $campos['ccMed3mRd'] ='pdr.cc_med3m';
+        $campos['ccM3Rd'] ='pdr.cc_m3';
+        $campos['ccM2Rd'] ='pdr.cc_m2';
+        $campos['ccM1Rd'] ='pdr.cc_m1';
+        $campos['ccMed12m'] ='vx.cc_med12m';
+        $campos['ccMed6m'] ='vx.cc_med6m';
+        $campos['ccMed3m'] ='vx.cc_med3m';
+        $campos['ccM3'] ='vx.cc_m3';
+        $campos['ccM2'] ='vx.cc_m2';
+        $campos['ccM1'] ='vx.cc_m1';
+        // $campos[''] ='pdr2.mb_3m_median';
+        $campos['mb_12mRd'] ='pdr.mb_12m';
+        $campos['mb_6mRd'] ='pdr.mb_6m';
+        $campos['mb_3mRd'] ='pdr.mb_3m';
+        $campos['mbM3Rd'] ='pdr.mb_m3';
+        $campos['mbM2Rd'] ='pdr.mb_m2';
+        $campos['mbM1Rd'] ='pdr.mb_m1';
+        $campos['mb_12mMc'] ='emm.mb_12m';
+        $campos['mb_6mMc'] ='emm.mb_6m';
+        $campos['mb_3mMc'] ='emm.mb_3m';
+        $campos['mb_12m'] ='vx.mb_12m';
+        $campos['mb_6m'] ='vx.mb_6m';
+        $campos['mb_3m'] ='vx.mb_3m';
+        $campos['mbM3'] ='vx.mb_m3';
+        $campos['mbM2'] ='vx.mb_m2';
+        $campos['mbM1'] ='vx.mb_m1';
+        $campos['paramMargem'] ='vx.param_margem';
+        $campos['margemPrecoAtual'] ='vx.margem_preco_atual';
+        $campos['precoAtual'] ='vx.preco_atual';
+        $campos['precoAtualMin'] ='vx.preco_atual_min';
+        $campos['precoAtualLiq'] ='vx.preco_atual_liq';
+        $campos['precoMargemParam'] ='vx.preco_margem_param';
+
+        return $campos;
+
+    }
+
     public function listargeraprecoAction(){
 
         $idEmpresas         = $this->params()->fromQuery('idEmpresas',null);
@@ -1124,9 +1183,20 @@ class BaseprecoController extends AbstractRestfulController
 
         $inicio     = $this->params()->fromQuery('start',null);
         $final      = $this->params()->fromQuery('limit',null);
+        $sort       = $this->params()->fromQuery('sort',null);
 
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
+
+        $orderBy = 'ORDER BY cod_empresa, cod_tabela, grupo_desconto';
+        if($sort){
+
+            $camposOrder = $this->camposgerapreco();
+
+            $sort = json_decode($sort);
+            $orderBy = 'ORDER BY '. $camposOrder[$sort[0]->property]." ".$sort[0]->direction;
+
+        }
 
         if($idEmpresas){
             $idEmpresas =  implode(",",json_decode($idEmpresas));
@@ -1563,7 +1633,7 @@ class BaseprecoController extends AbstractRestfulController
                 $andSqlTpPrecificacao
                 $andSqlCkGdesc
                 $andSqlCkParamMargem
-                ORDER BY cod_empresa, cod_tabela, grupo_desconto
+                $orderBy
           ";
 
         $session = $this->getSession();

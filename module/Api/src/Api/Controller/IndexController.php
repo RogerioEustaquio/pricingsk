@@ -81,7 +81,7 @@ class IndexController extends AbstractRestfulController
     }
 
     public function usuario($cpf)
-    {   
+    {
         $data = array();
         
         try {

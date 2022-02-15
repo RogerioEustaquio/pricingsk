@@ -80,6 +80,8 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                         }),
                         pageSize: 50,
                         autoLoad: false,
+                        remoteSort: true,
+                        // sorters: [{ property: 'vendaM6', direction: 'DESC' }],
                         proxy: {
                             type: 'ajax',
                             method:'POST',
