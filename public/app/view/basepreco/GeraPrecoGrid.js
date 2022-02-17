@@ -155,7 +155,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     // // format:'0.000,00',
                     renderer: function (v) {
 
-                        v = v > 0 ? utilFormat.Value2(v,2) : null;
+                        v = v != 0 ? utilFormat.Value2(v,2) : null;
                         return v;
                     },
                 },
@@ -183,7 +183,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -193,7 +193,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -203,7 +203,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 60,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -213,7 +213,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 80,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -223,7 +223,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 80,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -238,7 +238,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 126,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -248,7 +248,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v != 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -258,7 +258,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v != 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -268,7 +268,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v != 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -278,7 +278,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 110,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v != 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -288,7 +288,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 110,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v != 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -298,7 +298,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 110,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,0) : null
+                        v = v != 0 ? utilFormat.Value2(v,0) : null
                         return v;
                     }
                 },
@@ -308,7 +308,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -318,7 +318,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -328,7 +328,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 110,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -338,7 +338,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -348,7 +348,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -358,7 +358,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -368,7 +368,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -378,7 +378,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -388,7 +388,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -398,7 +398,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -408,7 +408,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -418,7 +418,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -428,7 +428,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -438,7 +438,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -448,7 +448,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -458,7 +458,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -468,7 +468,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -478,7 +478,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -489,7 +489,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -499,7 +499,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -509,7 +509,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 90,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -520,7 +520,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     hidden: false,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -530,7 +530,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 150,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -540,7 +540,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 120,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -550,7 +550,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 130,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -560,7 +560,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 130,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 },
@@ -570,7 +570,7 @@ Ext.define('App.view.basepreco.GeraPrecoGrid', {
                     width: 160,
                     align: 'right',
                     renderer: function (v) {
-                        v = v > 0 ? utilFormat.Value2(v,2) : null
+                        v = v != 0 ? utilFormat.Value2(v,2) : null
                         return v;
                     }
                 }

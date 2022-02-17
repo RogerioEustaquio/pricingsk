@@ -164,6 +164,7 @@ Ext.define('App.view.basepreco.GeraPrecoToolbar',{
         var tipoprecificacao= me.up('container').down('#geraprecofiltro').down('#elTpPrecificacao').getValue();
         var faixaCusto      = me.up('container').down('#geraprecofiltro').down('#eltagfaixacusto').getValue();
         var grupoDesconto   = me.up('container').down('#geraprecofiltro').down('#eltaggrupodesconto').getValue();
+        var personalizado   = me.up('container').down('#geraprecofiltro').down('#eltagpersonalizado').getValue();
         var slidMargem      = me.up('container').down('#geraprecofiltro').down('#slidmargem').getValue();
 
         var fieldset =  me.up('container').down('#geraprecofiltro').down('fieldset').collapsed  ? '' : 1;
@@ -198,6 +199,7 @@ Ext.define('App.view.basepreco.GeraPrecoToolbar',{
             tipoprecificacao: Ext.encode(tipoprecificacao),
             faixaCusto: Ext.encode(faixaCusto),
             grupoDesconto: Ext.encode(grupoDesconto),
+            filtropersonalizado: Ext.encode(personalizado),
             slidMargem: Ext.encode(slidMargem),
             checkEstoque: checkEstoque,
             checkpreco: checkpreco,

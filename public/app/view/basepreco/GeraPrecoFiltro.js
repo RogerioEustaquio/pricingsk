@@ -431,6 +431,35 @@ Ext.define('App.view.basepreco.GeraPrecoFiltro',{
             }
         );
 
+        var elTagPersonalizado = Ext.create('Ext.form.field.Tag',{
+            name: 'eltagpersonalizado',
+            itemId: 'eltagpersonalizado',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'filtropersonalizado', type: 'string' },
+                    { name: 'id', type: 'number' }
+                ],
+                data : [
+                    {filtropersonalizado: 'Margem Preço Atual Negativa', id: 1}
+                ]
+            }),
+            queryParam: 'filtropersonalizado',
+            queryMode: 'local',
+            displayField: 'filtropersonalizado',
+            // valueField: 'filtropersonalizado',
+            valueField: 'id',
+            emptyText: 'Filtro Personalizado',
+            fieldLabel: 'Filtro Personalizado',
+            // labelWidth: 60,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: false
+        });
+
         var elSlidMargem = Ext.create('Ext.slider.Multi', {
             itemId: 'slidmargem',
             name: 'slidmargem',
@@ -882,6 +911,24 @@ Ext.define('App.view.basepreco.GeraPrecoFiltro',{
                     hidden: false,
                     items: [
                         elTagGrupodesconto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 10 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items: [
+                        elTagPersonalizado,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
