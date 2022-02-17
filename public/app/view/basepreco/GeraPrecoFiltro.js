@@ -443,7 +443,8 @@ Ext.define('App.view.basepreco.GeraPrecoFiltro',{
                     { name: 'id', type: 'number' }
                 ],
                 data : [
-                    {filtropersonalizado: 'Margem Preço Atual Negativa', id: 1}
+                    {filtropersonalizado: 'Margem Preço Atual Negativa', id: 1},
+                    {filtropersonalizado: 'Sem preço de venda', id: 2}
                 ]
             }),
             queryParam: 'filtropersonalizado',

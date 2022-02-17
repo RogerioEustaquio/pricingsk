@@ -1163,6 +1163,7 @@ class BaseprecoController extends AbstractRestfulController
         $ands = array();
         $ands[] = '';
         $ands[] =' and nvl(vx.margem_preco_atual,0) < 0'; //Margem Preço Atual Negativa
+        $ands[] =' and vx.preco_atual is null';//Sem preço de venda
         
         return $ands;
     }
