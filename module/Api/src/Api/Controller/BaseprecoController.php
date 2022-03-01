@@ -901,14 +901,14 @@ class BaseprecoController extends AbstractRestfulController
                     $nomeEmpresa    = $data[$i]['nomeEmpresa'];
                     $codTabPreco    = $data[$i]['codTabPreco'];
 
-                    $preco          = $data[$i]['preco'] >0 ? $data[$i]['preco'] : null ;
-                    $mb             = $data[$i]['mb'] >0 ? $data[$i]['mb'] : null ;
-                    $despVariavel   = $data[$i]['despVariavel'] >0 ? $data[$i]['despVariavel'] : null ;
-                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
-                    $valorEstoque   = $data[$i]['valorEstoque'] >0 ? $data[$i]['valorEstoque'] : null ;
-                    $custoOpe       = $data[$i]['custoOpe'] >0 ? $data[$i]['custoOpe'] : null ;
-                    $pisCofins      = $data[$i]['pisCofins'] >0 ? $data[$i]['pisCofins'] : null ;
-                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
+                    $preco          = $data[$i]['preco'] != 0 ? $data[$i]['preco'] : null ;
+                    $mb             = $data[$i]['mb'] !=0 ? $data[$i]['mb'] : null ;
+                    $despVariavel   = $data[$i]['despVariavel'] !=0 ? $data[$i]['despVariavel'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] !=0 ? $data[$i]['custoMedio'] : null ;
+                    $valorEstoque   = $data[$i]['valorEstoque'] !=0 ? $data[$i]['valorEstoque'] : null ;
+                    $custoOpe       = $data[$i]['custoOpe'] !=0 ? $data[$i]['custoOpe'] : null ;
+                    $pisCofins      = $data[$i]['pisCofins'] !=0 ? $data[$i]['pisCofins'] : null ;
+                    $icms           = $data[$i]['icms'] !=0 ? $data[$i]['icms'] : null ;
 
                     $output  .= $codEmpresa.';'.
                                 $nomeEmpresa.';'.
@@ -1038,14 +1038,14 @@ class BaseprecoController extends AbstractRestfulController
                     $nomeEmpresa    = $data[$i]['nomeEmpresa'];
                     $codTabPreco    = $data[$i]['codTabPreco'];
 
-                    $preco          = $data[$i]['preco'] >0 ? $data[$i]['preco'] : null ;
-                    $mb             = $data[$i]['mb'] >0 ? $data[$i]['mb'] : null ;
-                    $despVariavel   = $data[$i]['despVariavel'] >0 ? $data[$i]['despVariavel'] : null ;
-                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
-                    $valorEstoque   = $data[$i]['valorEstoque'] >0 ? $data[$i]['valorEstoque'] : null ;
-                    $custoOpe       = $data[$i]['custoOpe'] >0 ? $data[$i]['custoOpe'] : null ;
-                    $pisCofins      = $data[$i]['pisCofins'] >0 ? $data[$i]['pisCofins'] : null ;
-                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
+                    $preco          = $data[$i]['preco'] !=0 ? $data[$i]['preco'] : null ;
+                    $mb             = $data[$i]['mb'] !=0 ? $data[$i]['mb'] : null ;
+                    $despVariavel   = $data[$i]['despVariavel'] !=0 ? $data[$i]['despVariavel'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] !=0 ? $data[$i]['custoMedio'] : null ;
+                    $valorEstoque   = $data[$i]['valorEstoque'] !=0 ? $data[$i]['valorEstoque'] : null ;
+                    $custoOpe       = $data[$i]['custoOpe'] !=0 ? $data[$i]['custoOpe'] : null ;
+                    $pisCofins      = $data[$i]['pisCofins'] !=0 ? $data[$i]['pisCofins'] : null ;
+                    $icms           = $data[$i]['icms'] !=0 ? $data[$i]['icms'] : null ;
 
                     $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
                                            ->setCellValue('B'.$ix, $nomeEmpresa)
@@ -1853,49 +1853,49 @@ class BaseprecoController extends AbstractRestfulController
                     $nomeEmpresa    = $data[$i]['empresa'];
                     $codTabPreco    = $data[$i]['codTabela'];
 
-                    $estoque        = $data[$i]['estoque'] >0 ? $data[$i]['estoque'] : null ;
-                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
-                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
-                    $pis            = $data[$i]['pis'] >0 ? $data[$i]['pis'] : null ;
-                    $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
-                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
-                    $percVendedor   = $data[$i]['percVendedor'] >0 ? $data[$i]['percVendedor'] : null ;
+                    $estoque        = $data[$i]['estoque'] !=0 ? $data[$i]['estoque'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] !=0 ? $data[$i]['custoMedio'] : null ;
+                    $valor          = $data[$i]['valor'] !=0 ? $data[$i]['valor'] : null ;
+                    $pis            = $data[$i]['pis'] !=0 ? $data[$i]['pis'] : null ;
+                    $cofins         = $data[$i]['cofins'] !=0 ? $data[$i]['cofins'] : null ;
+                    $icms           = $data[$i]['icms'] !=0 ? $data[$i]['icms'] : null ;
+                    $percVendedor   = $data[$i]['percVendedor'] !=0 ? $data[$i]['percVendedor'] : null ;
 
-                    $ccMed12mRd     = $data[$i]['ccMed12mRd'] >0 ? $data[$i]['ccMed12mRd'] : null ;
-                    $ccMed6mRd      = $data[$i]['ccMed6mRd'] >0 ? $data[$i]['ccMed6mRd'] : null ;
-                    $ccMed3mRd      = $data[$i]['ccMed3mRd'] >0 ? $data[$i]['ccMed3mRd'] : null ;
-                    $ccM3Rd         = $data[$i]['ccM3Rd'] >0 ? $data[$i]['ccM3Rd'] : null ;
-                    $ccM2Rd         = $data[$i]['ccM2Rd'] >0 ? $data[$i]['ccM2Rd'] : null ;
-                    $ccM1Rd         = $data[$i]['ccM1Rd'] >0 ? $data[$i]['ccM1Rd'] : null ;
-                    $ccMed12m       = $data[$i]['ccMed12m'] >0 ? $data[$i]['ccMed12m'] : null ;
-                    $ccMed6m        = $data[$i]['ccMed6m'] >0 ? $data[$i]['ccMed6m'] : null ;
-                    $ccMed3m        = $data[$i]['ccMed3m'] >0 ? $data[$i]['ccMed3m'] : null ;
-                    $ccM3           = $data[$i]['ccM3'] >0 ? $data[$i]['ccM3'] : null ;
-                    $ccM2           = $data[$i]['ccM2'] >0 ? $data[$i]['ccM2'] : null ;
-                    $ccM1           = $data[$i]['ccM1'] >0 ? $data[$i]['ccM1'] : null ;
+                    $ccMed12mRd     = $data[$i]['ccMed12mRd'] !=0 ? $data[$i]['ccMed12mRd'] : null ;
+                    $ccMed6mRd      = $data[$i]['ccMed6mRd'] !=0 ? $data[$i]['ccMed6mRd'] : null ;
+                    $ccMed3mRd      = $data[$i]['ccMed3mRd'] !=0 ? $data[$i]['ccMed3mRd'] : null ;
+                    $ccM3Rd         = $data[$i]['ccM3Rd'] !=0 ? $data[$i]['ccM3Rd'] : null ;
+                    $ccM2Rd         = $data[$i]['ccM2Rd'] !=0 ? $data[$i]['ccM2Rd'] : null ;
+                    $ccM1Rd         = $data[$i]['ccM1Rd'] !=0 ? $data[$i]['ccM1Rd'] : null ;
+                    $ccMed12m       = $data[$i]['ccMed12m'] !=0 ? $data[$i]['ccMed12m'] : null ;
+                    $ccMed6m        = $data[$i]['ccMed6m'] !=0 ? $data[$i]['ccMed6m'] : null ;
+                    $ccMed3m        = $data[$i]['ccMed3m'] !=0 ? $data[$i]['ccMed3m'] : null ;
+                    $ccM3           = $data[$i]['ccM3'] !=0 ? $data[$i]['ccM3'] : null ;
+                    $ccM2           = $data[$i]['ccM2'] !=0 ? $data[$i]['ccM2'] : null ;
+                    $ccM1           = $data[$i]['ccM1'] !=0 ? $data[$i]['ccM1'] : null ;
 
-                    $mb_12mRd       = $data[$i]['mb_12mRd'] >0 ? $data[$i]['mb_12mRd'] : null ;
-                    $mb_6mRd        = $data[$i]['mb_6mRd'] >0 ? $data[$i]['mb_6mRd'] : null ;
-                    $mb_3mRd        = $data[$i]['mb_3mRd'] >0 ? $data[$i]['mb_3mRd'] : null ;
-                    $mbM3Rd         = $data[$i]['mbM3Rd'] >0 ? $data[$i]['mbM3Rd'] : null ;
-                    $mbM2Rd         = $data[$i]['mbM2Rd'] >0 ? $data[$i]['mbM2Rd'] : null ;
-                    $mbM1Rd         = $data[$i]['mbM1Rd'] >0 ? $data[$i]['mbM1Rd'] : null ;
+                    $mb_12mRd       = $data[$i]['mb_12mRd'] !=0 ? $data[$i]['mb_12mRd'] : null ;
+                    $mb_6mRd        = $data[$i]['mb_6mRd'] !=0 ? $data[$i]['mb_6mRd'] : null ;
+                    $mb_3mRd        = $data[$i]['mb_3mRd'] !=0 ? $data[$i]['mb_3mRd'] : null ;
+                    $mbM3Rd         = $data[$i]['mbM3Rd'] !=0 ? $data[$i]['mbM3Rd'] : null ;
+                    $mbM2Rd         = $data[$i]['mbM2Rd'] !=0 ? $data[$i]['mbM2Rd'] : null ;
+                    $mbM1Rd         = $data[$i]['mbM1Rd'] !=0 ? $data[$i]['mbM1Rd'] : null ;
 
-                    $mb_12mMc       = $data[$i]['mb_12mMc'] >0 ? $data[$i]['mb_12mMc'] : null ;
-                    $mb_6mMc        = $data[$i]['mb_6mMc'] >0 ? $data[$i]['mb_6mMc'] : null ;
-                    $mb_3mMc        = $data[$i]['mb_3mMc'] >0 ? $data[$i]['mb_3mMc'] : null ;
-                    $mb_12m         = $data[$i]['mb_12m'] >0 ? $data[$i]['mb_12m'] : null ;
-                    $mb_6m          = $data[$i]['mb_6m'] >0 ? $data[$i]['mb_6m'] : null ;
-                    $mb_3m          = $data[$i]['mb_3m'] >0 ? $data[$i]['mb_3m'] : null ;
-                    $mbM3           = $data[$i]['mbM3'] >0 ? $data[$i]['mbM3'] : null ;
-                    $mbM2           = $data[$i]['mbM2'] >0 ? $data[$i]['mbM2'] : null ;
-                    $mbM1           = $data[$i]['mbM1'] >0 ? $data[$i]['mbM1'] : null ;
+                    $mb_12mMc       = $data[$i]['mb_12mMc'] !=0 ? $data[$i]['mb_12mMc'] : null ;
+                    $mb_6mMc        = $data[$i]['mb_6mMc'] !=0 ? $data[$i]['mb_6mMc'] : null ;
+                    $mb_3mMc        = $data[$i]['mb_3mMc'] !=0 ? $data[$i]['mb_3mMc'] : null ;
+                    $mb_12m         = $data[$i]['mb_12m'] !=0 ? $data[$i]['mb_12m'] : null ;
+                    $mb_6m          = $data[$i]['mb_6m'] !=0 ? $data[$i]['mb_6m'] : null ;
+                    $mb_3m          = $data[$i]['mb_3m'] !=0 ? $data[$i]['mb_3m'] : null ;
+                    $mbM3           = $data[$i]['mbM3'] !=0 ? $data[$i]['mbM3'] : null ;
+                    $mbM2           = $data[$i]['mbM2'] !=0 ? $data[$i]['mbM2'] : null ;
+                    $mbM1           = $data[$i]['mbM1'] !=0 ? $data[$i]['mbM1'] : null ;
 
-                    $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] >0 ? $data[$i]['margemPrecoAtual'] : null ;
-                    $precoAtual         = $data[$i]['precoAtual'] >0 ? $data[$i]['precoAtual'] : null ;
-                    $precoAtualMin      = $data[$i]['precoAtualMin'] >0 ? $data[$i]['precoAtualMin'] : null ;
-                    $precoAtualLiq      = $data[$i]['precoAtualLiq'] >0 ? $data[$i]['precoAtualLiq'] : null ;
-                    $precoMargemParam               = $data[$i]['precoMargemParam'] >0 ? $data[$i]['precoMargemParam'] : null ;
+                    $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] <> 0 ? $data[$i]['margemPrecoAtual'] : null ;
+                    $precoAtual         = $data[$i]['precoAtual'] !=0 ? $data[$i]['precoAtual'] : null ;
+                    $precoAtualMin      = $data[$i]['precoAtualMin'] !=0 ? $data[$i]['precoAtualMin'] : null ;
+                    $precoAtualLiq      = $data[$i]['precoAtualLiq'] !=0 ? $data[$i]['precoAtualLiq'] : null ;
+                    $precoMargemParam               = $data[$i]['precoMargemParam'] !=0 ? $data[$i]['precoMargemParam'] : null ;
 
 
                     $output  .= $codEmpresa.';'.
@@ -2082,48 +2082,48 @@ class BaseprecoController extends AbstractRestfulController
                     $nomeEmpresa    = $data[$i]['empresa'];
                     $codTabPreco    = $data[$i]['codTabela'];
 
-                    $estoque        = $data[$i]['estoque'] >0 ? $data[$i]['estoque'] : null ;
-                    $custoMedio     = $data[$i]['custoMedio'] >0 ? $data[$i]['custoMedio'] : null ;
-                    $valor          = $data[$i]['valor'] >0 ? $data[$i]['valor'] : null ;
-                    $pis            = $data[$i]['pis'] >0 ? $data[$i]['pis'] : null ;
-                    $cofins         = $data[$i]['cofins'] >0 ? $data[$i]['cofins'] : null ;
-                    $icms           = $data[$i]['icms'] >0 ? $data[$i]['icms'] : null ;
-                    $percVendedor   = $data[$i]['percVendedor'] >0 ? $data[$i]['percVendedor'] : null ;
+                    $estoque        = $data[$i]['estoque'] !=0 ? $data[$i]['estoque'] : null ;
+                    $custoMedio     = $data[$i]['custoMedio'] !=0 ? $data[$i]['custoMedio'] : null ;
+                    $valor          = $data[$i]['valor'] !=0 ? $data[$i]['valor'] : null ;
+                    $pis            = $data[$i]['pis'] !=0 ? $data[$i]['pis'] : null ;
+                    $cofins         = $data[$i]['cofins'] !=0 ? $data[$i]['cofins'] : null ;
+                    $icms           = $data[$i]['icms'] !=0 ? $data[$i]['icms'] : null ;
+                    $percVendedor   = $data[$i]['percVendedor'] !=0 ? $data[$i]['percVendedor'] : null ;
 
-                    $ccMed12mRd     = $data[$i]['ccMed12mRd'] >0 ? $data[$i]['ccMed12mRd'] : null ;
-                    $ccMed6mRd      = $data[$i]['ccMed6mRd'] >0 ? $data[$i]['ccMed6mRd'] : null ;
-                    $ccMed3mRd      = $data[$i]['ccMed3mRd'] >0 ? $data[$i]['ccMed3mRd'] : null ;
-                    $ccM3Rd         = $data[$i]['ccM3Rd'] >0 ? $data[$i]['ccM3Rd'] : null ;
-                    $ccM2Rd         = $data[$i]['ccM2Rd'] >0 ? $data[$i]['ccM2Rd'] : null ;
-                    $ccM1Rd         = $data[$i]['ccM1Rd'] >0 ? $data[$i]['ccM1Rd'] : null ;
-                    $ccMed12m       = $data[$i]['ccMed12m'] >0 ? $data[$i]['ccMed12m'] : null ;
-                    $ccMed6m        = $data[$i]['ccMed6m'] >0 ? $data[$i]['ccMed6m'] : null ;
-                    $ccMed3m        = $data[$i]['ccMed3m'] >0 ? $data[$i]['ccMed3m'] : null ;
-                    $ccM3           = $data[$i]['ccM3'] >0 ? $data[$i]['ccM3'] : null ;
-                    $ccM2           = $data[$i]['ccM2'] >0 ? $data[$i]['ccM2'] : null ;
-                    $ccM1           = $data[$i]['ccM1'] >0 ? $data[$i]['ccM1'] : null ;
+                    $ccMed12mRd     = $data[$i]['ccMed12mRd'] !=0 ? $data[$i]['ccMed12mRd'] : null ;
+                    $ccMed6mRd      = $data[$i]['ccMed6mRd'] !=0 ? $data[$i]['ccMed6mRd'] : null ;
+                    $ccMed3mRd      = $data[$i]['ccMed3mRd'] !=0 ? $data[$i]['ccMed3mRd'] : null ;
+                    $ccM3Rd         = $data[$i]['ccM3Rd'] !=0 ? $data[$i]['ccM3Rd'] : null ;
+                    $ccM2Rd         = $data[$i]['ccM2Rd'] !=0 ? $data[$i]['ccM2Rd'] : null ;
+                    $ccM1Rd         = $data[$i]['ccM1Rd'] !=0 ? $data[$i]['ccM1Rd'] : null ;
+                    $ccMed12m       = $data[$i]['ccMed12m'] !=0 ? $data[$i]['ccMed12m'] : null ;
+                    $ccMed6m        = $data[$i]['ccMed6m'] !=0 ? $data[$i]['ccMed6m'] : null ;
+                    $ccMed3m        = $data[$i]['ccMed3m'] !=0 ? $data[$i]['ccMed3m'] : null ;
+                    $ccM3           = $data[$i]['ccM3'] !=0 ? $data[$i]['ccM3'] : null ;
+                    $ccM2           = $data[$i]['ccM2'] !=0 ? $data[$i]['ccM2'] : null ;
+                    $ccM1           = $data[$i]['ccM1'] !=0 ? $data[$i]['ccM1'] : null ;
 
-                    $mb_12mRd       = $data[$i]['mb_12mRd'] >0 ? $data[$i]['mb_12mRd'] : null ;
-                    $mb_6mRd        = $data[$i]['mb_6mRd'] >0 ? $data[$i]['mb_6mRd'] : null ;
-                    $mb_3mRd        = $data[$i]['mb_3mRd'] >0 ? $data[$i]['mb_3mRd'] : null ;
-                    $mbM3Rd         = $data[$i]['mbM3Rd'] >0 ? $data[$i]['mbM3Rd'] : null ;
-                    $mbM2Rd         = $data[$i]['mbM2Rd'] >0 ? $data[$i]['mbM2Rd'] : null ;
-                    $mbM1Rd         = $data[$i]['mbM1Rd'] >0 ? $data[$i]['mbM1Rd'] : null ;
+                    $mb_12mRd       = $data[$i]['mb_12mRd'] !=0 ? $data[$i]['mb_12mRd'] : null ;
+                    $mb_6mRd        = $data[$i]['mb_6mRd'] !=0 ? $data[$i]['mb_6mRd'] : null ;
+                    $mb_3mRd        = $data[$i]['mb_3mRd'] !=0 ? $data[$i]['mb_3mRd'] : null ;
+                    $mbM3Rd         = $data[$i]['mbM3Rd'] !=0 ? $data[$i]['mbM3Rd'] : null ;
+                    $mbM2Rd         = $data[$i]['mbM2Rd'] !=0 ? $data[$i]['mbM2Rd'] : null ;
+                    $mbM1Rd         = $data[$i]['mbM1Rd'] !=0 ? $data[$i]['mbM1Rd'] : null ;
 
-                    $mb_12mMc       = $data[$i]['mb_12mMc'] >0 ? $data[$i]['mb_12mMc'] : null ;
-                    $mb_6mMc        = $data[$i]['mb_6mMc'] >0 ? $data[$i]['mb_6mMc'] : null ;
-                    $mb_3mMc        = $data[$i]['mb_3mMc'] >0 ? $data[$i]['mb_3mMc'] : null ;
-                    $mb_12m         = $data[$i]['mb_12m'] >0 ? $data[$i]['mb_12m'] : null ;
-                    $mb_6m          = $data[$i]['mb_6m'] >0 ? $data[$i]['mb_6m'] : null ;
-                    $mb_3m          = $data[$i]['mb_3m'] >0 ? $data[$i]['mb_3m'] : null ;
-                    $mbM3           = $data[$i]['mbM3'] >0 ? $data[$i]['mbM3'] : null ;
-                    $mbM2           = $data[$i]['mbM2'] >0 ? $data[$i]['mbM2'] : null ;
-                    $mbM1           = $data[$i]['mbM1'] >0 ? $data[$i]['mbM1'] : null ;
-                    $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] >0 ? $data[$i]['margemPrecoAtual'] : null ;
-                    $precoAtual         = $data[$i]['precoAtual'] >0 ? $data[$i]['precoAtual'] : null ;
-                    $precoAtualMin      = $data[$i]['precoAtualMin'] >0 ? $data[$i]['precoAtualMin'] : null ;
-                    $precoAtualLiq      = $data[$i]['precoAtualLiq'] >0 ? $data[$i]['precoAtualLiq'] : null ;
-                    $precoMargemParam   = $data[$i]['precoMargemParam'] >0 ? $data[$i]['precoMargemParam'] : null ;
+                    $mb_12mMc       = $data[$i]['mb_12mMc'] !=0 ? $data[$i]['mb_12mMc'] : null ;
+                    $mb_6mMc        = $data[$i]['mb_6mMc'] !=0 ? $data[$i]['mb_6mMc'] : null ;
+                    $mb_3mMc        = $data[$i]['mb_3mMc'] !=0 ? $data[$i]['mb_3mMc'] : null ;
+                    $mb_12m         = $data[$i]['mb_12m'] !=0 ? $data[$i]['mb_12m'] : null ;
+                    $mb_6m          = $data[$i]['mb_6m'] !=0 ? $data[$i]['mb_6m'] : null ;
+                    $mb_3m          = $data[$i]['mb_3m'] !=0 ? $data[$i]['mb_3m'] : null ;
+                    $mbM3           = $data[$i]['mbM3'] !=0 ? $data[$i]['mbM3'] : null ;
+                    $mbM2           = $data[$i]['mbM2'] !=0 ? $data[$i]['mbM2'] : null ;
+                    $mbM1           = $data[$i]['mbM1'] !=0 ? $data[$i]['mbM1'] : null ;
+                    $margemPrecoAtual   = $data[$i]['margemPrecoAtual'] !=0 ? $data[$i]['margemPrecoAtual'] : null ;
+                    $precoAtual         = $data[$i]['precoAtual'] !=0 ? $data[$i]['precoAtual'] : null ;
+                    $precoAtualMin      = $data[$i]['precoAtualMin'] !=0 ? $data[$i]['precoAtualMin'] : null ;
+                    $precoAtualLiq      = $data[$i]['precoAtualLiq'] !=0 ? $data[$i]['precoAtualLiq'] : null ;
+                    $precoMargemParam   = $data[$i]['precoMargemParam'] !=0 ? $data[$i]['precoMargemParam'] : null ;
 
                     $phpExcel->getActiveSheet()->setCellValue('A'.$ix, $codEmpresa)
                                                ->setCellValue('B'.$ix, $nomeEmpresa)

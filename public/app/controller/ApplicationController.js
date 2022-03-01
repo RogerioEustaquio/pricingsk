@@ -11,7 +11,8 @@ Ext.define('App.controller.ApplicationController', {
         'App.view.grupodesconto.GrupodescontoPanel',
         'App.view.analisegrafica.AnalisegraficaPanel',
         'App.view.analisemarca.AnalisemarcaPanel',
-        'App.view.acompanhamentovenda.AcompanhaVendaPanel'
+        'App.view.acompanhamentovenda.AcompanhaVendaPanel',
+        'App.view.faixamargem.FaixaMargemPanel'
     ],
 
     control: {
@@ -27,7 +28,8 @@ Ext.define('App.controller.ApplicationController', {
         'grupodesconto': { action: 'grupodescontoAction' },
         'analisegrafica': { action: 'analisegraficaAction' },
         'analisemarca': { action: 'analisemarcaAction' },
-        'acompanhavenda': { action: 'acompanhavendaAction' }
+        'acompanhavenda': { action: 'acompanhavendaAction' },
+        'faixamargem': { action: 'faixamargemAction' }
     },
 
     controllerEvent: function(){
@@ -87,6 +89,10 @@ Ext.define('App.controller.ApplicationController', {
 
     acompanhavendaAction: function(){
         this.goActionMasterTab('acompanhavenda', true)
+    },
+
+    faixamargemAction: function(){
+        this.goActionMasterTab('faixamargem', true)
     },
 
     configViewport: function(){
