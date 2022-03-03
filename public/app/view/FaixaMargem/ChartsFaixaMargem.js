@@ -122,13 +122,15 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
         
             xAxis: {
                 categories: xaxis,
-                    title: null,
-                    reversed: false
+                title: null,
+                reversed: false
             },
         
             yAxis: {
                 categories: yaxis,
-                title: null,
+                title: {
+                    text: 'Margem'
+                },
                 reversed: true
             },
         

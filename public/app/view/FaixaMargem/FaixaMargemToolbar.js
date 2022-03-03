@@ -107,6 +107,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
 
         var faixamargemfiltro = me.up('container').down('#faixamargemfiltro') ;
 
+        var codEmpresa      = faixamargemfiltro.down('#elEmp').getValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
         var dataFinal       = faixamargemfiltro.down('#datafinal').getRawValue();
@@ -117,6 +118,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
         var idProduto       = faixamargemfiltro.down('#eltagidproduto').getValue();
 
         var params = {
+            codEmpresa: Ext.encode(codEmpresa),
             dataInicio: dataInicio,
             dataFinal: dataFinal,
             // notMarca: notMarca,

@@ -1876,10 +1876,10 @@ class AnalisemarcaController extends AbstractRestfulController
                         du.dias,
                         a.qtde,
                         a.cmv,
-                        round(a.rol / du.dias, 2) as rol_dia,
-                        round(a.lb / du.dias, 2) as lb_dia,
-                        round(a.qtde / du.dias, 0) as qtde_dia,
-                        round(a.cmv / du.dias, 2) as cmv_dia
+                        case when  du.dias > 0 then round(a.rol / du.dias, 2) else 0  end as rol_dia,
+                        case when  du.dias > 0 then round(a.lb / du.dias, 2) else 0  end as lb_dia,
+                        case when  du.dias > 0 then round(a.qtde / du.dias, 0) else 0  end as qtde_dia,
+                        case when  du.dias > 0 then round(a.cmv / du.dias, 2) else 0  end as cmv_dia
                     from VM_SKDIAS_UTEIS du,
                         (select trunc(i.data, 'MM') as data,
                                 round(sum(rol),2) as rol,

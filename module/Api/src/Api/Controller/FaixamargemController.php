@@ -30,10 +30,10 @@ class FaixamargemController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            $sql = "select e.apelido emp, e.id_empresa
-                        from ms.empresa e
-                    where e.id_empresa not in (26, 27, 28, 11, 20, 102, 101)
-                    order by e.apelido";
+            $sql = "select distinct emp, cod_empresa id_empresa
+                        from VW_SKEMPRESA
+                    where emp not in ('CD','EC','M2','PAR','PLA','SP','TL')
+                    order by emp";
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -113,83 +113,38 @@ class FaixamargemController extends AbstractRestfulController
         
         try {
 
-            $filial     = $this->params()->fromPost('filial',null);
-            $pData      = $this->params()->fromPost('data',null);
-            $pDataInicio= $this->params()->fromPost('datainicio',null);
-            $pDataFim   = $this->params()->fromPost('datafim',null);
+            $codEmpresa = $this->params()->fromPost('codEmpresa',null);
+            $pDataInicio= $this->params()->fromPost('dataInicio',null);
+            $pDataFim   = $this->params()->fromPost('dataFinal',null);
             $idMarcas   = $this->params()->fromPost('idMarcas',null);
-            $codProdutos= $this->params()->fromPost('produto',null);
-            $idPessoas  = $this->params()->fromPost('cliente',null);
-            $pareto     = $this->params()->fromPost('pareto',null);
-            $paretoMb   = $this->params()->fromPost('paretoMb',null);
-            $idEixos    = $this->params()->fromPost('idEixos',null);
+            $codProdutos= $this->params()->fromPost('idProduto',null);
 
             $em = $this->getEntityManager();
 
             /////////////////////////////////////////////////////////////////
-            if($filial){
-                $filial = implode(",",json_decode($filial));
+            if($codEmpresa){
+                $codEmpresa = implode(",",json_decode($codEmpresa));
             }
             $andFilial ='';
-            if($filial){
-                $andFilial = " and vi.id_empresa in ($filial)";
+            if($codEmpresa){
+                $andFilial = " and cod_empresa in ($codEmpresa)";
             }
 
             if($codProdutos){
                 $codProdutos =  implode("','",json_decode($codProdutos));
             }
-            if($idPessoas){
-                $idPessoas =  implode(",",json_decode($idPessoas));
-            }
-
-            if($idEixos){
-                $idEixos = json_decode($idEixos);
-            }else{
-                $idEixos = new \stdClass;
-                $idEixos->x = 'rol';
-                $idEixos->y = 'mb';
-            }
-            if($pareto){
-                $pareto =  json_decode($pareto);
-            }
-            if($pareto){
-                $and_accumulated = "and med_accumulated >= $pareto[0] and med_accumulated <= $pareto[1]";
-            }else{
-                $and_accumulated = "and med_accumulated >= 0 and med_accumulated <= 80";
-            }
-            if($paretoMb){
-                $paretoMb =  json_decode($paretoMb);
-            }
-            if($paretoMb){
-                $and_mb = "and mb >= $paretoMb[0] and mb <= $paretoMb[1]";
-            }else{
-                $and_mb = "and mb > 0 and mb <= 50";
-            }
-            /////////////////////////////////////////////////////////////////
-            
-            $andEmpEstoque = '';
-            $andEmpVi      = '';
 
             $andData = '';
             if($pDataInicio){
-                $andData = "and trunc(vi.data_emissao) >= to_date('".$pDataInicio."')";
-                $sysdateInicio = "to_date('".$pDataInicio."')";
+                $andData = "and trunc(a.data) >= to_date('".$pDataInicio."')";
             }else{
                 $sysdateInicio = 'add_months(trunc(sysdate,\'MM\'),-0)';
-                $andData = "and trunc(vi.data_emissao) >= to_char($sysdateInicio,'dd/mm/yyyy')";
+                // $andData = "and trunc(a.data) >= to_char($sysdateInicio,'dd/mm/yyyy')";
             }
             if($pDataFim){
-                $andData .= " and trunc(vi.data_emissao) <= to_date('".$pDataFim."')";
-                $sysdateFim = "to_date('".$pDataFim."')";
+                $andData .= " and trunc(a.data) <= to_date('".$pDataFim."')";
             }else{
-                $sysdateFim = 'sysdate';
-                $andData .= " and trunc(vi.data_emissao) <= sysdate";
-            }
-
-            if($pData){
-                $sysdate = "to_date('01/".substr($pData,3,5)."')";
-            }else{
-                $sysdate = "to_date('01/'||to_char(sysdate,'mm/yyyy'))";
+                $andData .= " and trunc(a.data) <= sysdate";
             }
 
             if($idMarcas){
@@ -197,15 +152,11 @@ class FaixamargemController extends AbstractRestfulController
             }
             $andMarca = '';
             if($idMarcas){
-                $andMarca = "and ic.id_marca in ($idMarcas)";
+                $andMarca = "and a.marca in (select descricao_marca from VW_SKMARCA where cod_marca in ($idMarcas))";
             }
             $andProduto = '';
             if($codProdutos){
-                $andProduto = " and i.cod_item||c.descricao in ('$codProdutos')";
-            }
-            $andCliente = '';
-            if($idPessoas){
-                $andCliente = " and id_pessoa in ($idPessoas)";
+                $andProduto = " and a.cod_produto in ('$codProdutos')";
             }
 
             $em = $this->getEntityManager();
@@ -223,7 +174,11 @@ class FaixamargemController extends AbstractRestfulController
                                     ROUND(SUM(lb)/SUM(rol)*100) AS mb
                                 FROM VM_SKVENDANOTA a
                                 WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                                AND a.cod_produto = 397
+                                $andFilial
+                                $andData
+                                $andMarca
+                                $andProduto
+                                --AND a.cod_produto = 397
                                 GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
                     order by 1 desc";
 
@@ -263,7 +218,11 @@ class FaixamargemController extends AbstractRestfulController
                             ROUND(SUM(lb)/SUM(rol)*100) AS mb
                         FROM VM_SKVENDANOTA a
                         WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                        AND a.cod_produto = 397
+                        --AND a.cod_produto = 397
+                        $andFilial
+                        $andData
+                        $andMarca
+                        $andProduto
                         GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
                         group by a.emp,a.mb
                         order by 1,2 desc";
@@ -387,28 +346,9 @@ class FaixamargemController extends AbstractRestfulController
 
             $em = $this->getEntityManager();
             
-            $sql = "select  g.id_grupo_marca,
-                            m.id_marca,
-                            m.descricao as marca,
-                            count(*) as skus
-                    from ms.tb_estoque e,
-                            ms.tb_item i,
-                            ms.tb_categoria c,
-                            ms.tb_item_categoria ic,
-                            ms.tb_marca m,
-                            ms.tb_grupo_marca g,
-                            ms.empresa em
-                    where e.id_item = i.id_item
-                    and e.id_categoria = c.id_categoria
-                    and e.id_item = ic.id_item
-                    and e.id_categoria = ic.id_categoria
-                    and ic.id_marca = m.id_marca
-                    and m.id_grupo_marca = g.id_grupo_marca
-                    and e.id_empresa = em.id_empresa
-                    --and e.id_curva_abc = 'E'
-                    and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
-                    group by g.id_grupo_marca, m.id_marca, m.descricao
-                    order by skus desc
+            $sql = "select distinct cod_marca as id_marca, descricao_marca marca
+                        from VW_SKMARCA
+                    order by descricao_marca
             ";
             
             $conn = $em->getConnection();

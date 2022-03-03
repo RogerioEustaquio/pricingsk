@@ -38,7 +38,7 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
             queryParam: 'emp',
             queryMode: 'local',
             displayField: 'emp',
-            valueField: 'emp',
+            valueField: 'idEmpresa',
             emptyText: 'Empresa',
             fieldLabel: 'Empresas',
             labelWidth: 60,
@@ -304,6 +304,7 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    hidden: true,
                     items:[
                         elTagProduto,
                         {
