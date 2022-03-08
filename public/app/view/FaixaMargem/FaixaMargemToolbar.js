@@ -105,8 +105,11 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
 
         var me = this.up('toolbar');
 
-        var faixamargemfiltro = me.up('container').down('#faixamargemfiltro') ;
+        var faixamargemfiltro = me.up('container').down('#faixamargemfiltro');
 
+        // var valorprincipal  = faixamargemfiltro.down('radiofield[name=valorprincipal]').getValue();
+        var checkRol        = faixamargemfiltro.down('radiofield[inputValue=ROL]').checked;
+        var checkQtde       = faixamargemfiltro.down('radiofield[inputValue=QTDE]').checked;
         var codEmpresa      = faixamargemfiltro.down('#elEmp').getValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
@@ -117,7 +120,13 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
         var produtos        = faixamargemfiltro.down('#elProduto').getValue();
         var idProduto       = faixamargemfiltro.down('#eltagidproduto').getValue();
 
+        var valorprincipal= 'rol';
+        if(checkQtde){
+            valorprincipal= 'qtde';
+        }
+
         var params = {
+            valorprincipal: valorprincipal,
             codEmpresa: Ext.encode(codEmpresa),
             dataInicio: dataInicio,
             dataFinal: dataFinal,
@@ -137,6 +146,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
         {
             charts.chart.series[i].remove();
         }
+        charts.chart.colorAxis[0].remove();
 
         charts.chart.update(false,false);
 
@@ -155,29 +165,53 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                 if(result.success){
                     xaxis       = result.xCategories;
                     yaxis       = result.yCategories;
+                    zMinMax       = result.zMinMax;
                     arraySerie  = result.data;
 
-                    // var extraUpdate = {
-                    //     xAxis: {
-                    //         categories: xaxis,
-                    //             title: null,
-                    //             reversed: false
-                    //     },
+                    var extraUpdate = {
+                        // colorAxis: {
+                            stops: [
+                                [0, '#00ff00'],
+                                [0.5, '#ffff00'],
+                                [0.9, '#ff0000']
+                            ],
+                            min : Number(zMinMax[0]),
+                            max : Number(zMinMax[1]),
+                            labels: {
+                                format: '{value}'
+                            },
+                            tickPositioner: function () {
+                                var positions = [],
+                                    min = Number(zMinMax[0]),
+                                    max = Number(zMinMax[1]);
                     
-                    //     yAxis: {
-                    //         categories: yaxis,
-                    //         title: null,
-                    //         reversed: true
-                    //     },
-                    // };
+                                var med = zMinMax[1] / 5 ;
+            
+                                var n2 = min + med,
+                                    n3 = min + (med*2),
+                                    n4 = min + (med*3);
+            
+                                positions.push(min);
+                                positions.push(n2);
+                                positions.push(n3);
+                                positions.push(n4);
+                                positions.push(max);
+            
+                                return positions;
+                            }
+                        // }
+                    }
 
-                    // charts.chart.update(extraUpdate);
+                    charts.chart.addColorAxis(extraUpdate);
+                    charts.chart.colorAxis[0].update(extraUpdate);
+                    setTimeout(function(){
+                        charts.chart.redraw();
+                    },200);
 
                     charts.chart.xAxis[0].setCategories(xaxis);
                     charts.chart.yAxis[0].setCategories(yaxis);
 
                     var vSerie = {
-                        name: '',
                         borderWidth: 0,
                         data: arraySerie,
                         dataLabels: {
@@ -185,14 +219,13 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                             // borderWidth:0,
                             // borderColor: '#000000',
                             color: '#000000',
-                            style: {
-                                'border-width': '0px !important',
-                                'border-color': '#000000 !important'
-                            }
+                            // style: {
+                            //     'border-width': '0px !important',
+                            //     'border-color': '#000000 !important'
+                            // }
                         }
                     };
                     charts.chart.addSeries(vSerie);
-
                     setTimeout(function(){
                         charts.chart.redraw();
                     },250);

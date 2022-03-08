@@ -54,6 +54,7 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                                     if(result.success){
                                         xaxis       = result.xCategories;
                                         yaxis       = result.yCategories;
+                                        zMinMax       = result.zMinMax;
                                         arraySerie  = result.data;
 
                                     }else{
@@ -68,7 +69,7 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                                         }).show();
                                     }
                                     
-                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis);
+                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax);
                                 },
                                 error: function() {
                                     
@@ -76,8 +77,9 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                                     arraySerie = [];
                                     yaxis       = [];
                                     xaxis       = [];
+                                    zMinMax       = [];
 
-                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis)
+                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax)
 
                                     new Noty({
                                         theme: 'relax',
@@ -98,7 +100,7 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
         me.callParent(arguments);
     },
 
-    buildChartContainer: function(el,series,yaxis,xaxis){
+    buildChartContainer: function(el,series,yaxis,xaxis,zMinMax){
         var me = this;
         var utilFormat = Ext.create('Ext.ux.util.Format');
         
@@ -111,8 +113,12 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
 
         me.chart =  Highcharts.chart(el.id, {
 
+            credits:{
+                enabled: false
+            },
             chart: {
                 type: 'heatmap',
+                zoomType: 'xy',
                 inverted: false
             },
 
@@ -148,17 +154,38 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
             },
 
             colorAxis: {
-                min: 0,
-                max: 100000,
                 stops: [
                     [0, '#00ff00'],
                     [0.5, '#ffff00'],
                     [0.9, '#ff0000']
                 ],
-                align: 'center',
-                startOnTick: false,
-                endOnTick: false,
-                // tickPositions: [0, 2, 4]
+                min: Number(zMinMax[0]),
+                max: Number(zMinMax[1]),
+                // startOnTick: false,
+                // endOnTick: false,
+                labels: {
+                    format: '{value}'
+                },
+                // tickPositions: [0, 0.2, 0.9]
+                tickPositioner: function () {
+                    var positions = [],
+                        min = Number(zMinMax[0]),
+                        max = Number(zMinMax[1]);
+        
+                    var med = zMinMax[1] / 5 ;
+
+                    var n2 = min + med,
+                        n3 = min + (med*2),
+                        n4 = min + (med*3);
+
+                    positions.push(min);
+                    positions.push(n2);
+                    positions.push(n3);
+                    positions.push(n4);
+                    positions.push(max);
+
+                    return positions;
+                }
             },
 
             legend: {
@@ -166,8 +193,8 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 layout: 'vertical',
                 margin: 4,
                 verticalAlign: 'top',
-                y: 60,
-                symbolHeight: 400
+                y: 40,
+                symbolHeight: 300
             },
         
             tooltip: {
@@ -178,18 +205,18 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
             },
         
             series: [{
-                name: '',
                 borderWidth: 0,
+                nullColor: '#EFEFEF',
                 data: series,
                 dataLabels: {
                     enabled: true,
                     // borderWidth:0,
                     // borderColor: '#000000',
                     color: '#000000',
-                    style: {
-                        'border-width': '0px !important',
-                        'border-color': '#000000 !important'
-                    }
+                    // style: {
+                    //     'border-width': '0px !important',
+                    //     'border-color': '#000000 !important'
+                    // }
                 }
             }],
 

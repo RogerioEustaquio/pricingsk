@@ -113,6 +113,7 @@ class FaixamargemController extends AbstractRestfulController
         
         try {
 
+            $valorprincipal = $this->params()->fromPost('valorprincipal',null);
             $codEmpresa = $this->params()->fromPost('codEmpresa',null);
             $pDataInicio= $this->params()->fromPost('dataInicio',null);
             $pDataFim   = $this->params()->fromPost('dataFinal',null);
@@ -120,6 +121,8 @@ class FaixamargemController extends AbstractRestfulController
             $codProdutos= $this->params()->fromPost('idProduto',null);
 
             $em = $this->getEntityManager();
+
+            $valorprincipal = !$valorprincipal ? 'rol' : $valorprincipal;
 
             /////////////////////////////////////////////////////////////////
             if($codEmpresa){
@@ -167,7 +170,7 @@ class FaixamargemController extends AbstractRestfulController
                                     a.emp, 
                                     a.cod_produto,
                                     a.nota,
-                                    SUM(qtd) AS qtd,
+                                    SUM(qtd) AS qtde,
                                     SUM(rol) AS rol,
                                     SUM(lb) AS lb,
                                     SUM(cmv) AS cmv,
@@ -181,6 +184,8 @@ class FaixamargemController extends AbstractRestfulController
                                 --AND a.cod_produto = 397
                                 GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
                     order by 1 desc";
+                    // print"$sql1";
+                    // exit;
 
             $stmt = $conn->prepare($sql1);
             $stmt->execute();
@@ -205,7 +210,8 @@ class FaixamargemController extends AbstractRestfulController
 
             }
 
-            $sql = "select a.emp,a.mb,round(sum(a.rol),0) rol from 
+            $sql = "select a.emp,a.mb,round(sum(a.rol),0) rol,round(sum(a.qtd),0) as qtde
+                     from 
                         (
                         SELECT TRUNC(a.data,'MM') AS data,
                             a.emp, 
@@ -237,7 +243,7 @@ class FaixamargemController extends AbstractRestfulController
             $hydrator = new ObjectProperty;
             // $hydrator->addStrategy('qtd', new ValueStrategy);
             $hydrator->addStrategy('rol', new ValueStrategy);
-            // $hydrator->addStrategy('lb', new ValueStrategy);
+            $hydrator->addStrategy('qtde', new ValueStrategy);
             // $hydrator->addStrategy('cmv', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
             $stdClass = new StdClass;
@@ -248,11 +254,13 @@ class FaixamargemController extends AbstractRestfulController
             $contLine = 0;
             $contColuna = 0;
             $empAnterior='';
+            $zMinMax = array();
             foreach ($resultSet as $row) {
                 
                 $elementos = $hydrator->extract($row);
 
-                $paramMb = $elementos['mb'];
+                $paramMb    = $elementos['mb'];
+                $zMinMax[]  = $elementos[$valorprincipal];
 
                 if($empAnterior && $elementos['emp'] <> $empAnterior){
 
@@ -277,7 +285,7 @@ class FaixamargemController extends AbstractRestfulController
                     }
                 }
 
-                $arrayEmp[] = array($contColuna,$mbCategoria[$paramMb],$elementos['rol']);
+                $arrayEmp[] = array($contColuna,$mbCategoria[$paramMb],$elementos[$valorprincipal]);
 
                 $contLine++;
                 $empAnterior = $elementos['emp'];
@@ -292,6 +300,16 @@ class FaixamargemController extends AbstractRestfulController
 
             $filiais[]= $empAnterior;
 
+            sort($zMinMax);
+            $min = 0;
+            for ($i=0; $i < count($zMinMax); $i++) {
+                
+                if($zMinMax[$i]){
+                    $min = $zMinMax[$i];
+                    break;
+                }
+            }
+
             $this->setCallbackData($arrayEmp);
             
         } catch (\Exception $e) {
@@ -300,6 +318,7 @@ class FaixamargemController extends AbstractRestfulController
         $objReturn = $this->getCallbackModel();
         $objReturn->yCategories = $margem;
         $objReturn->xCategories = $filiais;
+        $objReturn->zMinMax = [$min,$zMinMax[count($zMinMax)-1]];
         // $objReturn->referencia  = array('incio'=> $resultCount[0]['DATAINICIO'],'fim'=> $resultCount[0]['DATAFIM']);
 
         return $objReturn; 

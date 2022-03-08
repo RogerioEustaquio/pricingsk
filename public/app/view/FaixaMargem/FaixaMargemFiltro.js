@@ -14,6 +14,38 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
     initComponent: function() {
         var me = this;
 
+        var valorPrincipal = Ext.create('Ext.form.FieldSet',{
+
+            layout: 'hbox',
+            hidden: false,
+            width: 230,
+            margin: '1 1 1 8',
+            title: 'Valor Principal',
+            items:[
+                {
+                    xtype: 'radiofield',
+                    checked: true,
+                    name : 'valorprincipal',
+                    inputValue: 'ROL',
+                    boxLabel: 'ROL',
+                    labelTextAlign: 'right',
+                    labelWidth: 24,
+                    width: 80,
+                    margin: '1 1 1 8'
+                },
+                {
+                    xtype: 'radiofield',
+                    name : 'valorprincipal',
+                    inputValue: 'QTDE',
+                    boxLabel: 'Quantidade',
+                    labelTextAlign: 'right',
+                    labelWidth: 24,
+                    width: 100,
+                    // margin: '1 1 1 8',
+                }
+            ]
+        });
+
         var elTagEmpresa = Ext.create('Ext.form.field.Tag',{
             name: 'elEmp',
             itemId: 'elEmp',
@@ -237,6 +269,15 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     border: false,
                     hidden: false,
                     items:[
+                        valorPrincipal
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items:[
                         elTagEmpresa,
                         {
                             xtype: 'button',
@@ -265,7 +306,8 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                             }
                         }
                     ]
-                },{
+                },
+                {
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
