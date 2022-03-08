@@ -189,12 +189,14 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
             
                                 var n2 = min + med,
                                     n3 = min + (med*2),
-                                    n4 = min + (med*3);
+                                    n4 = min + (med*3),
+                                    n5 = min + (med*4);
             
                                 positions.push(min);
                                 positions.push(n2);
                                 positions.push(n3);
                                 positions.push(n4);
+                                positions.push(n5);
                                 positions.push(max);
             
                                 return positions;
