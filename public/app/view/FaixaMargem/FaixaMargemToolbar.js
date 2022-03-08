@@ -105,6 +105,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
 
         var me = this.up('toolbar');
 
+        var utilFormat = Ext.create('Ext.ux.util.Format');
         var faixamargemfiltro = me.up('container').down('#faixamargemfiltro');
 
         // var valorprincipal  = faixamargemfiltro.down('radiofield[name=valorprincipal]').getValue();
@@ -163,6 +164,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                 charts.chart.update(false,false);
                 // charts.chart.hideLoading();
                 if(result.success){
+                    nmPrincipal = result.nmPrincipal;
                     xaxis       = result.xCategories;
                     yaxis       = result.yCategories;
                     zMinMax       = result.zMinMax;
@@ -178,7 +180,9 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                             min : Number(zMinMax[0]),
                             max : Number(zMinMax[1]),
                             labels: {
-                                format: '{value}'
+                                formatter: function () {
+                                    return utilFormat.Value2(this.value,0);
+                                }
                             },
                             tickPositioner: function () {
                                 var positions = [],
@@ -187,10 +191,10 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                     
                                 var med = zMinMax[1] / 5 ;
             
-                                var n2 = min + med,
-                                    n3 = min + (med*2),
-                                    n4 = min + (med*3),
-                                    n5 = min + (med*4);
+                                var n2 =  Number(min + med),
+                                    n3 =  Number(min + (med*2)),
+                                    n4 =  Number(min + (med*3)),
+                                    n5 =  Number(min + (med*4));
             
                                 positions.push(min);
                                 positions.push(n2);
@@ -214,6 +218,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                     charts.chart.yAxis[0].setCategories(yaxis);
 
                     var vSerie = {
+                        nmPrincipal: nmPrincipal,
                         borderWidth: 0,
                         data: arraySerie,
                         dataLabels: {

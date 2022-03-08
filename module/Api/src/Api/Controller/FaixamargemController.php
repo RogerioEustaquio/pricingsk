@@ -267,6 +267,15 @@ class FaixamargemController extends AbstractRestfulController
                     while($contLine < count($mbCategoria)){// adiciona posição null (Caso ultima margem anterior nao seja final)
 
                         $arrayEmp[] = [$contColuna,$contLine, null];
+                        // $arrayEmp[] =array( // estoura gráfico
+                        //     'x' => $contColuna,
+                        //     'y'=> $contLine,
+                        //     'value' => null,
+                        //     'valueColor' => null,
+                        //     'name' => "Point".$contColuna.$contLine,
+                        //     'nmPrincipal' => $valorprincipal,
+                        // );
+
                         $contLine++;
                     }
 
@@ -281,12 +290,12 @@ class FaixamargemController extends AbstractRestfulController
                     while($contLine < $mbCategoria[$paramMb] ){// adiciona posição null (Caso margem não seja a inicial)
 
                         $arrayEmp[] = [$contColuna,$contLine, null];
+
                         $contLine++;
                     }
                 }
 
                 $arrayEmp[] = array($contColuna,$mbCategoria[$paramMb],$elementos[$valorprincipal]);
-
                 $contLine++;
                 $empAnterior = $elementos['emp'];
 
@@ -295,6 +304,7 @@ class FaixamargemController extends AbstractRestfulController
             while($contLine < count($mbCategoria)){/// adiciona posição null (Caso ultima margem nao seja final na ultima coluna)
 
                 $arrayEmp[] = [$contColuna,$contLine, null];
+
                 $contLine++;
             }
 
@@ -319,6 +329,7 @@ class FaixamargemController extends AbstractRestfulController
         $objReturn->yCategories = $margem;
         $objReturn->xCategories = $filiais;
         $objReturn->zMinMax = [$min,$zMinMax[count($zMinMax)-1]];
+        $objReturn->nmPrincipal = $valorprincipal;
         // $objReturn->referencia  = array('incio'=> $resultCount[0]['DATAINICIO'],'fim'=> $resultCount[0]['DATAFIM']);
 
         return $objReturn; 

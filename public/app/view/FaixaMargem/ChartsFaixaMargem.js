@@ -52,9 +52,10 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                                     me.setLoading(false);
                                     var result = Ext.decode(response.responseText);
                                     if(result.success){
+                                        nmPrincipal = result.nmPrincipal;
                                         xaxis       = result.xCategories;
                                         yaxis       = result.yCategories;
-                                        zMinMax       = result.zMinMax;
+                                        zMinMax     = result.zMinMax;
                                         arraySerie  = result.data;
 
                                     }else{
@@ -69,7 +70,7 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                                         }).show();
                                     }
                                     
-                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax);
+                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal);
                                 },
                                 error: function() {
                                     
@@ -77,9 +78,10 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                                     arraySerie = [];
                                     yaxis       = [];
                                     xaxis       = [];
-                                    zMinMax       = [];
+                                    zMinMax     = [];
+                                    nmPrincipal ='';
 
-                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax)
+                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal)
 
                                     new Noty({
                                         theme: 'relax',
@@ -100,9 +102,11 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
         me.callParent(arguments);
     },
 
-    buildChartContainer: function(el,series,yaxis,xaxis,zMinMax){
+    buildChartContainer: function(el,series,yaxis,xaxis,zMinMax,nmPrincipal){
         var me = this;
         var utilFormat = Ext.create('Ext.ux.util.Format');
+
+        // console.log(series);
         
         function getPointCategoryName(point, dimension) {
             var series = point.series,
@@ -120,6 +124,16 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 type: 'heatmap',
                 zoomType: 'xy',
                 inverted: false
+            },
+            
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        formatter: function () {
+                            return utilFormat.Value2(this.point.options.value,0);
+                        }
+                    }
+                }
             },
 
             title: {
@@ -164,7 +178,9 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 // startOnTick: false,
                 // endOnTick: false,
                 labels: {
-                    format: '{value}'
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,0);
+                    }
                 },
                 // tickPositions: [0, 0.2, 0.9]
                 tickPositioner: function () {
@@ -174,10 +190,10 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
         
                     var med = zMinMax[1] / 5 ;
 
-                    var n2 = min + med,
-                        n3 = min + (med*2),
-                        n4 = min + (med*3),
-                        n5 = min + (med*4);
+                    var n2 =  Number(min + med),
+                            n3 =  Number(min + (med*2)),
+                            n4 =  Number(min + (med*3)),
+                            n5 =  Number(min + (med*4));
 
                     positions.push(min);
                     positions.push(n2);
@@ -196,41 +212,29 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 margin: 4,
                 verticalAlign: 'top',
                 y: 40,
-                symbolHeight: 300
+                symbolHeight: 300,
+                width: 80
             },
         
             tooltip: {
                 formatter: function () {
-                    return '<b> Filial: </b>' +getPointCategoryName(this.point, 'x') + ' <br><b>ROL: </b>'+
-                        this.point.value + '<br><b>Margem: </b>' + getPointCategoryName(this.point, 'y') ;
+                    
+                    var nValorPrincipal = this.point.series.options.nmPrincipal;
+                    return '<b> Filial: </b>' +getPointCategoryName(this.point, 'x') + ' <br><b>'+nValorPrincipal.toUpperCase()+': </b>'+
+                    utilFormat.Value2(this.point.value,0) + '<br><b>Margem: </b>' + getPointCategoryName(this.point, 'y') ;
                 }
             },
         
             series: [{
+                nmPrincipal: nmPrincipal,
                 borderWidth: 0,
                 nullColor: '#EFEFEF',
                 data: series,
                 dataLabels: {
                     enabled: true,
-                    // borderWidth:0,
-                    // borderColor: '#000000',
-                    color: '#000000',
-                    // style: {
-                    //     'border-width': '0px !important',
-                    //     'border-color': '#000000 !important'
-                    // }
+                    color: '#000000'
                 }
             }],
-
-            // plotOptions: {
-            //     series: {
-            //         dataLabels: {
-            //             borderWidth:0,
-            //             borderColor: '#000000',
-            //             color: '#000000',
-            //         }
-            //     }
-            // },
         
             responsive: {
                 rules: [{
