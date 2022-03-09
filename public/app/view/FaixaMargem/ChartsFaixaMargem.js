@@ -130,7 +130,9 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 series: {
                     dataLabels: {
                         formatter: function () {
-                            return utilFormat.Value2(this.point.options.value,0);
+                            var valor = this.point.options.value ;
+                            valor = !valor ? null : utilFormat.Value2(valor,0) ;
+                            return valor;
                         }
                     }
                 }
@@ -191,9 +193,9 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                     var med = zMinMax[1] / 5 ;
 
                     var n2 =  Number(min + med),
-                            n3 =  Number(min + (med*2)),
-                            n4 =  Number(min + (med*3)),
-                            n5 =  Number(min + (med*4));
+                        n3 =  Number(min + (med*2)),
+                        n4 =  Number(min + (med*3)),
+                        n5 =  Number(min + (med*4));
 
                     positions.push(min);
                     positions.push(n2);
