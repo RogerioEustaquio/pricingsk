@@ -177,6 +177,7 @@ class FaixamargemController extends AbstractRestfulController
                                     ROUND(SUM(lb)/SUM(rol)*100) AS mb
                                 FROM VM_SKVENDANOTA a
                                 WHERE TRUNC(a.data,'MM') >= '01/11/2021'
+                                --AND a.cod_produto = 397
                                 $andFilial
                                 $andData
                                 $andMarca

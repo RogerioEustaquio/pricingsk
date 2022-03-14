@@ -9,7 +9,7 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
     style: {
         background: '#ffffff'
     },
-    requires: [ 
+    requires: [
     ],
     showLegend: [],
     // controller: 'chart',
@@ -129,10 +129,13 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
             plotOptions: {
                 series: {
                     dataLabels: {
-                        formatter: function () {
+                        // format: '<b>{point.value:.0f}',
+                        formatter: function (el) {
                             var valor = this.point.options.value ;
-                            valor = !valor ? null : utilFormat.Value2(valor,0) ;
-                            return valor;
+                            valor = !valor ? '' : utilFormat.Value2(valor,0) ;
+
+                            var obj = '<p>'+valor+'</p>';
+                            return obj;
                         }
                     }
                 }
@@ -145,7 +148,10 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
             xAxis: {
                 categories: xaxis,
                 title: null,
-                reversed: false
+                reversed: false,
+                dataLabels: {
+                    enabled: false
+                }
             },
         
             yAxis: {
@@ -153,27 +159,17 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 title: {
                     text: 'Margem'
                 },
-                reversed: true
-            },
-        
-            accessibility: {
-                point: {
-                    descriptionFormatter: function (point) {
-                        var ix = point.index + 1,
-                            xName = getPointCategoryName(point, 'x'),
-                            yName = getPointCategoryName(point, 'y'),
-                            val = point.value;
-
-                        return ix + '. ' + xName + ' sales ' + yName + ', ' + val + '.';
-                    }
+                reversed: true,
+                dataLabels: {
+                    enabled: false
                 }
             },
 
             colorAxis: {
                 stops: [
-                    [0, '#00ff00'],
+                    [0, '#ff0000'],
                     [0.5, '#ffff00'],
-                    [0.9, '#ff0000']
+                    [0.9, '#00ff00']
                 ],
                 min: Number(zMinMax[0]),
                 max: Number(zMinMax[1]),
@@ -197,14 +193,27 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                         n4 =  Number(min + (med*3)),
                         n5 =  Number(min + (med*4));
 
-                    positions.push(min);
-                    positions.push(n2);
-                    positions.push(n3);
-                    positions.push(n4);
-                    positions.push(n5);
                     positions.push(max);
+                    positions.push(n5);
+                    positions.push(n4);
+                    positions.push(n3);
+                    positions.push(n2);
+                    positions.push(min);
 
                     return positions;
+                }
+            },
+        
+            accessibility: {
+                point: {
+                    descriptionFormatter: function (point) {
+                        var ix = point.index + 1,
+                            xName = getPointCategoryName(point, 'x'),
+                            yName = getPointCategoryName(point, 'y'),
+                            val = point.value;
+
+                        return ix + '. ' + xName + ' sales ' + yName + ', ' + val + '.';
+                    }
                 }
             },
 
@@ -229,12 +238,17 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
         
             series: [{
                 nmPrincipal: nmPrincipal,
+                type: 'heatmap',
                 borderWidth: 0,
                 nullColor: '#EFEFEF',
                 data: series,
                 dataLabels: {
                     enabled: true,
-                    color: '#000000'
+                    color: '#000000',
+                    style: {
+                        fontSize: '8px',
+                        textOutline: 'none'
+                    }
                 }
             }],
         

@@ -37,7 +37,7 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     xtype: 'radiofield',
                     name : 'valorprincipal',
                     inputValue: 'QTDE',
-                    boxLabel: 'Quantidade',
+                    boxLabel: 'QTD',
                     labelTextAlign: 'right',
                     labelWidth: 24,
                     width: 100,

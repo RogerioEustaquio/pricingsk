@@ -173,9 +173,9 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                     var extraUpdate = {
                         // colorAxis: {
                             stops: [
-                                [0, '#00ff00'],
+                                [0, '#ff0000'],
                                 [0.5, '#ffff00'],
-                                [0.9, '#ff0000']
+                                [0.9, '#00ff00']
                             ],
                             min : Number(zMinMax[0]),
                             max : Number(zMinMax[1]),
@@ -196,12 +196,12 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                                     n4 =  Number(min + (med*3)),
                                     n5 =  Number(min + (med*4));
             
-                                positions.push(min);
-                                positions.push(n2);
-                                positions.push(n3);
-                                positions.push(n4);
-                                positions.push(n5);
                                 positions.push(max);
+                                positions.push(n5);
+                                positions.push(n4);
+                                positions.push(n3);
+                                positions.push(n2);
+                                positions.push(min);
             
                                 return positions;
                             }
@@ -223,13 +223,11 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                         data: arraySerie,
                         dataLabels: {
                             enabled: true,
-                            // borderWidth:0,
-                            // borderColor: '#000000',
-                            color: '#000000',
-                            // style: {
-                            //     'border-width': '0px !important',
-                            //     'border-color': '#000000 !important'
-                            // }
+                            style: {
+                                fontSize: '8px',
+                                textOutline: 'none'
+                            },
+                            color: '#000000'
                         }
                     };
                     charts.chart.addSeries(vSerie);
