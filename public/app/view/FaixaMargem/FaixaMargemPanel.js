@@ -2,7 +2,7 @@ Ext.define('App.view.faixamargem.FaixaMargemPanel', {
     extend: 'Ext.panel.Panel',
     xtype: 'faixamargempanel',
     itemId: 'faixamargempanel',
-    // title: 'Home',
+    title: 'Faixa Margem',
     requires: [
         'App.view.faixamargem.FaixaMargemToolbar',
         'App.view.faixamargem.FaixaMargemFiltro',

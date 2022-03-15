@@ -169,7 +169,8 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                 stops: [
                     [0, '#ff0000'],
                     [0.5, '#ffff00'],
-                    [0.9, '#00ff00']
+                    [0.9,Highcharts.getOptions().colors[0]]
+                    // [0.9, '#00ff00']
                 ],
                 min: Number(zMinMax[0]),
                 max: Number(zMinMax[1]),

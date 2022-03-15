@@ -16,7 +16,16 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
 
         var valorPrincipal = Ext.create('Ext.form.FieldSet',{
 
-            layout: 'hbox',
+            // layout: 'hbox',
+            layout: {
+                type: 'table',
+                columns: 2,
+                tableAttrs: {
+                    style: {
+                        width: '100%'
+                    }
+                }
+            },
             hidden: false,
             width: 230,
             margin: '1 1 1 8',
@@ -42,6 +51,16 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     labelWidth: 24,
                     width: 100,
                     // margin: '1 1 1 8',
+                },
+                {
+                    xtype: 'radiofield',
+                    name : 'valorprincipal',
+                    inputValue: 'LB',
+                    boxLabel: 'LB',
+                    labelTextAlign: 'right',
+                    labelWidth: 24,
+                    width: 100,
+                    margin: '1 1 1 8'
                 }
             ]
         });

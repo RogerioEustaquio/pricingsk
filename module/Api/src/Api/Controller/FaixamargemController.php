@@ -211,18 +211,22 @@ class FaixamargemController extends AbstractRestfulController
 
             }
 
-            $sql = "select a.emp,a.mb,round(sum(a.rol),0) rol,round(sum(a.qtd),0) as qtde
+            $sql = "select a.emp,
+                           a.mb,
+                           round(sum(a.rol),0) rol,
+                           round(sum(a.qtd),0) as qtde,
+                           round(sum(a.lb),0) as lb
                      from 
                         (
                         SELECT TRUNC(a.data,'MM') AS data,
-                            a.emp, 
-                            a.cod_produto,
-                            a.nota,
-                            SUM(qtd) AS qtd,
-                            SUM(rol) AS rol,
-                            SUM(lb) AS lb,
-                            SUM(cmv) AS cmv,
-                            ROUND(SUM(lb)/SUM(rol)*100) AS mb
+                                a.emp, 
+                                a.cod_produto,
+                                a.nota,
+                                SUM(qtd) AS qtd,
+                                SUM(rol) AS rol,
+                                SUM(lb) AS lb,
+                                SUM(cmv) AS cmv,
+                                ROUND(SUM(lb)/SUM(rol)*100) AS mb
                         FROM VM_SKVENDANOTA a
                         WHERE TRUNC(a.data,'MM') >= '01/11/2021'
                         --AND a.cod_produto = 397
@@ -247,6 +251,7 @@ class FaixamargemController extends AbstractRestfulController
             $hydrator->addStrategy('qtde', new ValueStrategy);
             // $hydrator->addStrategy('cmv', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
+            $hydrator->addStrategy('lb', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);

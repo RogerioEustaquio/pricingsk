@@ -76,6 +76,13 @@ Ext.define('App.view.Toolbar', {
                     handler: function(){
                         window.document.location= BASEURL +'/#acompanhavenda';
                     }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Faixa Margem',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#faixamargem';
+                    }
                 }
             ]
         });

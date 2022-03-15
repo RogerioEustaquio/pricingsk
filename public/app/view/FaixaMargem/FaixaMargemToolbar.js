@@ -111,6 +111,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
         // var valorprincipal  = faixamargemfiltro.down('radiofield[name=valorprincipal]').getValue();
         var checkRol        = faixamargemfiltro.down('radiofield[inputValue=ROL]').checked;
         var checkQtde       = faixamargemfiltro.down('radiofield[inputValue=QTDE]').checked;
+        var checkLb       = faixamargemfiltro.down('radiofield[inputValue=LB]').checked;
         var codEmpresa      = faixamargemfiltro.down('#elEmp').getValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
@@ -124,6 +125,9 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
         var valorprincipal= 'rol';
         if(checkQtde){
             valorprincipal= 'qtde';
+        }
+        if(checkLb){
+            valorprincipal= 'lb';
         }
 
         var params = {
@@ -175,7 +179,8 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                             stops: [
                                 [0, '#ff0000'],
                                 [0.5, '#ffff00'],
-                                [0.9, '#00ff00']
+                                [0.9,Highcharts.getOptions().colors[0]]
+                                // [0.9, '#00ff00']
                             ],
                             min : Number(zMinMax[0]),
                             max : Number(zMinMax[1]),
