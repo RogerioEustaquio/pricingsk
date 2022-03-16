@@ -1374,12 +1374,51 @@ class AnalisemarcaController extends AbstractRestfulController
                             -- Aplicar filtro de produtos / marcas / lojas
                             --and a.COD_PRODUTO = 397
                             --and a.emp = 'SA'
+                            
+                            and a.data < '01012022'
                             order by a.data
                             ) a
                     where 1 = 1 
                     $andSqlData
+                    and a.data < '01012022'
+                    group by data
+                    union all
+                    select data,
+                           sum(valor) as estoque_valor, 
+                           sum(valor2) as estoque_valor_custo_anterior,
+                           --sum(valor2)/sum(valor) as idx,
+                           round((sum(valor)/sum(valor2)-1)*100,2) as idx
+                    from ( select a.data,
+                                  a.estoque as estoque,
+                                  round(a.valor/a.estoque,2) custo_medio,
+                                  round(a.estoque*a.custo_medio,2) valor,
+                                  round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
+                            from vw_skestoque_master a,
+                                 vw_skmarca m,
+                                 (select data, emp, cod_produto, estoque, custo_medio, valor
+                                    from vw_skestoque_master
+                                 where data = '01/12/2021') a2
+                                 $andSqltCurva
+                            where 1=1
+                            and a.marca = m.descricao_marca
+                            and a.emp = a2.emp(+)
+                            and a.cod_produto = a2.cod_produto(+)
+                            and a.data >= '01/01/2022' -- Não alterar essa data
+                            $andSql
+                            $andSqlCurva
+                            -- Aplicar filtro de produtos / marcas / lojas
+                            --and a.COD_PRODUTO = 397
+                            --and a.emp = 'SA'
+                            and a.data >= '01012022'
+                            order by a.data
+                            ) a
+                    where 1 = 1 
+                    $andSqlData
+                    and a.data >= '01012022'
                     group by data
                     order by data";
+                    // print "$sql";
+                    // exit;
             
             $stmt = $conn->prepare($sql);
             $stmt->execute();
