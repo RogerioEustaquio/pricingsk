@@ -383,7 +383,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
             yAxis: [
                     {
                         title: {
-                            text: 'ROL',
+                            text: 'ROB',
                             style: {
                                 color: colors[0], //Highcharts.getOptions().colors[0],
                                 fontSize: '10px'
@@ -403,174 +403,13 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                 }
                         },
                         opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'LB',
-                            style: {
-                                color: colors[1],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                        formatter: function () {
-                            return utilFormat.ValueZero(this.value);
-                        },
-                        x: 0,
-                        y: 0,
-                        padding: 0,
-                        style: {
-                            color: colors[1],
-                            fontSize: '10px'
-                        }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'MB',
-                            style: {
-                                color: colors[2],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[2],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'PREÇO MÉDIO',
-                            style: {
-                                color: colors[3],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[3],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
                         visible: false
                     },
                     {
                         title: {
-                            text: 'CUSTO MÉDIO',
+                            text: 'ROL',
                             style: {
-                                color: colors[4],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[4],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'Dias',
-                            style: {
-                                color: colors[5],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[5],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'QTD',
-                            style: {
-                                color: colors[6],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[6],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CMV',
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ROB',
-                            style: {
-                                color: colors[8], //Highcharts.getOptions().colors[0],
+                                color: colors[1], //Highcharts.getOptions().colors[0],
                                 fontSize: '10px'
                             }
                         },
@@ -583,30 +422,76 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                 y: 0,
                                 padding: 0,
                                 style: {
-                                    color: colors[8],
+                                    color: colors[1],
                                     fontSize: '10px'
                                 }
                         },
                         opposite: true,
-                        visible: false
+                        visible: true
                     },
                     {
                         title: {
-                            text: 'ROL Dia',
+                            text: 'LB',
                             style: {
-                                color: colors[9],
+                                color: colors[2],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                        formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[2],
+                            fontSize: '10px'
+                        }
+                        },
+                        opposite: true,
+                        visible: true
+                    },
+                    {
+                        title: {
+                            text: 'MB',
+                            style: {
+                                color: colors[3],
                                 fontSize: '10px'
                             }
                         },
                         labels: {
                             formatter: function () {
-                                return utilFormat.ValueZero(this.value);
+                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
                             },
                             x: 0,
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[9],
+                                color: colors[3],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: true
+                    },
+                    {
+                        title: {
+                            text: 'PREÇO MÉDIO',
+                            style: {
+                                color: colors[4],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[4],
                                 fontSize: '10px'
                             }
                         },
@@ -615,21 +500,21 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'LB Dia',
+                            text: 'CUSTO MÉDIO',
                             style: {
-                                color: colors[10],
+                                color: colors[5],
                                 fontSize: '10px'
                             }
                         },
                         labels: {
                             formatter: function () {
-                                return utilFormat.ValueZero(this.value);
+                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
                             },
                             x: 0,
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[10],
+                                color: colors[5],
                                 fontSize: '10px'
                             }
                         },
@@ -638,21 +523,44 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'QTD Dia',
+                            text: 'Dias',
                             style: {
-                                color: colors[11],
+                                color: colors[6],
                                 fontSize: '10px'
                             }
                         },
                         labels: {
                             formatter: function () {
-                                return utilFormat.ValueZero(this.value);
+                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
                             },
                             x: 0,
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[11],
+                                color: colors[6],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: true
+                    },
+                    {
+                        title: {
+                            text: 'QTD',
+                            style: {
+                                color: colors[7],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                            return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[7],
                                 fontSize: '10px'
                             }
                         },
@@ -661,9 +569,9 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'CMV Dia',
+                            text: 'CMV',
                             style: {
-                                color: colors[12],
+                                color: colors[8],
                                 fontSize: '10px'
                             }
                         },
@@ -675,7 +583,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[12],
+                                color: colors[8],
                                 fontSize: '10px'
                             }
                         },
@@ -686,13 +594,105 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ROB Dia',
                             style: {
-                                color: colors[13],
+                                color: colors[9],
                                 fontSize: '10px'
                             }
                         },
                         labels: {
                             formatter: function () {
                                 return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[9],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'ROL Dia',
+                            style: {
+                                color: colors[10],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[10],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'LB Dia',
+                            style: {
+                                color: colors[11],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[11],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'QTD Dia',
+                            style: {
+                                color: colors[12],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[12],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'CMV Dia',
+                            style: {
+                                color: colors[13],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.Value2(this.value,2);
                             },
                             x: 0,
                             y: 0,
