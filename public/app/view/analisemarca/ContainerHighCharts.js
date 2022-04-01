@@ -615,7 +615,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     },
                     {
                         title: {
-                            text: 'ROB Dia',
+                            text: 'Impostos',
                             style: {
                                 color: colors[10],
                                 fontSize: '10px'
@@ -630,6 +630,29 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             padding: 0,
                             style: {
                                 color: colors[10],
+                                fontSize: '10px'
+                            }
+                        },
+                        opposite: true,
+                        visible: false
+                    },
+                    {
+                        title: {
+                            text: 'ROB Dia',
+                            style: {
+                                color: colors[11],
+                                fontSize: '10px'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return utilFormat.ValueZero(this.value);
+                            },
+                            x: 0,
+                            y: 0,
+                            padding: 0,
+                            style: {
+                                color: colors[11],
                                 fontSize: '10px'
                             }
                         },
@@ -640,7 +663,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ROL Dia',
                             style: {
-                                color: colors[11],
+                                color: colors[12],
                                 fontSize: '10px'
                             }
                         },
@@ -652,7 +675,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[11],
+                                color: colors[12],
                                 fontSize: '10px'
                             }
                         },
@@ -663,7 +686,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'LB Dia',
                             style: {
-                                color: colors[12],
+                                color: colors[13],
                                 fontSize: '10px'
                             }
                         },
@@ -675,7 +698,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[12],
+                                color: colors[13],
                                 fontSize: '10px'
                             }
                         },
@@ -686,7 +709,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'QTD Dia',
                             style: {
-                                color: colors[13],
+                                color: colors[14],
                                 fontSize: '10px'
                             }
                         },
@@ -698,7 +721,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[13],
+                                color: colors[14],
                                 fontSize: '10px'
                             }
                         },
@@ -709,7 +732,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'CMV Dia',
                             style: {
-                                color: colors[14],
+                                color: colors[15],
                                 fontSize: '10px'
                             }
                         },
@@ -721,7 +744,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[14],
+                                color: colors[15],
                                 fontSize: '10px'
                             }
                         },
@@ -732,7 +755,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ES. QTD',
                             style: {
-                                color: colors[15],
+                                color: colors[16],
                                 fontSize: '10px'
                             }
                         },
@@ -744,7 +767,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[15],
+                                color: colors[16],
                                 fontSize: '10px'
                             }
                         },
@@ -755,7 +778,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ES. Custo Médio',
                             style: {
-                                color: colors[16],
+                                color: colors[17],
                                 fontSize: '10px'
                             }
                         },
@@ -767,7 +790,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[16],
+                                color: colors[17],
                                 fontSize: '10px'
                             }
                         },
@@ -778,7 +801,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ES. Valor',
                             style: {
-                                color: colors[17],
+                                color: colors[18],
                                 fontSize: '10px'
                             }
                         },
@@ -790,7 +813,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[17],
+                                color: colors[18],
                                 fontSize: '10px'
                             }
                         },
@@ -801,7 +824,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ES. Fator',
                             style: {
-                                color: colors[18],
+                                color: colors[19],
                                 fontSize: '10px'
                             }
                         },
@@ -813,7 +836,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[18],
+                                color: colors[19],
                                 fontSize: '10px'
                             }
                         },
@@ -824,7 +847,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ES. GIRO',
                             style: {
-                                color: colors[19],
+                                color: colors[20],
                                 fontSize: '10px'
                             }
                         },
@@ -836,7 +859,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[19],
+                                color: colors[20],
                                 fontSize: '10px'
                             }
                         },
@@ -847,7 +870,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'ES. DIAS',
                             style: {
-                                color: colors[20],
+                                color: colors[21],
                                 fontSize: '10px'
                             }
                         },
@@ -859,7 +882,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[20],
+                                color: colors[21],
                                 fontSize: '10px'
                             }
                         },
@@ -870,7 +893,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'SKUD',
                             style: {
-                                color: colors[21],
+                                color: colors[22],
                                 fontSize: '10px'
                             }
                         },
@@ -882,7 +905,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[21],
+                                color: colors[22],
                                 fontSize: '10px'
                             }
                         },
@@ -893,7 +916,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'CC',
                             style: {
-                                color: colors[22],
+                                color: colors[23],
                                 fontSize: '10px'
                             }
                         },
@@ -905,7 +928,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[22],
+                                color: colors[23],
                                 fontSize: '10px'
                             }
                         },
@@ -916,7 +939,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'NF',
                             style: {
-                                color: colors[23],
+                                color: colors[24],
                                 fontSize: '10px'
                             }
                         },
@@ -928,7 +951,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[23],
+                                color: colors[24],
                                 fontSize: '10px'
                             }
                         },
@@ -939,7 +962,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'TKM',
                             style: {
-                                color: colors[24],
+                                color: colors[25],
                                 fontSize: '10px'
                             }
                         },
@@ -951,7 +974,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[24],
+                                color: colors[25],
                                 fontSize: '10px'
                             }
                         },
@@ -962,7 +985,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'CC Dia',
                             style: {
-                                color: colors[25],
+                                color: colors[26],
                                 fontSize: '10px'
                             }
                         },
@@ -974,7 +997,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[25],
+                                color: colors[26],
                                 fontSize: '10px'
                             }
                         },
@@ -985,7 +1008,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'Inflação de Estoque',
                             style: {
-                                color: colors[26],
+                                color: colors[27],
                                 fontSize: '10px'
                             }
                         },
@@ -997,7 +1020,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[26],
+                                color: colors[27],
                                 fontSize: '10px'
                             }
                         },
@@ -1008,7 +1031,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         title: {
                             text: 'Inflação de Compra',
                             style: {
-                                color: colors[27],
+                                color: colors[28],
                                 fontSize: '10px'
                             }
                         },
@@ -1020,7 +1043,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             y: 0,
                             padding: 0,
                             style: {
-                                color: colors[27],
+                                color: colors[28],
                                 fontSize: '10px'
                             }
                         },
