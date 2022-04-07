@@ -11,6 +11,8 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
     requires: [ 
     ],
     showLegend: [],
+    showType: [],
+    showOrder: '',
     // controller: 'chart',
     layout: 'border',
     border: true,
@@ -20,7 +22,9 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
     constructor: function(config) {
         var me = this;
         // var utilFormat = Ext.create('Ext.ux.util.Format');
-        me.showLegend = Array();
+        me.showLegend   = Array();
+        me.showType     = Array();
+        me.showOrder    = '';
 
         Ext.applyIf(me, {
             items: [
@@ -39,6 +43,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         afterrender: function(el){
 
                             me.setLoading({msg: 'Carregando...'});
+                            var yaxis = me.buildChartYaix();
                             
                             Ext.Ajax.request({
                                 url: BASEURL + '/api/analisemarca/listarfichaitemgrafico',
@@ -56,11 +61,27 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                         if(rsarray.series){
 
+                                            var contOrder = 0;
+                                            var cont =0;
                                             rsarray.series.forEach(function(record){
                                                 if(me.showLegend){
                                                     me.showLegend.push(record.showInLegend);
                                                 }
-                                            })
+
+                                                if(record.visible){
+                                                    me.showOrder += ','+ record.name;
+                                                    record.zIndex = contOrder ;
+                                                    record.color = Highcharts.getOptions().colors[contOrder];
+                                                    yaxis[cont].title.style.color = Highcharts.getOptions().colors[contOrder];
+                                                    yaxis[cont].labels.style.color= Highcharts.getOptions().colors[contOrder];
+
+                                                    contOrder++;
+                                                }
+
+                                                cont++;
+                                            });
+
+                                            me.showOrder = me.showOrder.substr(1, parseInt(me.showOrder.length));
                                         }
 
                                     }else{
@@ -75,14 +96,15 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                         }).show();
                                     }
 
-                                    me.buildChartContainer(el,rsarray.categories,rsarray.series)
+                                    me.buildChartContainer(el,rsarray.categories,rsarray.series,yaxis);
                                 },
                                 error: function() {
                                     
                                     me.setLoading(false);
                                     rsarray = [];
+                                    yaxis = [];
 
-                                    me.buildChartContainer(el,rsarray.categories,rsarray.series)
+                                    me.buildChartContainer(el,rsarray.categories,rsarray.series,yaxis);
 
                                     new Noty({
                                         theme: 'relax',
@@ -103,12 +125,738 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
         me.callParent(arguments);
     },
 
-    buildChartContainer: function(el,meses,series){
+    buildChartYaix: function(){
+
+        var utilFormat = Ext.create('Ext.ux.util.Format');
+
+        colors = ["#63b598","#ce7d78","#ea9e70","#a48a9e","#c6e1e8","#648177","#0d5ac1","#f205e6","#1c0365","#14a9ad","#4ca2f9"
+        ,"#a4e43f","#d298e2","#6119d0","#d2737d","#c0a43c","#f2510e","#651be6","#79806e","#61da5e","#cd2f00","#9348af"
+        ,"#01ac53","#c5a4fb","#996635","#b11573","#2f3f94","#2f7b99","#da967d","#34891f","#b0d87b","#4bb473","#75d89e"];
+
+        var arrayYaxis= [
+            {
+                title: {
+                    text: 'ROB',
+                    style: {
+                        color: colors[0], //Highcharts.getOptions().colors[0],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                        formatter: function () {
+                            var v = utilFormat.ValueZero(this.value);
+                            return v;
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[0],
+                            fontSize: '10px'
+                        }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ROL',
+                    style: {
+                        color: colors[1], //Highcharts.getOptions().colors[0],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                        formatter: function () {
+                            var v = utilFormat.ValueZero(this.value);
+                            return v;
+                        },
+                        x: 0,
+                        y: 0,
+                        padding: 0,
+                        style: {
+                            color: colors[1],
+                            fontSize: '10px'
+                        }
+                },
+                opposite: true,
+                visible: true
+            },
+            {
+                title: {
+                    text: 'LB',
+                    style: {
+                        color: colors[2],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                formatter: function () {
+                    return utilFormat.ValueZero(this.value);
+                },
+                x: 0,
+                y: 0,
+                padding: 0,
+                style: {
+                    color: colors[2],
+                    fontSize: '10px'
+                }
+                },
+                opposite: true,
+                visible: true
+            },
+            {
+                title: {
+                    text: 'MB',
+                    style: {
+                        color: colors[3],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                    return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[3],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: true
+            },
+            {
+                title: {
+                    text: 'PREÇO MÉDIO ROB',
+                    style: {
+                        color: colors[4],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                    return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[4],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'PREÇO MÉDIO ROL',
+                    style: {
+                        color: colors[5],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                    return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[5],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'CUSTO MÉDIO',
+                    style: {
+                        color: colors[6],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                    return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[6],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'Dias',
+                    style: {
+                        color: colors[7],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                    return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[7],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: true
+            },
+            {
+                title: {
+                    text: 'QTD',
+                    style: {
+                        color: colors[8],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                    return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[8],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'CMV',
+                    style: {
+                        color: colors[9],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[9],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'Impostos',
+                    style: {
+                        color: colors[10],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[10],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ROB Dia',
+                    style: {
+                        color: colors[11],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[11],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ROL Dia',
+                    style: {
+                        color: colors[12],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[12],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'LB Dia',
+                    style: {
+                        color: colors[13],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[13],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'QTD Dia',
+                    style: {
+                        color: colors[14],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[14],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'CMV Dia',
+                    style: {
+                        color: colors[15],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[15],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ES. QTD',
+                    style: {
+                        color: colors[16],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[16],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ES. Custo Médio',
+                    style: {
+                        color: colors[17],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[17],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ES. Valor',
+                    style: {
+                        color: colors[18],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[18],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ES. Fator',
+                    style: {
+                        color: colors[19],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[19],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ES. GIRO',
+                    style: {
+                        color: colors[20],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[20],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'ES. DIAS',
+                    style: {
+                        color: colors[21],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[21],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'SKUD',
+                    style: {
+                        color: colors[22],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[22],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'CC',
+                    style: {
+                        color: colors[23],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[23],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'NF',
+                    style: {
+                        color: colors[24],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[24],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'TKM',
+                    style: {
+                        color: colors[25],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.ValueZero(this.value);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[25],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'CC Dia',
+                    style: {
+                        color: colors[26],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[26],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'Inflação de Estoque',
+                    style: {
+                        color: colors[27],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[27],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'Inflação de Compra',
+                    style: {
+                        color: colors[28],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[28],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            // {
+            //     title: {
+            //         text: 'ROL Fx 101-250',
+            //         style: {
+            //             color: colors[11],
+            //             fontSize: '10px'
+            //         }
+            //     },
+            //     labels: {
+            //         formatter: function () {
+            //             return utilFormat.ValueZero(this.value);
+            //         },
+            //         x: 0,
+            //         y: 0,
+            //         padding: 0,
+            //         style: {
+            //             color: colors[11],
+            //             fontSize: '10px'
+            //         }
+            //     },
+            //     opposite: true,
+            //     visible: false
+            // },
+            // {
+            //     title: {
+            //         text: 'ROL Fx 251-500',
+            //         style: {
+            //             color: colors[12],
+            //             fontSize: '10px'
+            //         }
+            //     },
+            //     labels: {
+            //         formatter: function () {
+            //             return utilFormat.ValueZero(this.value);
+            //         },
+            //         x: 0,
+            //         y: 0,
+            //         padding: 0,
+            //         style: {
+            //             color: colors[12],
+            //             fontSize: '10px'
+            //         }
+            //     },
+            //     opposite: true,
+            //     visible: false
+            // }
+        ];
+        return arrayYaxis;
+    },
+
+    buildChartContainer: function(el,meses,series,aYaxis){
         var me = this;
         var utilFormat = Ext.create('Ext.ux.util.Format');
-        colors = ["#63b598","#ce7d78","#ea9e70","#a48a9e","#c6e1e8","#648177","#0d5ac1","#f205e6","#1c0365","#14a9ad","#4ca2f9"
-                 ,"#a4e43f","#d298e2","#6119d0","#d2737d","#c0a43c","#f2510e","#651be6","#79806e","#61da5e","#cd2f00","#9348af"
-                 ,"#01ac53","#c5a4fb","#996635","#b11573","#2f3f94","#2f7b99","#da967d","#34891f","#b0d87b","#4bb473","#75d89e"];
+
 
         me.chart =  Highcharts.chart(el.id, {
             loading: {
@@ -137,32 +885,106 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                             var meChart = this;
                             var lista = [];
                             var element = '';
+                            var elementCombo = '';
+                            var arryElements = {
+                                xtype: 'panel',
+                                layout: 'hbox',
+                                width: 336,
+                                border: false,
+                                items: [
+                                    {
+                                        xtype:'label',
+                                        html: 'Indicador',
+                                        margin: '2 2 2 2',
+                                        labelWidth: 180,
+                                        width: 200,
+                                    },
+                                    {
+                                        xtype:'label',
+                                        html: 'Tipo',
+                                        width: 100,
+                                        margin: '2 2 2 2',
+                                    }
+                                ]
+                            };
+
+                            lista.push(arryElements);
+
                             meChart.series.forEach(function(record){
 
                                 var recordSeries = record;
 
                                 var indicadoresAdd = me.up('panel').up('container').down('#analisemarcatoolbar').indicadoresAdd;
-                                
+
+                                elementCombo = Ext.create('Ext.form.field.Tag',{
+                                    multiSelect: false,
+                                    width: 100,
+                                    name: 'cb'+record.name,
+                                    itemId: 'cb'+record.name,
+                                    store: Ext.data.Store({
+                                        fields: [
+                                            { name: 'tipo', type: 'string' },
+                                            { name: 'name', type: 'string' }
+                                        ],
+                                        data: [
+                                            {"tipo":"line", "name":"line"},
+                                            {"tipo":"column", "name":"column"},
+                                            {"tipo":"spline", "name":"spline"},
+                                            {"tipo":"scatter", "name":"scatter"}
+                                        ]
+                                    }),
+                                    queryParam: 'tipo',
+                                    queryMode: 'local',
+                                    displayField: 'name',
+                                    displayTpl: Ext.create('Ext.XTemplate','<tpl for=".">','<b>{tipo}</b>','</tpl>'),
+                                    valueField: 'tipo',
+                                    fieldLabel: '',
+                                    margin: '2 2 2 2',
+                                    filterPickList: true,
+                                    publishes: 'value',
+                                    disabled: false,
+                                    value: me.showType[recordSeries.index] == 'line'? null : me.showType[recordSeries.index],
+                                    listeners : {
+                                        select : function(record,index){
+
+                                            if(!record.value)
+                                                record.value = 'line';
+
+                                            me.showType[recordSeries.index] = record.value ;
+
+                                            recordSeries.update({type: record.value},false);
+                                            meChart.redraw();
+                                        }
+                                    }
+                                });
+
                                 element = {
                                     xtype: 'checkboxfield',
                                     margin: '2 2 2 2',
-                                    labelWidth: 190,
+                                    labelWidth: 180,
+                                    width: 200,
                                     fieldLabel: record.name,
                                     name: record.name,
                                     checked: recordSeries.options.showInLegend,
                                     handler: function(record,index){
-                                        
-                                        let cont = 0;
+
+                                        var cont = 0;
                                         if(index){
 
                                             var listaCheck = record.up('window').items;
 
-                                                for (let i = 0; i < listaCheck.length; i++) {
-                                                    const element = listaCheck.items[i];
+                                            for (let i = 0; i < listaCheck.length; i++) {
+                                                const itemsPanel = listaCheck.items[i];
 
-                                                    cont = (element.checked) ? cont+1 : cont;
-                                                    
+                                                if(i == 0){
+                                                     continue;
                                                 }
+                                                const element  = itemsPanel.items.items[0]; // checket
+                                                // var element2 = itemsPanel.items.items[1]; // tipo
+                                                
+                                                cont = (element.checked) ? cont+1 : cont;
+                                            
+                                            }
                                         }
 
                                         if(cont > 8){
@@ -176,56 +998,124 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                         }else{
 
+                                            var arrayOrder = me.showOrder ? me.showOrder.split(',') : Array();
+
+                                            if(record.checked){
+                                                
+                                                arrayOrder.push(record.name);
+                                                
+                                                if(me.showOrder.length > 0){
+                                                    me.showOrder += ','+ record.name;
+                                                }else{
+                                                    me.showOrder = record.name;
+                                                }
+                                                
+                                                var contOrder = 0;
+                                                arrayOrder.forEach(function(){
+
+                                                    meChart.yAxis[recordSeries.index].update(
+                                                        {
+                                                            title:{
+                                                                style:{
+                                                                    color: Highcharts.getOptions().colors[contOrder]
+                                                
+                                                                }
+                                                            },
+                                                            labels:{
+                                                                style:{
+                                                                    color: Highcharts.getOptions().colors[contOrder]
+                                                
+                                                                }
+                                                            }
+                                                        }
+                                                    ,true);
+                                                    
+                                                    recordSeries.update(
+                                                        {
+                                                            zIndex: contOrder,
+                                                            color : Highcharts.getOptions().colors[contOrder]
+                                                        }
+                                                    ,true);
+
+                                                    contOrder++
+                                                    
+                                                });
+
+                                            }else{  // Remover da Ordem //
+
+                                                var removido = '';
+                                                me.showOrder = '';
+                                                var contOrder = 0;
+                                                arrayOrder.forEach(function(v){
+
+                                                    if(!record.checked && v == record.name){
+                                                    removido = v;
+                                                    recordSeries.update({zIndex: recordSeries.index},true);
+        
+                                                    }else if(v){
+                                                        me.showOrder += ','+ v;
+
+                                                        for (let conty = 0; conty < aYaxis.length; conty++) {
+
+                                                            if(v == meChart.series[conty].name){
+                                                                
+                                                                meChart.yAxis[conty].update(
+                                                                    {
+                                                                        title:{
+                                                                            style:{
+                                                                                color: Highcharts.getOptions().colors[contOrder]
+                                                            
+                                                                            }
+                                                                        },
+                                                                        labels:{
+                                                                            style:{
+                                                                                color: Highcharts.getOptions().colors[contOrder]
+                                                            
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ,false);
+
+                                                                meChart.series[conty].update(
+                                                                    {
+                                                                        zIndex: contOrder,
+                                                                        color : Highcharts.getOptions().colors[contOrder]
+                                                                    }
+                                                                ,true);
+
+                                                                break;
+                                                            }
+
+                                                        };
+
+                                                        contOrder++
+                                                    }
+                                                });
+
+                                                me.showOrder = me.showOrder.substr(1, parseInt(me.showOrder.length));
+
+                                            }
+
                                             me.showLegend[recordSeries.index] = index ;
                                             recordSeries.update({showInLegend: index, visible: index},false);
-                                            meChart.yAxis[recordSeries.index].update({visible: index},false);
-
-                                            var iColor = 0;
-                                            var iCont = 0;
-
-                                            setTimeout(function(){
-                                                
-                                                // meChart.series.forEach(function(rowSerie){
-
-                                                //     if(rowSerie.visible){
-                                                //         const color = colors[iColor]; //Highcharts.getOptions().colors[iColor];
-
-                                                //         rowSerie.update({color:color},false);
-                                                //         meChart.yAxis[iCont].update(
-                                                //             {
-                                                //                 title:{
-                                                //                     style: {
-                                                //                         color: color
-                                                //                     }
-                                                //                 },
-                                                //                 labels:{
-                                                //                     style: {
-                                                //                         color: color
-                                                //                     }
-                                                //                 }
-                                                //             }
-                                                //             ,false);
-                                                            
-                                                //         iColor++;
-                                                //     }
-
-                                                //     iCont++;
-                                                // });
-
-                                                meChart.redraw();
-                                            },100);
+                                            meChart.yAxis[recordSeries.index].update({visible: index});
 
                                         }
 
-                                        meChart.redraw();
                                         record.up('window').down('displayfield[name=contCheck]').setValue(cont);
+
+                                        setTimeout(function(){
+                                            meChart.redraw();
+                                        },100);
+                                        
                                     }
                                 };
                                 
                                 if(indicadoresAdd){
                                     for (let e = 0; e < indicadoresAdd.length; e++) {
                                         if(indicadoresAdd[e].name == record.name){
-                                            element = (!indicadoresAdd[e].value) ? null: element;
+                                            element     = (!indicadoresAdd[e].value) ? null: element;
+                                            elementCombo= (!indicadoresAdd[e].value) ? null: elementCombo;
                                         }
                                     }
                                 }
@@ -235,12 +1125,31 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){
 
-                                        element = (recordSeries.yData.length > 0) ? element : null;
+                                        if(record.checked)
+                                            me.showOrder += ','+ record.name;
+
+                                        element     = (recordSeries.yData.length > 0) ? element : null;
+                                        elementCombo= (recordSeries.yData.length > 0) ? elementCombo : null;
                                     }
                                 }
 
-                                if(element)
-                                    lista.push(element);
+                                if(element){
+                                    arryElements = {
+                                        xtype: 'panel',
+                                        layout: 'hbox',
+                                        width: 336,
+                                        border: false,
+                                        items: [
+                                            element,
+                                            elementCombo
+                                        ]
+                                         
+                                    };
+
+                                    lista.push(arryElements);
+                                }
+
+                                // contIndex++;
                                 
                             });
 
@@ -249,7 +1158,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                 // renderTo: me,
                                 scrollable: true,
                                 height: 300,
-                                width: 260,
+                                width: 366,
                                 // padding: '1 1 1 1',
                                 // layout: 'fit',
                                 tbar: [
@@ -261,9 +1170,9 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                             let cont =0;
                                             me.showLegend.forEach(function(record){
                                                 if(record){
-                                                    cont++
+                                                    cont++;
                                                 }
-                                            })
+                                            });
                                             return cont;
                                         }
                                     },
@@ -278,15 +1187,30 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
         
                                                 var listaCheck = this.up('panel').up('window').items;
 
-
                                                 for (let i = 0; i < listaCheck.length; i++) {
-                                                    const element = listaCheck.items[i];
+                                                    const itemsPanel = listaCheck.items[i];
 
+                                                   if(itemsPanel.items.items[1].config.html == 'Tipo'){
+                                                        continue;
+                                                   }
+
+                                                   const element  = itemsPanel.items.items[0]; // checket
+                                                   var element2 = itemsPanel.items.items[1]; // tipo
+
+                                                    if(element2.value && element2.value != 'line'){
+                                                        meChart.series[i-1].update({type: 'line'},false);
+                                                        meChart.redraw();
+                                                    }
+
+                                                    element2.setValue(null);
+                                                    me.showType[i-1] = 'line' ;
                                                     element.setValue(false);
-                                                    me.showLegend[i] = false ;
-                                                    meChart.series[i].setVisible(false, false);
-                                                    meChart.yAxis[i].update({visible: false},false);
-                                                    
+                                                    me.showLegend[i-1] = false ;
+                                                    meChart.series[i-1].setVisible(false, false);
+                                                    meChart.yAxis[i-1].update({visible: false},false);
+    
+                                                    meChart.redraw();
+
                                                 }
 
                                                 meChart.redraw();
@@ -331,7 +1255,6 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
             plotOptions: {
                 series: {
                     events: {
-
                         hide: function(){
                             this.chart.yAxis[this.index].update({visible: false},false);
                             this.chart.redraw();
@@ -339,19 +1262,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                         show: function(){
                             this.chart.yAxis[this.index].update({visible: true},false);
                             this.chart.redraw();
-                        },
-                        // legendItemClick: function () {
-
-                        //     var index = this.index;
-
-                        //     if(this.chart.yAxis[index].visible){
-                        //         this.chart.yAxis[index].update({visible: false});
-                        //     }else{
-                        //         this.chart.yAxis[index].update({visible: true});
-                        //     }
-
-                        //     return this;
-                        // }
+                        }
                     },
                     dataLabels: {
                         // format: '{series}'
@@ -380,728 +1291,12 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 categories: meses,
                 crosshair: true
             },
-            yAxis: [
-                    {
-                        title: {
-                            text: 'ROB',
-                            style: {
-                                color: colors[0], //Highcharts.getOptions().colors[0],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                                formatter: function () {
-                                    var v = utilFormat.ValueZero(this.value);
-                                    return v;
-                                },
-                                x: 0,
-                                y: 0,
-                                padding: 0,
-                                style: {
-                                    color: colors[0],
-                                    fontSize: '10px'
-                                }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ROL',
-                            style: {
-                                color: colors[1], //Highcharts.getOptions().colors[0],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                                formatter: function () {
-                                    var v = utilFormat.ValueZero(this.value);
-                                    return v;
-                                },
-                                x: 0,
-                                y: 0,
-                                padding: 0,
-                                style: {
-                                    color: colors[1],
-                                    fontSize: '10px'
-                                }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'LB',
-                            style: {
-                                color: colors[2],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                        formatter: function () {
-                            return utilFormat.ValueZero(this.value);
-                        },
-                        x: 0,
-                        y: 0,
-                        padding: 0,
-                        style: {
-                            color: colors[2],
-                            fontSize: '10px'
-                        }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'MB',
-                            style: {
-                                color: colors[3],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[3],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'PREÇO MÉDIO ROB',
-                            style: {
-                                color: colors[4],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[4],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'PREÇO MÉDIO ROL',
-                            style: {
-                                color: colors[5],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[5],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CUSTO MÉDIO',
-                            style: {
-                                color: colors[6],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[6],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'Dias',
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.Value2(this.value,this.chart.options.series[this.chart.index].vDecimos);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[7],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: true
-                    },
-                    {
-                        title: {
-                            text: 'QTD',
-                            style: {
-                                color: colors[8],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                            return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[8],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CMV',
-                            style: {
-                                color: colors[9],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[9],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'Impostos',
-                            style: {
-                                color: colors[10],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[10],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ROB Dia',
-                            style: {
-                                color: colors[11],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[11],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ROL Dia',
-                            style: {
-                                color: colors[12],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[12],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'LB Dia',
-                            style: {
-                                color: colors[13],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[13],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'QTD Dia',
-                            style: {
-                                color: colors[14],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[14],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CMV Dia',
-                            style: {
-                                color: colors[15],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[15],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ES. QTD',
-                            style: {
-                                color: colors[16],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[16],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ES. Custo Médio',
-                            style: {
-                                color: colors[17],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[17],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ES. Valor',
-                            style: {
-                                color: colors[18],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[18],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ES. Fator',
-                            style: {
-                                color: colors[19],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[19],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ES. GIRO',
-                            style: {
-                                color: colors[20],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[20],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'ES. DIAS',
-                            style: {
-                                color: colors[21],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[21],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'SKUD',
-                            style: {
-                                color: colors[22],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[22],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CC',
-                            style: {
-                                color: colors[23],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[23],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'NF',
-                            style: {
-                                color: colors[24],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[24],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'TKM',
-                            style: {
-                                color: colors[25],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.ValueZero(this.value);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[25],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'CC Dia',
-                            style: {
-                                color: colors[26],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[26],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'Inflação de Estoque',
-                            style: {
-                                color: colors[27],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[27],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    {
-                        title: {
-                            text: 'Inflação de Compra',
-                            style: {
-                                color: colors[28],
-                                fontSize: '10px'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return utilFormat.Value2(this.value,2);
-                            },
-                            x: 0,
-                            y: 0,
-                            padding: 0,
-                            style: {
-                                color: colors[28],
-                                fontSize: '10px'
-                            }
-                        },
-                        opposite: true,
-                        visible: false
-                    },
-                    // {
-                    //     title: {
-                    //         text: 'ROL Fx 101-250',
-                    //         style: {
-                    //             color: colors[11],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     labels: {
-                    //         formatter: function () {
-                    //             return utilFormat.ValueZero(this.value);
-                    //         },
-                    //         x: 0,
-                    //         y: 0,
-                    //         padding: 0,
-                    //         style: {
-                    //             color: colors[11],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     opposite: true,
-                    //     visible: false
-                    // },
-                    // {
-                    //     title: {
-                    //         text: 'ROL Fx 251-500',
-                    //         style: {
-                    //             color: colors[12],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     labels: {
-                    //         formatter: function () {
-                    //             return utilFormat.ValueZero(this.value);
-                    //         },
-                    //         x: 0,
-                    //         y: 0,
-                    //         padding: 0,
-                    //         style: {
-                    //             color: colors[12],
-                    //             fontSize: '10px'
-                    //         }
-                    //     },
-                    //     opposite: true,
-                    //     visible: false
-                    // }
-                ],
-                tooltip: {
-                    // shared: true,
-                    // outside: true
-                },
-                series: series
+            yAxis: aYaxis,
+            tooltip: {
+                // shared: true,
+                // outside: true
+            },
+            series: series
         });
 
     }

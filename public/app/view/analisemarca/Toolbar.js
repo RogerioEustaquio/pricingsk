@@ -281,17 +281,32 @@ Ext.define('App.view.analisemarca.Toolbar',{
 
                     rsarray = result.data;
                     var cont = 0;
-                    
                     charts.chart.xAxis[0].setCategories(rsarray.categories);
+
+                    var arrayOrder = charts.showOrder ? charts.showOrder.split(',') : Array();
 
                     rsarray.series.forEach(function(record){
 
                         record.visible      = seriesOrig[cont].visible;
                         record.color        = seriesCores[cont];
                         record.showInLegend = charts.showLegend[cont];
+                        if(charts.showType[cont] != 'line')
+                            record.type = charts.showType[cont];
+
+
+                        for (let contOrder = 0; contOrder < arrayOrder.length; contOrder++) {
+                          
+                            if(arrayOrder[contOrder] == record.name){
+                                record.zIndex = contOrder ;
+                                record.color = Highcharts.getOptions().colors[contOrder];
+                                break;
+                            }
+                        }
+                        
                         charts.chart.addSeries(record);
                         cont++;
                     });
+
 
                 }else{
                     rsarray = [];
