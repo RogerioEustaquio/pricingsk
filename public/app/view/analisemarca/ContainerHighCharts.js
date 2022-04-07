@@ -1028,14 +1028,14 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                                                 }
                                                             }
                                                         }
-                                                    ,true);
+                                                    ,false);
                                                     
                                                     recordSeries.update(
                                                         {
                                                             zIndex: contOrder,
                                                             color : Highcharts.getOptions().colors[contOrder]
                                                         }
-                                                    ,true);
+                                                    ,false);
 
                                                     contOrder++
                                                     
@@ -1050,7 +1050,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                                     if(!record.checked && v == record.name){
                                                     removido = v;
-                                                    recordSeries.update({zIndex: recordSeries.index},true);
+                                                    recordSeries.update({zIndex: recordSeries.index},false);
         
                                                     }else if(v){
                                                         me.showOrder += ','+ v;
@@ -1081,7 +1081,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                                                         zIndex: contOrder,
                                                                         color : Highcharts.getOptions().colors[contOrder]
                                                                     }
-                                                                ,true);
+                                                                ,false);
 
                                                                 break;
                                                             }
@@ -1098,15 +1098,14 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                             me.showLegend[recordSeries.index] = index ;
                                             recordSeries.update({showInLegend: index, visible: index},false);
-                                            meChart.yAxis[recordSeries.index].update({visible: index});
+                                            meChart.yAxis[recordSeries.index].update({visible: index},false);
 
                                         }
 
                                         record.up('window').down('displayfield[name=contCheck]').setValue(cont);
 
-                                        setTimeout(function(){
-                                            meChart.redraw();
-                                        },100);
+                                        meChart.redraw(true);
+                                        // meChart.reflow(true);
                                         
                                     }
                                 };
@@ -1199,7 +1198,6 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                                     if(element2.value && element2.value != 'line'){
                                                         meChart.series[i-1].update({type: 'line'},false);
-                                                        meChart.redraw();
                                                     }
 
                                                     element2.setValue(null);
@@ -1208,12 +1206,10 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                                     me.showLegend[i-1] = false ;
                                                     meChart.series[i-1].setVisible(false, false);
                                                     meChart.yAxis[i-1].update({visible: false},false);
-    
-                                                    meChart.redraw();
 
                                                 }
 
-                                                meChart.redraw();
+                                                // meChart.redraw();
 
                                                 this.up('panel').up('window').down('displayfield[name=contCheck]').setValue(0);
                                             }
@@ -1257,11 +1253,11 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     events: {
                         hide: function(){
                             this.chart.yAxis[this.index].update({visible: false},false);
-                            this.chart.redraw();
+                            // this.chart.redraw();
                         },
                         show: function(){
                             this.chart.yAxis[this.index].update({visible: true},false);
-                            this.chart.redraw();
+                            // this.chart.redraw();
                         }
                     },
                     dataLabels: {
