@@ -39,59 +39,68 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
                         },
                         afterrender: function(el){
 
-                            me.setLoading({msg: 'Carregando...'});
+                            // me.setLoading({msg: 'Carregando...'});
 
-                            Ext.Ajax.request({
-                                url: BASEURL +'/api/faixamargem/faixamargem',
-                                method: 'POST',
-                                params: me.params,
-                                async: true,
-                                timeout: 240000,
-                                success: function (response) {
+                            // me.setLoading(false);
+                            arraySerie = [];
+                            yaxis       = [];
+                            xaxis       = [];
+                            zMinMax     = [];
+                            nmPrincipal ='';
+
+                            me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal);
+
+                            // Ext.Ajax.request({
+                            //     url: BASEURL +'/api/faixamargem/faixamargem',
+                            //     method: 'POST',
+                            //     params: me.params,
+                            //     async: true,
+                            //     timeout: 240000,
+                            //     success: function (response) {
                                     
-                                    me.setLoading(false);
-                                    var result = Ext.decode(response.responseText);
-                                    if(result.success){
-                                        nmPrincipal = result.nmPrincipal;
-                                        xaxis       = result.xCategories;
-                                        yaxis       = result.yCategories;
-                                        zMinMax     = result.zMinMax;
-                                        arraySerie  = result.data;
+                            //         me.setLoading(false);
+                            //         var result = Ext.decode(response.responseText);
+                            //         if(result.success){
+                            //             nmPrincipal = result.nmPrincipal;
+                            //             xaxis       = result.xCategories;
+                            //             yaxis       = result.yCategories;
+                            //             zMinMax     = result.zMinMax;
+                            //             arraySerie  = result.data;
 
-                                    }else{
-                                        arraySerie = [];
+                            //         }else{
+                            //             arraySerie = [];
 
-                                        new Noty({
-                                            theme: 'relax',
-                                            layout: 'bottomRight',
-                                            type: 'error',
-                                            closeWith: [],
-                                            text: 'Erro sistema: '+ result.message.substr(0,20)
-                                        }).show();
-                                    }
+                            //             new Noty({
+                            //                 theme: 'relax',
+                            //                 layout: 'bottomRight',
+                            //                 type: 'error',
+                            //                 closeWith: [],
+                            //                 text: 'Erro sistema: '+ result.message.substr(0,20)
+                            //             }).show();
+                            //         }
                                     
-                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal);
-                                },
-                                error: function() {
+                            //         me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal);
+                            //     },
+                            //     error: function() {
                                     
-                                    me.setLoading(false);
-                                    arraySerie = [];
-                                    yaxis       = [];
-                                    xaxis       = [];
-                                    zMinMax     = [];
-                                    nmPrincipal ='';
+                            //         me.setLoading(false);
+                            //         arraySerie = [];
+                            //         yaxis       = [];
+                            //         xaxis       = [];
+                            //         zMinMax     = [];
+                            //         nmPrincipal ='';
 
-                                    me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal)
+                            //         me.buildChartContainer(el,arraySerie,yaxis,xaxis,zMinMax,nmPrincipal);
 
-                                    new Noty({
-                                        theme: 'relax',
-                                        layout: 'bottomRight',
-                                        type: 'error',
-                                        closeWith: [],
-                                        text: 'Erro sistema: '+ result.message.substr(0,20)
-                                    }).show();
-                                }
-                            });
+                            //         new Noty({
+                            //             theme: 'relax',
+                            //             layout: 'bottomRight',
+                            //             type: 'error',
+                            //             closeWith: [],
+                            //             text: 'Erro sistema: '+ result.message.substr(0,20)
+                            //         }).show();
+                            //     }
+                            // });
 
                         }
                     }
