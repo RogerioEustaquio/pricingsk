@@ -916,7 +916,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
 
                                 var indicadoresAdd = me.up('panel').up('container').down('#analisemarcatoolbar').indicadoresAdd;
 
-                                elementCombo = Ext.create('Ext.form.field.Tag',{
+                                elementCombo = Ext.create('Ext.form.field.ComboBox',{
                                     multiSelect: false,
                                     width: 100,
                                     name: 'cb'+record.name,
@@ -936,7 +936,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                     queryParam: 'tipo',
                                     queryMode: 'local',
                                     displayField: 'name',
-                                    displayTpl: Ext.create('Ext.XTemplate','<tpl for=".">','<b>{tipo}</b>','</tpl>'),
+                                    // displayTpl: Ext.create('Ext.XTemplate','<tpl for=".">','<b>{tipo}</b>','</tpl>'),
                                     valueField: 'tipo',
                                     fieldLabel: '',
                                     margin: '2 2 2 2',
