@@ -12,7 +12,8 @@ Ext.define('App.controller.ApplicationController', {
         'App.view.analisegrafica.AnalisegraficaPanel',
         'App.view.analisemarca.AnalisemarcaPanel',
         'App.view.acompanhamentovenda.AcompanhaVendaPanel',
-        'App.view.faixamargem.FaixaMargemPanel'
+        'App.view.faixamargem.FaixaMargemPanel',
+        'App.view.analiseperformance.AnalisePerformancePanel'
     ],
 
     control: {
@@ -29,7 +30,8 @@ Ext.define('App.controller.ApplicationController', {
         'analisegrafica': { action: 'analisegraficaAction' },
         'analisemarca': { action: 'analisemarcaAction' },
         'acompanhavenda': { action: 'acompanhavendaAction' },
-        'faixamargem': { action: 'faixamargemAction' }
+        'faixamargem': { action: 'faixamargemAction' },
+        'analiseperformance': { action: 'analiseperformanceAction' }
     },
 
     controllerEvent: function(){
@@ -93,6 +95,10 @@ Ext.define('App.controller.ApplicationController', {
 
     faixamargemAction: function(){
         this.goActionMasterTab('faixamargem', true)
+    },
+
+    analiseperformanceAction: function(){
+        this.goActionMasterTab('analiseperformance', true)
     },
 
     configViewport: function(){

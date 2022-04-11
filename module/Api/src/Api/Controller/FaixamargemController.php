@@ -107,9 +107,9 @@ class FaixamargemController extends AbstractRestfulController
 
     public function faixamargemAction()
     {
-        $data = array();
+        $data   = array();
         $margem = array();
-        $filiais = array();
+        $filiais= array();
         
         try {
 

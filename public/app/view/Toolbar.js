@@ -56,13 +56,13 @@ Ext.define('App.view.Toolbar', {
                         window.document.location= BASEURL +'/#grupodesconto';
                     }
                 },
-                {
-                    xtype: 'button',
-                    text: 'Análise Gráfica',
-                    handler: function(){
-                        window.document.location= BASEURL +'/#analisegrafica';
-                    }
-                },
+                // {
+                //     xtype: 'button',
+                //     text: 'Análise Gráfica',
+                //     handler: function(){
+                //         window.document.location= BASEURL +'/#analisegrafica';
+                //     }
+                // },
                 {
                     xtype: 'button',
                     text: 'Análise Marca',
@@ -83,7 +83,14 @@ Ext.define('App.view.Toolbar', {
                     handler: function(){
                         window.document.location= BASEURL +'/#faixamargem';
                     }
-                }
+                },
+                // {
+                //     xtype: 'button',
+                //     text: 'Análise Performance',
+                //     handler: function(){
+                //         window.document.location= BASEURL +'/#analiseperformance';
+                //     }
+                // }
             ]
         });
 

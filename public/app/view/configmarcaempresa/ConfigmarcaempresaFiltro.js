@@ -126,7 +126,6 @@ Ext.define('App.view.configmarcaempresa.ConfigmarcaempresaFiltro',{
                 '{idProduto}',
                 '</tpl>'), 
             valueField: 'idProduto',
-            // emptyText: 'Produto',
             fieldLabel: 'Código Produto',
             emptyText: 'Código Produto',
             // matchFieldWidth: false,
