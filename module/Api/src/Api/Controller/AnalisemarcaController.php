@@ -565,8 +565,46 @@ class AnalisemarcaController extends AbstractRestfulController
         
         return $this->getCallbackModel();
     }
-    
-    public function faixacusto($idEmpresas,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto)
+
+    public function listarcategoriaAction()
+    {
+        $data = array();
+        
+        try {
+
+            $em = $this->getEntityManager();
+
+            $sql = "select distinct categoria
+                        from vw_skproduto_categoria
+                    order by categoria";
+  
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+    public function faixacusto($idEmpresas,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto,$categoria)
     {
         $data1 = array();
 
@@ -587,6 +625,12 @@ class AnalisemarcaController extends AbstractRestfulController
 
         if($codProdutos){
             $andSql .= " and i.cod_produto in ('$codProdutos')";
+        }
+
+        if($categoria){
+            $andSql .= " and i.cod_produto in (select cod_produto
+                                                 from vw_skproduto_categoria
+                                               where categoria in ('$categoria'))";
         }
 
         $qtdemeses = !$qtdemeses ? 12: $qtdemeses;
@@ -743,7 +787,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayFaixaCusto;
     }
     
-    public function estoquemes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function estoquemes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto,$categoria)
     {
         $data1 = array();
 
@@ -779,6 +823,12 @@ class AnalisemarcaController extends AbstractRestfulController
                 }
             }
 
+        }
+
+        if($categoria){
+            $andSql .= " and a.cod_produto in (select cod_produto
+                                                 from vw_skproduto_categoria
+                                               where categoria in ('$categoria'))";
         }
         
         if($idMarcas){
@@ -956,7 +1006,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayEstoqueMes;
     }
 
-    public function clientemes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function clientemes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto,$categoria)
     {
         $data1 = array();
 
@@ -1001,6 +1051,14 @@ class AnalisemarcaController extends AbstractRestfulController
                 }
             }
         }
+
+        if($categoria){
+            $andSql .= " and cod_produto in (select cod_produto
+                                                 from vw_skproduto_categoria
+                                               where categoria in ('$categoria'))";
+        }
+
+
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
             $andSql .= " and marca $inmarca in (select descricao_marca from vw_skmarca m where m.cod_marca in ($idMarcas))";
@@ -1133,8 +1191,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     and a.data = c.data
                     group by '01'||to_char(a.data,'/mm/yyyy')
                     order by data asc";
-// print" $sql";
-// exit;
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll();
@@ -1190,7 +1246,7 @@ class AnalisemarcaController extends AbstractRestfulController
         return $arrayClienteMes;
     }
 
-    public function indicesmes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto)
+    public function indicesmes($emp,$data,$qtdemeses,$curvas,$codNbs,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto,$categoria)
     {
         $data1 = array();
 
@@ -1250,6 +1306,17 @@ class AnalisemarcaController extends AbstractRestfulController
                 }
             }
         }
+
+        if($categoria){
+            $andSql .= " and a.cod_produto in (select cod_produto
+                                                 from vw_skproduto_categoria
+                                               where categoria in ('$categoria'))";
+
+            $andSql2 .= " and COD_PRODUTO in (select cod_produto
+                                                    from vw_skproduto_categoria
+                                                where categoria in ('$categoria'))";
+        }
+
         $andSqlmarca = '';
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
@@ -1417,8 +1484,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     and a.data >= '01012022'
                     group by data
                     order by data";
-                    // print "$sql";
-                    // exit;
             
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -1542,6 +1607,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $notmontadora   = $this->params()->fromPost('notmontadora',null);
             $cesta          = $this->params()->fromPost('cesta',null);
             $especialproduto= $this->params()->fromPost('especialproduto',null);
+            $categoria      = $this->params()->fromPost('categoria',null);
             $indicadoresAdd = $this->params()->fromPost('indicadoresAdd',null);
                                     
             $meses = [null,
@@ -1565,6 +1631,7 @@ class AnalisemarcaController extends AbstractRestfulController
             $indicadoresAdd = json_decode($indicadoresAdd);
             $cesta          = json_decode($cesta);
             $especialproduto= json_decode($especialproduto);
+            
             if($emp){
                 $emp =  implode("','",json_decode($emp));
             }
@@ -1588,6 +1655,10 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($curvas){
                 $curvas = implode("','",json_decode($curvas));
+            }
+
+            if($categoria){
+                $categoria = implode("','",json_decode($categoria));
             }
             
             if($especialproduto){
@@ -1713,6 +1784,12 @@ class AnalisemarcaController extends AbstractRestfulController
                 }else{
                     $andSql .= " and i.cod_produto in ($codProdutos)";
                 }
+            }
+
+            if($categoria){
+                $andSql .= " and i.cod_produto in (select cod_produto
+                                                     from vw_skproduto_categoria
+                                                   where categoria in ('$categoria'))";
             }
             
             if($data){
@@ -1874,7 +1951,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaFaixaCusto){
 
-                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto);
+                $FaixaCusto = $this->faixacusto($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$montadora,$notmontadora,$cesta,$especialproduto,$categoria);
                 $FxCusto  = $FaixaCusto[0];
                 $FxCusto2  = $FaixaCusto[1];
             }
@@ -1887,7 +1964,7 @@ class AnalisemarcaController extends AbstractRestfulController
             
             if($consultaEstoque){
 
-                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
+                $estoqueMes = $this->estoquemes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto,$categoria);
                 $estoque            = $estoqueMes[0];
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
@@ -1900,7 +1977,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaCliente){
 
-                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
+                $clienteMes = $this->clientemes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto,$categoria);
                 $cc         = $clienteMes[0];
                 $nf         = $clienteMes[1];
                 $tkm        = $clienteMes[2];
@@ -1911,7 +1988,7 @@ class AnalisemarcaController extends AbstractRestfulController
 
             if($consultaIndices){
 
-                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto);
+                $idxMes = $this->indicesmes($emp,$data,$qtdemeses,$curvas,$produtos,$codProdutos,$idMarcas,$notmarca,$montadora,$notmontadora,$cesta,$especialproduto,$categoria);
                 $idxestoque         = $idxMes[0];
                 $idxcompra          = $idxMes[1];
             }

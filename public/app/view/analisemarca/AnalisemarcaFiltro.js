@@ -446,7 +446,6 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
         //     }
         // });
 
-        
         var elTagespecial = Ext.create('Ext.form.field.Tag',{
             name: 'elespecialproduto',
             itemId: 'elespecialproduto',
@@ -488,6 +487,43 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
             }
         );
 
+        var elTagCategoria = Ext.create('Ext.form.field.Tag',{
+            name: 'elcategoria',
+            itemId: 'elcategoria',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'categoria', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listarcategoria',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'categoria',
+            queryMode: 'local',
+            displayField: 'categoria',
+            valueField: 'categoria',
+            emptyText: 'Categoria',
+            fieldLabel: 'Categorias',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTagCategoria.store.load(
+            function(){
+                elTagCategoria.setDisabled(false);
+            }
+        );
 
         Ext.applyIf(me, {
 
@@ -660,6 +696,7 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    hidden: true,
                     items:[
                         elTagCesta,
                         {
@@ -677,8 +714,26 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                     xtype: 'panel',
                     layout: 'hbox',
                     border: false,
+                    hidden: true,
                     items:[
                         elTagespecial,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },,
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagCategoria,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',
@@ -707,6 +762,9 @@ Ext.define('App.view.analisemarca.AnalisemarcaFiltro',{
                                 form.up('toolbar').up('panel').down('tagfield[name=eltagidproduto]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=elProduto]').setValue(null);
                                 form.up('toolbar').up('panel').down('tagfield[name=elMarca]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=elcesta]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=elespecialproduto]').setValue(null);
+                                form.up('toolbar').up('panel').down('tagfield[name=elcategoria]').setValue(null);
                                 
                             }
                         }

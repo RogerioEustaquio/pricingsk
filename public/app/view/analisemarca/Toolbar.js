@@ -207,6 +207,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
         var notmontadora    = me.up('container').down('#analisemarcafiltro').down('#notmontadora').checked;
         var cesta           = me.up('container').down('#analisemarcafiltro').down('#elcesta').getValue();
         var especialproduto = me.up('container').down('#analisemarcafiltro').down('#elespecialproduto').getValue();
+        var categoria       = me.up('container').down('#analisemarcafiltro').down('#elcategoria').getValue();
 
         if(especialproduto.length > 0 && cesta.length > 0){
             alert('Informar no filtro somente Cesta de produto ou Seleção especial de produto!');
@@ -240,6 +241,7 @@ Ext.define('App.view.analisemarca.Toolbar',{
             notmontadora : notmontadora,
             cesta : Ext.encode(cesta),
             especialproduto: Ext.encode(especialproduto),
+            categoria: Ext.encode(categoria),
             indicadoresAdd: Ext.encode(me.indicadoresAdd)
         };
 
