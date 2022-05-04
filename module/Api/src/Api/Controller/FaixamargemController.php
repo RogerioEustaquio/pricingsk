@@ -160,8 +160,8 @@ class FaixamargemController extends AbstractRestfulController
              "round(count(distinct nf),0)"
             ];
 
-            $x = empty($x) ? 0 : $x;
-            $y = !$y && $y != '0' ? 1 : $y;
+            $x = empty($x) ? 1 : $x;
+            $y = !$y && $y != '0' ? 2 : $y;
             $z = empty($v) ? 0 : $v;
             $v = !$v ? 'rol' : $dataZ[$v];
 
@@ -246,7 +246,7 @@ class FaixamargemController extends AbstractRestfulController
                                                WHEN mb > 5 AND mb <= 10 THEN 2
                                                WHEN mb > 10 AND mb <= 15 THEN 3
                                                WHEN mb > 15 AND mb <= 20 THEN 4
-                                               WHEN mb > 20 AND mb <= 15 THEN 5
+                                               WHEN mb > 20 AND mb <= 25 THEN 5
                                                WHEN mb > 25 AND mb <= 30 THEN 6
                                                WHEN mb > 30 AND mb <= 35 THEN 7
                                                WHEN mb > 35 THEN 8 END) AS fx_mb_o
@@ -254,7 +254,7 @@ class FaixamargemController extends AbstractRestfulController
                                                WHEN mb > 5 AND mb <= 10 THEN '6-10'
                                                WHEN mb > 10 AND mb <= 15 THEN '11-15'
                                                WHEN mb > 15 AND mb <= 20 THEN '16-20'
-                                               WHEN mb > 20 AND mb <= 15 THEN '21-15'
+                                               WHEN mb > 20 AND mb <= 25 THEN '21-25'
                                                WHEN mb > 25 AND mb <= 30 THEN '26-30'
                                                WHEN mb > 30 AND mb <= 35 THEN '31-35'
                                                WHEN mb > 35 THEN '36-x' END) AS fx_mb_v
@@ -305,7 +305,7 @@ class FaixamargemController extends AbstractRestfulController
                                                WHEN mb > 5 AND mb <= 10 THEN '6-10'
                                                WHEN mb > 10 AND mb <= 15 THEN '11-15'
                                                WHEN mb > 15 AND mb <= 20 THEN '16-20'
-                                               WHEN mb > 20 AND mb <= 15 THEN '21-15'
+                                               WHEN mb > 20 AND mb <= 25 THEN '21-25'
                                                WHEN mb > 25 AND mb <= 30 THEN '26-30'
                                                WHEN mb > 30 AND mb <= 35 THEN '31-35'
                                                WHEN mb > 35 THEN '36-x' END) AS fx_mb_v
