@@ -160,7 +160,7 @@ class FaixamargemController extends AbstractRestfulController
              "round(count(distinct nf),0)"
             ];
 
-            $x = empty($x) ? 1 : $x;
+            $x = empty($x) && $x != '0' ? 1 : $x;
             $y = !$y && $y != '0' ? 2 : $y;
             $z = empty($v) ? 0 : $v;
             $v = !$v ? 'rol' : $dataZ[$v];
@@ -228,15 +228,22 @@ class FaixamargemController extends AbstractRestfulController
                                                        where categoria in ('$categoria'))";
                 }
 
-                $valorOrder = '';
-                $orderBy = 'ORDER BY 1 DESC';
-                if($dataXy[$y] == 'fx_mb_v' ){
-                    $orderBy = 'ORDER BY fx_mb_o DESC';
-                    $valorOrder = ',fx_mb_o';
+                $paramOrderY = $dataXy[$y];
+                $paramOrderX = $dataXy[$x];
+
+                if($paramOrderY  == 'fx_mb_v' ){
+                    $paramOrderY = 'fx_mb_o';
                 }
 
+                if($paramOrderX == 'fx_mb_v' ){
+                    $paramOrderX = 'fx_mb_o';
+                }
+
+                $orderY = "ORDER BY $paramOrderY DESC";
+                $orderXY = "ORDER BY $paramOrderX , $paramOrderY DESC";
+
                 $sql1 = "select $dataXy[$y] AS y
-                                $valorOrder
+                                ,$paramOrderY
                             FROM (select 'REDE' as rede 
                                         ,emp
                                         ,mb
@@ -277,8 +284,8 @@ class FaixamargemController extends AbstractRestfulController
                                             GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
                                     )
                             GROUP BY $dataXy[$y]
-                                     $valorOrder
-                            $orderBy";
+                                     ,$paramOrderY
+                            $orderY";
                             
                 $stmt = $conn->prepare($sql1);
                 $stmt->execute();
@@ -293,6 +300,8 @@ class FaixamargemController extends AbstractRestfulController
                 $sql = "select $dataXy[$x] as x
                                 ,$dataXy[$y] as y
                                 ,$dataZcol[$z] as z
+                                ,$paramOrderY
+                                ,$paramOrderX
                         from  (select   'REDE' as rede
                                         ,emp
                                         ,mb
@@ -301,6 +310,14 @@ class FaixamargemController extends AbstractRestfulController
                                         ,lb
                                         ,nf
                                         ,cc
+                                        ,(CASE WHEN mb <= 5 THEN 1
+                                               WHEN mb > 5 AND mb <= 10 THEN 2
+                                               WHEN mb > 10 AND mb <= 15 THEN 3
+                                               WHEN mb > 15 AND mb <= 20 THEN 4
+                                               WHEN mb > 20 AND mb <= 25 THEN 5
+                                               WHEN mb > 25 AND mb <= 30 THEN 6
+                                               WHEN mb > 30 AND mb <= 35 THEN 7
+                                               WHEN mb > 35 THEN 8 END) AS fx_mb_o
                                         ,(CASE WHEN mb <= 5 THEN '0-5' 
                                                WHEN mb > 5 AND mb <= 10 THEN '6-10'
                                                WHEN mb > 10 AND mb <= 15 THEN '11-15'
@@ -329,8 +346,10 @@ class FaixamargemController extends AbstractRestfulController
                                 ) a
                                 group by $dataXy[$x]
                                         ,$dataXy[$y]
-                            order by 1, 2 desc";
-                        
+                                        ,$paramOrderX
+                                        ,$paramOrderY
+                                $orderXY";
+                
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
                 $results = $stmt->fetchAll();
