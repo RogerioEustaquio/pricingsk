@@ -125,6 +125,7 @@ class FaixamargemController extends AbstractRestfulController
             $categoria  = $this->params()->fromPost('categoria',null);
 
             $dataXy = [
+                "rede", 
                 "emp", //Filial
                 "mb", //Margem
                 "fx_mb_v", //Faixa Margem
@@ -227,19 +228,36 @@ class FaixamargemController extends AbstractRestfulController
                                                        where categoria in ('$categoria'))";
                 }
 
+                $valorOrder = '';
+                $orderBy = 'ORDER BY 1 DESC';
+                if($dataXy[$y] == 'fx_mb_v' ){
+                    $orderBy = 'ORDER BY fx_mb_o DESC';
+                    $valorOrder = ',fx_mb_o';
+                }
+
                 $sql1 = "select $dataXy[$y] AS y
-                            FROM (select emp
+                                $valorOrder
+                            FROM (select 'REDE' as rede 
+                                        ,emp
                                         ,mb
                                         ,qtd
                                         ,rol
-                                        ,(CASE WHEN mb <= 15 THEN 1 
-                                            WHEN mb > 15 AND mb <= 20 THEN 2
-                                            WHEN mb > 20 AND mb <= 29 THEN 3
-                                            WHEN mb >= 30 THEN 4 END) fx_mb_o
-                                        ,(CASE WHEN mb <= 15 THEN '0-15' 
-                                            WHEN mb > 15 AND mb <= 20 THEN '16-20'
-                                            WHEN mb > 20 AND mb <= 29 THEN '21-29'
-                                            WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v
+                                        ,(CASE WHEN mb <= 5 THEN 1
+                                               WHEN mb > 5 AND mb <= 10 THEN 2
+                                               WHEN mb > 10 AND mb <= 15 THEN 3
+                                               WHEN mb > 15 AND mb <= 20 THEN 4
+                                               WHEN mb > 20 AND mb <= 15 THEN 5
+                                               WHEN mb > 25 AND mb <= 30 THEN 6
+                                               WHEN mb > 30 AND mb <= 35 THEN 7
+                                               WHEN mb > 35 THEN 8 END) AS fx_mb_o
+                                        ,(CASE WHEN mb <= 5 THEN '0-5' 
+                                               WHEN mb > 5 AND mb <= 10 THEN '6-10'
+                                               WHEN mb > 10 AND mb <= 15 THEN '11-15'
+                                               WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                               WHEN mb > 20 AND mb <= 15 THEN '21-15'
+                                               WHEN mb > 25 AND mb <= 30 THEN '26-30'
+                                               WHEN mb > 30 AND mb <= 35 THEN '31-35'
+                                               WHEN mb > 35 THEN '36-x' END) AS fx_mb_v
                                     FROM (SELECT TRUNC(a.data,'MM') AS data
                                                     ,a.emp 
                                                     ,a.cod_produto
@@ -259,7 +277,8 @@ class FaixamargemController extends AbstractRestfulController
                                             GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
                                     )
                             GROUP BY $dataXy[$y]
-                            ORDER BY 1 DESC";
+                                     $valorOrder
+                            $orderBy";
                             
                 $stmt = $conn->prepare($sql1);
                 $stmt->execute();
@@ -274,21 +293,22 @@ class FaixamargemController extends AbstractRestfulController
                 $sql = "select $dataXy[$x] as x
                                 ,$dataXy[$y] as y
                                 ,$dataZcol[$z] as z
-                        from  (select emp
+                        from  (select   'REDE' as rede
+                                        ,emp
                                         ,mb
                                         ,rol
                                         ,qtd
                                         ,lb
                                         ,nf
                                         ,cc
-                                        ,(CASE WHEN mb <= 15 THEN 1 
-                                            WHEN mb > 15 AND mb <= 20 THEN 2
-                                            WHEN mb > 20 AND mb <= 29 THEN 3
-                                            WHEN mb >= 30 THEN 4 END) fx_mb_o
-                                        ,(CASE WHEN mb <= 15 THEN '0-15' 
-                                            WHEN mb > 15 AND mb <= 20 THEN '16-20'
-                                            WHEN mb > 20 AND mb <= 29 THEN '21-29'
-                                            WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v
+                                        ,(CASE WHEN mb <= 5 THEN '0-5' 
+                                               WHEN mb > 5 AND mb <= 10 THEN '6-10'
+                                               WHEN mb > 10 AND mb <= 15 THEN '11-15'
+                                               WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                               WHEN mb > 20 AND mb <= 15 THEN '21-15'
+                                               WHEN mb > 25 AND mb <= 30 THEN '26-30'
+                                               WHEN mb > 30 AND mb <= 35 THEN '31-35'
+                                               WHEN mb > 35 THEN '36-x' END) AS fx_mb_v
                                 FROM (SELECT TRUNC(a.data,'MM') AS data
                                              ,a.emp
                                              ,a.cod_produto
