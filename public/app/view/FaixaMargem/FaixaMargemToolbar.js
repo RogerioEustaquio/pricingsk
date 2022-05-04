@@ -108,29 +108,25 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
         var utilFormat = Ext.create('Ext.ux.util.Format');
         var faixamargemfiltro = me.up('container').down('#faixamargemfiltro');
 
-        // var valorprincipal  = faixamargemfiltro.down('radiofield[name=valorprincipal]').getValue();
-        var checkRol        = faixamargemfiltro.down('radiofield[inputValue=ROL]').checked;
-        var checkQtde       = faixamargemfiltro.down('radiofield[inputValue=QTDE]').checked;
-        var checkLb       = faixamargemfiltro.down('radiofield[inputValue=LB]').checked;
+        var valorprincipal  = faixamargemfiltro.down('combobox[name=valorprincipal]').getValue();
+        var x               = faixamargemfiltro.down('combobox[name=x]').getValue();
+        var y               = faixamargemfiltro.down('combobox[name=y]').getValue();
         var codEmpresa      = faixamargemfiltro.down('#elEmp').getValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
         var dataInicio      = faixamargemfiltro.down('#datainicio').getRawValue();
         var dataFinal       = faixamargemfiltro.down('#datafinal').getRawValue();
 
-        // var notMarca        = faixamargemfiltro.down('#notmarca').value;
         var idMarcas        = faixamargemfiltro.down('#elMarca').getValue();
         var produtos        = faixamargemfiltro.down('#elProduto').getValue();
         var idProduto       = faixamargemfiltro.down('#eltagidproduto').getValue();
+        var categoria       = faixamargemfiltro.down('#elcategoria').getValue();
 
-        var valorprincipal= 'rol';
-        if(checkQtde){
-            valorprincipal= 'qtde';
-        }
-        if(checkLb){
-            valorprincipal= 'lb';
-        }
+        // if (valorprincipal)
+        //     valorprincipal =valorprincipal.toLowerCase();
 
         var params = {
+            x: x,
+            y: y,
             valorprincipal: valorprincipal,
             codEmpresa: Ext.encode(codEmpresa),
             dataInicio: dataInicio,
@@ -138,7 +134,8 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
             // notMarca: notMarca,
             idMarcas: Ext.encode(idMarcas),
             produtos: Ext.encode(produtos),
-            idProduto: Ext.encode(idProduto)
+            idProduto: Ext.encode(idProduto),
+            categoria: Ext.encode(categoria)
         };
 
         var charts = me.up('panel').down('#chartsfaixamargem');
@@ -169,10 +166,18 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                 // charts.chart.hideLoading();
                 if(result.success){
                     nmPrincipal = result.nmPrincipal;
+                    valorFormat = result.valorFormat;
                     xaxis       = result.xCategories;
                     yaxis       = result.yCategories;
-                    zMinMax       = result.zMinMax;
+                    zMinMax     = result.zMinMax;
                     arraySerie  = result.data;
+
+                    var textY = faixamargemfiltro.down('combobox[name=y]').rawValue;
+                    if(!textY)
+                        textY = 'Margem';
+                    var textX = faixamargemfiltro.down('combobox[name=x]').rawValue;
+                    if(!textX)
+                        textX = 'Filial';
 
                     var extraUpdate = {
                         // colorAxis: {
@@ -184,12 +189,13 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                             ],
                             min : Number(zMinMax[0]),
                             max : Number(zMinMax[1]),
-                            labels: {
-                                formatter: function () {
-                                    return utilFormat.Value2(this.value,0);
-                                }
-                            },
+                            // labels: {
+                            //     formatter: function () {
+                            //         return utilFormat.Value2(this.value,0);
+                            //     }
+                            // },
                             tickPositioner: function () {
+
                                 var positions = [],
                                     min = Number(zMinMax[0]),
                                     max = Number(zMinMax[1]);
@@ -200,7 +206,12 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                                     n3 =  Number(min + (med*2)),
                                     n4 =  Number(min + (med*3)),
                                     n5 =  Number(min + (med*4));
-            
+
+                                n2 = Number(parseFloat(n2).toFixed(valorFormat));
+                                n3 = Number(parseFloat(n3).toFixed(valorFormat));
+                                n4 = Number(parseFloat(n4).toFixed(valorFormat));
+                                n5 = Number(parseFloat(n5).toFixed(valorFormat));
+
                                 positions.push(max);
                                 positions.push(n5);
                                 positions.push(n4);
@@ -214,16 +225,30 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                     }
 
                     charts.chart.addColorAxis(extraUpdate);
-                    charts.chart.colorAxis[0].update(extraUpdate);
-                    setTimeout(function(){
-                        charts.chart.redraw();
-                    },200);
+                    charts.chart.colorAxis[0].update(extraUpdate,false);
+                    // charts.chart.redraw();
+                    // setTimeout(function(){
+                    //     charts.chart.redraw();
+                    // },200);
 
                     charts.chart.xAxis[0].setCategories(xaxis);
                     charts.chart.yAxis[0].setCategories(yaxis);
+                    charts.chart.yAxis[0].update(
+                        {
+                            title: {
+                                text: textY
+                            }
+                        }
+                    ,false);
+                    charts.chart.xAxis[0].update(
+                        {
+                            title: {
+                                text: textX
+                            }
+                        }
+                    ,false);
 
                     var vSerie = {
-                        nmPrincipal: nmPrincipal,
                         borderWidth: 0,
                         data: arraySerie,
                         dataLabels: {
@@ -233,12 +258,15 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                                 textOutline: 'none'
                             },
                             color: '#000000'
-                        }
+                        },
+                        nmPrincipal: nmPrincipal,
+                        valorFormat: valorFormat,
                     };
                     charts.chart.addSeries(vSerie);
-                    setTimeout(function(){
-                        charts.chart.redraw();
-                    },250);
+                    // setTimeout(function(){
+                    //     charts.chart.redraw();
+                    // },250);
+                    charts.chart.redraw();
 
                 }else{
                     arraySerie = [];
@@ -275,7 +303,7 @@ Ext.define('App.view.faixamargem.FaixaMargemToolbar',{
                     }]
                 };
 
-                charts.chart.update(extraUpdate);
+                charts.chart.update(extraUpdate,false);
 
                 new Noty({
                     theme: 'relax',

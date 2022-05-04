@@ -5,6 +5,7 @@ Ext.define('App.view.analiseperformance.AnalisePerformancePanel', {
     height: Ext.getBody().getHeight() * 0.9,
     width: Ext.getBody().getWidth() * 0.9,
     requires: [
+        'App.view.analiseperformance.TabExplore',
         'App.view.analiseperformance.TabFilial',
         'App.view.analiseperformance.TabMarca',
         'App.view.analiseperformance.TabCategoria'
@@ -25,7 +26,7 @@ Ext.define('App.view.analiseperformance.AnalisePerformancePanel', {
                     region: 'center',
                     items:[
                         {
-                            xtype: 'tabfilial'
+                            xtype: 'tabexplore'
                         },
                         {
                             xtype: 'tabmarca'

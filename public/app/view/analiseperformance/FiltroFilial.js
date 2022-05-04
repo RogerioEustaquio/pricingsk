@@ -1,7 +1,7 @@
-Ext.define('App.view.rpe.FiltroFilialPosicionamento',{
+Ext.define('App.view.analiseperformance.FiltroFilial',{
     extend: 'Ext.panel.Panel',
-    xtype: 'filtrofilialposicionamento',
-    itemId: 'filtrofilialposicionamento',
+    xtype: 'filtrofilial',
+    itemId: 'filtrofilial',
     title: 'Filtro',
     region: 'west',
     width: 220,
@@ -44,46 +44,46 @@ Ext.define('App.view.rpe.FiltroFilialPosicionamento',{
             // value: sysdate
         });
 
-        var elTagMarca = Ext.create('Ext.form.field.Tag',{
-            name: 'filialelmarca',
-            itemId: 'filialelmarca',
-            multiSelect: true,
-            labelAlign: 'top',
-            width: 180,
-            store: Ext.data.Store({
-                fields: [
-                    { name: 'marca', type: 'string' },
-                    { name: 'idMarca', type: 'string' }
-                ],
-                proxy: {
-                    type: 'ajax',
-                    url: BASEURL + '/api/filialposicionamento/listarmarca',
-                    timeout: 120000,
-                    reader: {
-                        type: 'json',
-                        root: 'data'
-                    }
-                }
-            }),
-            queryParam: 'marca',
-            queryMode: 'local',
-            displayField: 'marca',
-            valueField: 'idMarca',
-            emptyText: 'Marca',
-            fieldLabel: 'Marcas',
-            // labelWidth: 60,
-            margin: '1 1 1 1',
-            // padding: 1,
-            plugins:'dragdroptag',
-            filterPickList: true,
-            publishes: 'value',
-            disabled: true
-        });
-        elTagMarca.store.load(
-            function(){
-                elTagMarca.setDisabled(false);
-            }
-        );
+        // var elTagMarca = Ext.create('Ext.form.field.Tag',{
+        //     name: 'filialelmarca',
+        //     itemId: 'filialelmarca',
+        //     multiSelect: true,
+        //     labelAlign: 'top',
+        //     width: 180,
+        //     store: Ext.data.Store({
+        //         fields: [
+        //             { name: 'marca', type: 'string' },
+        //             { name: 'idMarca', type: 'string' }
+        //         ],
+        //         proxy: {
+        //             type: 'ajax',
+        //             url: BASEURL + '/api/filialposicionamento/listarmarca',
+        //             timeout: 120000,
+        //             reader: {
+        //                 type: 'json',
+        //                 root: 'data'
+        //             }
+        //         }
+        //     }),
+        //     queryParam: 'marca',
+        //     queryMode: 'local',
+        //     displayField: 'marca',
+        //     valueField: 'idMarca',
+        //     emptyText: 'Marca',
+        //     fieldLabel: 'Marcas',
+        //     // labelWidth: 60,
+        //     margin: '1 1 1 1',
+        //     // padding: 1,
+        //     plugins:'dragdroptag',
+        //     filterPickList: true,
+        //     publishes: 'value',
+        //     disabled: true
+        // });
+        // elTagMarca.store.load(
+        //     function(){
+        //         elTagMarca.setDisabled(false);
+        //     }
+        // );
 
 
         Ext.applyIf(me, {
@@ -123,23 +123,23 @@ Ext.define('App.view.rpe.FiltroFilialPosicionamento',{
                         }
                     ]
                 },
-                {
-                    xtype: 'panel',
-                    layout: 'hbox',
-                    border: false,
-                    items:[
-                        elTagMarca,
-                        {
-                            xtype: 'button',
-                            iconCls: 'fa fa-file',
-                            tooltip: 'Limpar',
-                            margin: '26 1 1 1',
-                            handler: function(form) {
-                                form.up('panel').down('tagfield').setValue(null);
-                            }
-                        }
-                    ]
-                },
+                // {
+                //     xtype: 'panel',
+                //     layout: 'hbox',
+                //     border: false,
+                //     items:[
+                //         elTagMarca,
+                //         {
+                //             xtype: 'button',
+                //             iconCls: 'fa fa-file',
+                //             tooltip: 'Limpar',
+                //             margin: '26 1 1 1',
+                //             handler: function(form) {
+                //                 form.up('panel').down('tagfield').setValue(null);
+                //             }
+                //         }
+                //     ]
+                // },
                 {
                     xtype: 'toolbar',
                     width: '100%',

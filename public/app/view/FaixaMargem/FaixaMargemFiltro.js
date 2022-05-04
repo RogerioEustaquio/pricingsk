@@ -14,55 +14,132 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
     initComponent: function() {
         var me = this;
 
-        var valorPrincipal = Ext.create('Ext.form.FieldSet',{
+        var dataXy = [
+            {"id":0, "name":"Filial"},
+            {"id":1, "name":"Margem"},
+            {"id":2, "name":"Faixa Margem"},
+            // {"id":3, "name":"Faixa Faturamento"},
+            // {"id":4, "name":"Pareto Faturamento"}
+        ];
 
-            // layout: 'hbox',
-            layout: {
-                type: 'table',
-                columns: 2,
-                tableAttrs: {
-                    style: {
-                        width: '100%'
-                    }
-                }
-            },
-            hidden: false,
+       var dataValor = [
+            {"id":0,"valor":"ROL"},
+            {"id":1,"valor":"MB"},
+            {"id":2,"valor":"QTD"},
+            {"id":3,"valor":"LB"},
+            {"id":4,"valor":"CC"},
+            {"id":5,"valor":"NF"}
+        ];
+
+        var valorY = Ext.create('Ext.form.field.ComboBox',{
+            multiSelect: false,
+            width: 100,
+            name: 'y',
+            itemId: 'y',
+            labelAlign: 'top',
+            emptyText: 'Y',
+            fieldLabel: 'Y',
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'name', type: 'string' }
+                ],
+                data: dataXy
+            }),
+            queryParam: 'name',
+            queryMode: 'local',
+            displayField: 'name',
+            // displayTpl: Ext.create('Ext.XTemplate','<tpl for=".">','<b>{tipo}</b>','</tpl>'),
+            valueField: 'id',
             width: 230,
             margin: '1 1 1 8',
-            title: 'Valor Principal',
-            items:[
-                {
-                    xtype: 'radiofield',
-                    checked: true,
-                    name : 'valorprincipal',
-                    inputValue: 'ROL',
-                    boxLabel: 'ROL',
-                    labelTextAlign: 'right',
-                    labelWidth: 24,
-                    width: 80,
-                    margin: '1 1 1 8'
-                },
-                {
-                    xtype: 'radiofield',
-                    name : 'valorprincipal',
-                    inputValue: 'QTDE',
-                    boxLabel: 'QTD',
-                    labelTextAlign: 'right',
-                    labelWidth: 24,
-                    width: 100,
-                    // margin: '1 1 1 8',
-                },
-                {
-                    xtype: 'radiofield',
-                    name : 'valorprincipal',
-                    inputValue: 'LB',
-                    boxLabel: 'LB',
-                    labelTextAlign: 'right',
-                    labelWidth: 24,
-                    width: 100,
-                    margin: '1 1 1 8'
+            filterPickList: true,
+            publishes: 'value',
+            disabled: false,
+            // value: me.showType[recordSeries.index] == 'line'? null : me.showType[recordSeries.index],
+            listeners : {
+                select : function(record,index){
+
+                    var array = [];
+                    for (let i = 0; i < dataXy.length; i++) {
+                        const element = dataXy[i];
+
+                        if(index.data.name != dataXy[i].name)
+                            array.push(element);
+                        
+                    }
+                    this.up('panel').up('panel').down('#x').store.setData(array);
                 }
-            ]
+            }
+        });
+        
+        var valorX = Ext.create('Ext.form.field.ComboBox',{
+            multiSelect: false,
+            width: 100,
+            name: 'x',
+            itemId: 'x',
+            labelAlign: 'top',
+            emptyText: 'X',
+            fieldLabel: 'X',
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'name', type: 'string' }
+                ],
+                data: dataXy
+            }),
+            queryParam: 'name',
+            queryMode: 'local',
+            displayField: 'name',
+            // displayTpl: Ext.create('Ext.XTemplate','<tpl for=".">','<b>{tipo}</b>','</tpl>'),
+            valueField: 'id',
+            width: 230,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: false,
+            // value: me.showType[recordSeries.index] == 'line'? null : me.showType[recordSeries.index],
+            listeners : {
+                select : function(record,index){
+
+                    var array = [];
+                    for (let i = 0; i < dataXy.length; i++) {
+                        const element = dataXy[i];
+
+                        if(index.data.name != dataXy[i].name)
+                            array.push(element);
+                        
+                    }
+                    this.up('panel').up('panel').down('#y').store.setData(array);
+                }
+            }
+        });
+        
+        var valorPrincipal = Ext.create('Ext.form.field.ComboBox',{
+            multiSelect: false,
+            width: 100,
+            name: 'valorprincipal',
+            itemId: 'valorprincipal',
+            labelAlign: 'top',
+            emptyText: 'Valor',
+            fieldLabel: 'Valor',
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'valor', type: 'string' }
+                ],
+                data: dataValor
+            }),
+            queryParam: 'valor',
+            queryMode: 'local',
+            displayField: 'valor',
+            // displayTpl: Ext.create('Ext.XTemplate','<tpl for=".">','<b>{tipo}</b>','</tpl>'),
+            valueField: 'id',
+            width: 230,
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: false,
+            // value: me.showType[recordSeries.index] == 'line'? null : me.showType[recordSeries.index],
+            listeners : {
+            }
         });
 
         var elTagEmpresa = Ext.create('Ext.form.field.Tag',{
@@ -253,7 +330,7 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
             displayTpl: Ext.create('Ext.XTemplate',
                 '<tpl for=".">',		                            
                 '{idProduto}',
-                '</tpl>'), 
+                '</tpl>'),
             valueField: 'idProduto',
             // emptyText: 'Produto',
             fieldLabel: 'Código Produto',
@@ -278,10 +355,66 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                 }
             }
         });
+        
+        var elTagCategoria = Ext.create('Ext.form.field.Tag',{
+            name: 'elcategoria',
+            itemId: 'elcategoria',
+            multiSelect: true,
+            labelAlign: 'top',
+            width: 230,
+            labelWidth: 60,
+            store: Ext.data.Store({
+                fields: [
+                    { name: 'categoria', type: 'string' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: BASEURL + '/api/analisemarca/listarcategoria',
+                    timeout: 120000,
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            }),
+            queryParam: 'categoria',
+            queryMode: 'local',
+            displayField: 'categoria',
+            valueField: 'categoria',
+            emptyText: 'Categoria',
+            fieldLabel: 'Categorias',
+            margin: '1 1 1 8',
+            filterPickList: true,
+            publishes: 'value',
+            disabled: true
+        });
+        elTagCategoria.store.load(
+            function(){
+                elTagCategoria.setDisabled(false);
+            }
+        );
 
         Ext.applyIf(me, {
 
             items : [
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items:[
+                        valorY
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    hidden: false,
+                    items:[
+                        valorX
+                    ]
+                },
                 {
                     xtype: 'panel',
                     layout: 'hbox',
@@ -385,6 +518,23 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     border: false,
                     items:[
                         elTagIdProduto,
+                        {
+                            xtype: 'button',
+                            iconCls: 'fa fa-file',
+                            tooltip: 'Limpar',
+                            margin: '26 1 1 1',
+                            handler: function(form) {
+                                form.up('panel').down('tagfield').setValue(null);
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    items:[
+                        elTagCategoria,
                         {
                             xtype: 'button',
                             iconCls: 'fa fa-file',

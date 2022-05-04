@@ -107,22 +107,62 @@ class FaixamargemController extends AbstractRestfulController
 
     public function faixamargemAction()
     {
-        $data   = array();
-        $margem = array();
-        $filiais= array();
+        $arrayY     = array();
+        $arrayX     = array();
+        $margem     = array();
+        $filiais    = array();
         
         try {
 
-            $valorprincipal = $this->params()->fromPost('valorprincipal',null);
+            $x          = $this->params()->fromPost('x',null);
+            $y          = $this->params()->fromPost('y',null);
+            $v          = $this->params()->fromPost('valorprincipal',null);
             $codEmpresa = $this->params()->fromPost('codEmpresa',null);
             $pDataInicio= $this->params()->fromPost('dataInicio',null);
             $pDataFim   = $this->params()->fromPost('dataFinal',null);
             $idMarcas   = $this->params()->fromPost('idMarcas',null);
             $codProdutos= $this->params()->fromPost('idProduto',null);
+            $categoria  = $this->params()->fromPost('categoria',null);
 
-            $em = $this->getEntityManager();
+            $dataXy = [
+                "emp", //Filial
+                "mb", //Margem
+                "fx_mb_v", //Faixa Margem
+                "Faixa Faturamento",
+                "Pareto Faturamento"
+            ];
 
-            $valorprincipal = !$valorprincipal ? 'rol' : $valorprincipal;
+            $dataZ = [
+                "rol", //Filial
+                "mb", //Margem
+                "qtd", //Faixa Margem
+                "lb",
+                "cc",
+                "nf"
+            ];
+
+            $fortmatZ = [
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+            ];
+
+            $dataZcol = [
+             "round(sum(a.rol),0)",
+             "case when  sum(a.rol) > 0 then round( (sum(a.lb) / sum(a.rol) ) * 100 ,2) else 0 end",
+             "round(sum(a.qtd),0)",
+             "round(sum(a.lb),0)",
+             "round(count(distinct cc),0)",
+             "round(count(distinct nf),0)"
+            ];
+
+            $x = empty($x) ? 0 : $x;
+            $y = !$y && $y != '0' ? 1 : $y;
+            $z = empty($v) ? 0 : $v;
+            $v = !$v ? 'rol' : $dataZ[$v];
 
             /////////////////////////////////////////////////////////////////
             if($codEmpresa){
@@ -135,6 +175,10 @@ class FaixamargemController extends AbstractRestfulController
 
             if($codProdutos){
                 $codProdutos =  implode("','",json_decode($codProdutos));
+            }
+            
+            if($categoria){
+                $categoria = implode("','",json_decode($categoria));
             }
 
             $andData = '';
@@ -164,157 +208,192 @@ class FaixamargemController extends AbstractRestfulController
 
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
-            
-            $sql1 = "select distinct a.mb
-                        from (SELECT TRUNC(a.data,'MM') AS data,
-                                    a.emp, 
-                                    a.cod_produto,
-                                    a.nota,
-                                    SUM(qtd) AS qtde,
-                                    SUM(rol) AS rol,
-                                    SUM(lb) AS lb,
-                                    SUM(cmv) AS cmv,
-                                    ROUND(SUM(lb)/SUM(rol)*100) AS mb
-                                FROM VM_SKVENDANOTA a
-                                WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                                --AND a.cod_produto = 397
-                                $andFilial
-                                $andData
-                                $andMarca
-                                $andProduto
-                                --AND a.cod_produto = 397
-                                GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
-                    order by 1 desc";
-                    // print"$sql1";
-                    // exit;
+            $conn->beginTransaction();
 
-            $stmt = $conn->prepare($sql1);
-            $stmt->execute();
-            $resultMb = $stmt->fetchAll();
+            try {
 
-            $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('mb', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSetMb = new HydratingResultSet($hydrator, $stdClass);
-            $resultSetMb->initialize($resultMb);
+                $sqlTmp ='';
+                if($categoria){
+                    
+                    $sqlTmp ="insert into vw_skproduto_categoria_tmp
+                    select cod_produto, categoria
+                    from vw_skproduto_categoria where categoria in ('$categoria')";
 
-            $mbCategoria = array();
-            $posicaoMb = 0;
-            foreach ($resultSetMb as $row) {
+                    $stmt = $conn->prepare($sqlTmp);
+                    $stmt->execute();
+
+                    $andProduto = " and a.cod_produto in (select cod_produto
+                                                         from vw_skproduto_categoria_tmp
+                                                       where categoria in ('$categoria'))";
+                }
+
+                $sql1 = "select $dataXy[$y] AS y
+                            FROM (select emp
+                                        ,mb
+                                        ,qtd
+                                        ,rol
+                                        ,(CASE WHEN mb <= 15 THEN 1 
+                                            WHEN mb > 15 AND mb <= 20 THEN 2
+                                            WHEN mb > 20 AND mb <= 29 THEN 3
+                                            WHEN mb >= 30 THEN 4 END) fx_mb_o
+                                        ,(CASE WHEN mb <= 15 THEN '0-15' 
+                                            WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                            WHEN mb > 20 AND mb <= 29 THEN '21-29'
+                                            WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v
+                                    FROM (SELECT TRUNC(a.data,'MM') AS data
+                                                    ,a.emp 
+                                                    ,a.cod_produto
+                                                    ,a.nota
+                                                    ,a.cnpj_parceiro as cc
+                                                    ,SUM(qtd) AS qtd
+                                                    ,SUM(rol) AS rol
+                                                    ,SUM(lb) AS lb
+                                                    ,SUM(cmv) AS cmv
+                                                    ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
+                                                FROM VM_SKVENDANOTA a
+                                            WHERE TRUNC(a.data,'MM') >= '01/11/2021'
+                                            $andFilial
+                                            $andData
+                                            $andMarca
+                                            $andProduto
+                                            GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
+                                    )
+                            GROUP BY $dataXy[$y]
+                            ORDER BY 1 DESC";
+                            
+                $stmt = $conn->prepare($sql1);
+                $stmt->execute();
+                $resultY = $stmt->fetchAll();
+
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('y', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSetY = new HydratingResultSet($hydrator, $stdClass);
+                $resultSetY->initialize($resultY);
+                
+                $sql = "select $dataXy[$x] as x
+                                ,$dataXy[$y] as y
+                                ,$dataZcol[$z] as z
+                        from  (select emp
+                                        ,mb
+                                        ,rol
+                                        ,qtd
+                                        ,lb
+                                        ,nf
+                                        ,cc
+                                        ,(CASE WHEN mb <= 15 THEN 1 
+                                            WHEN mb > 15 AND mb <= 20 THEN 2
+                                            WHEN mb > 20 AND mb <= 29 THEN 3
+                                            WHEN mb >= 30 THEN 4 END) fx_mb_o
+                                        ,(CASE WHEN mb <= 15 THEN '0-15' 
+                                            WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                            WHEN mb > 20 AND mb <= 29 THEN '21-29'
+                                            WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v
+                                FROM (SELECT TRUNC(a.data,'MM') AS data
+                                             ,a.emp
+                                             ,a.cod_produto
+                                             ,a.nota as nf
+                                             ,a.cnpj_parceiro as cc
+                                             ,SUM(qtd) AS qtd
+                                             ,SUM(rol) AS rol
+                                             ,SUM(lb) AS lb
+                                             ,SUM(cmv) AS cmv
+                                             ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
+                                        FROM VM_SKVENDANOTA a
+                                        where TRUNC(a.data,'MM') >= '01/11/2021'
+                                        $andFilial
+                                        $andData
+                                        $andMarca
+                                        $andProduto
+                                        GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
+                                ) a
+                                group by $dataXy[$x]
+                                        ,$dataXy[$y]
+                            order by 1, 2 desc";
+                        
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('x', new ValueStrategy);
+                $hydrator->addStrategy('y', new ValueStrategy);
+                $hydrator->addStrategy('z', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $conn->commit();
+
+            } catch (\Exception $e) {
+                $conn->rollBack();
+                throw $e;
+            }
+
+            $yCategoria = array();
+            $posicaoY = 0;
+            foreach ($resultSetY as $row) {
                 $elementos = $hydrator->extract($row);
 
-                $mbCategoria[(string)$elementos['mb']] = $posicaoMb;
+                $yCategoria[(string)$elementos['y']] = $posicaoY;
                 
-                $margem[]   = $elementos['mb'];
+                $arrayY[]   = $elementos['y'];
 
-                $posicaoMb++;
+                $posicaoY++;
 
             }
 
-            $sql = "select a.emp,
-                           a.mb,
-                           round(sum(a.rol),0) rol,
-                           round(sum(a.qtd),0) as qtde,
-                           round(sum(a.lb),0) as lb
-                     from 
-                        (
-                        SELECT TRUNC(a.data,'MM') AS data,
-                                a.emp, 
-                                a.cod_produto,
-                                a.nota,
-                                SUM(qtd) AS qtd,
-                                SUM(rol) AS rol,
-                                SUM(lb) AS lb,
-                                SUM(cmv) AS cmv,
-                                ROUND(SUM(lb)/SUM(rol)*100) AS mb
-                        FROM VM_SKVENDANOTA a
-                        WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                        --AND a.cod_produto = 397
-                        $andFilial
-                        $andData
-                        $andMarca
-                        $andProduto
-                        GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
-                        group by a.emp,a.mb
-                        order by 1,2 desc";
-            // print "$sql";
-            // exit;
-            $stmt = $conn->prepare($sql);
-            // $stmt->bindValue(1, $pEmp);
-            
-            $stmt->execute();
-            $results = $stmt->fetchAll();
-
-            $hydrator = new ObjectProperty;
-            // $hydrator->addStrategy('qtd', new ValueStrategy);
-            $hydrator->addStrategy('rol', new ValueStrategy);
-            $hydrator->addStrategy('qtde', new ValueStrategy);
-            // $hydrator->addStrategy('cmv', new ValueStrategy);
-            $hydrator->addStrategy('mb', new ValueStrategy);
-            $hydrator->addStrategy('lb', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
-            $resultSet->initialize($results);
-
-            $arrayEmp = array();
-            $contLine = 0;
-            $contColuna = 0;
-            $empAnterior='';
-            $zMinMax = array();
+            $arrayPosition  = array();
+            $contLine       = 0;
+            $contColuna     = 0;
+            $xAnterior      ='';
+            $zMinMax        = array();
             foreach ($resultSet as $row) {
                 
                 $elementos = $hydrator->extract($row);
 
-                $paramMb    = $elementos['mb'];
-                $zMinMax[]  = $elementos[$valorprincipal];
+                $paramY     = $elementos['y'];
+                $zMinMax[]  = $elementos['z'];
 
-                if($empAnterior && $elementos['emp'] <> $empAnterior){
+                if($xAnterior && $elementos['x'] <> $xAnterior){
 
-                    while($contLine < count($mbCategoria)){// adiciona posição null (Caso ultima margem anterior nao seja final)
+                    while($contLine < count($yCategoria)){// adiciona posição null (Caso ultima margem anterior nao seja final)
 
-                        $arrayEmp[] = [$contColuna,$contLine, null];
-                        // $arrayEmp[] =array( // estoura gráfico
-                        //     'x' => $contColuna,
-                        //     'y'=> $contLine,
-                        //     'value' => null,
-                        //     'valueColor' => null,
-                        //     'name' => "Point".$contColuna.$contLine,
-                        //     'nmPrincipal' => $valorprincipal,
-                        // );
-
+                        $arrayPosition[] = [$contColuna,$contLine, null];
                         $contLine++;
                     }
 
-                    $filiais[]= $empAnterior;
+                    $arrayX[]= $xAnterior;
                     $contLine=0;
                     $contColuna++;
 
                 }
 
-                if( count($mbCategoria) > 0){
+                if( count($yCategoria) > 0){
 
-                    while($contLine < $mbCategoria[$paramMb] ){// adiciona posição null (Caso margem não seja a inicial)
+                    while($contLine < $yCategoria[$paramY] ){// adiciona posição null (Caso margem não seja a inicial)
 
-                        $arrayEmp[] = [$contColuna,$contLine, null];
+                        $arrayPosition[] = [$contColuna,$contLine, null];
 
                         $contLine++;
                     }
                 }
 
-                $arrayEmp[] = array($contColuna,$mbCategoria[$paramMb],$elementos[$valorprincipal]);
+                $valorZ = $elementos['z'];
+                $arrayPosition[] = array($contColuna,$yCategoria[$paramY],$valorZ);
                 $contLine++;
-                $empAnterior = $elementos['emp'];
+                $xAnterior = $elementos['x'];
 
             }
 
-            while($contLine < count($mbCategoria)){/// adiciona posição null (Caso ultima margem nao seja final na ultima coluna)
+            while($contLine < count($yCategoria)){/// adiciona posição null (Caso ultima margem nao seja final na ultima coluna)
 
-                $arrayEmp[] = [$contColuna,$contLine, null];
+                $arrayPosition[] = [$contColuna,$contLine, null];
 
                 $contLine++;
             }
 
-            $filiais[]= $empAnterior;
+            $arrayX[]= $xAnterior;
 
             sort($zMinMax);
             $min = 0;
@@ -326,16 +405,17 @@ class FaixamargemController extends AbstractRestfulController
                 }
             }
 
-            $this->setCallbackData($arrayEmp);
+            $this->setCallbackData($arrayPosition);
             
         } catch (\Exception $e) {
             $this->setCallbackError($e->getMessage());
         }
         $objReturn = $this->getCallbackModel();
-        $objReturn->yCategories = $margem;
-        $objReturn->xCategories = $filiais;
+        $objReturn->yCategories = $arrayY;
+        $objReturn->xCategories = $arrayX;
         $objReturn->zMinMax = [$min,$zMinMax[count($zMinMax)-1]];
-        $objReturn->nmPrincipal = $valorprincipal;
+        $objReturn->nmPrincipal = $v;
+        $objReturn->valorFormat = $fortmatZ[$z];
         // $objReturn->referencia  = array('incio'=> $resultCount[0]['DATAINICIO'],'fim'=> $resultCount[0]['DATAFIM']);
 
         return $objReturn; 
@@ -438,9 +518,7 @@ class FaixamargemController extends AbstractRestfulController
             $sql = "select distinct nvl(COD_NBS,'') COD_ITEM, DESCRICAO
                 from VW_SKPRODUTO 
             where 1 =1 
-            and nvl(COD_NBS,'') $filtroProduto";
-
-            
+            and nvl(COD_NBS,'') $filtroProduto";            
 
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -505,6 +583,44 @@ class FaixamargemController extends AbstractRestfulController
 
             $hydrator = new ObjectProperty;
             $hydrator->addStrategy('id_produto', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+    public function listarcategoriaAction()
+    {
+        $data = array();
+        
+        try {
+
+            $em = $this->getEntityManager();
+
+            $sql = "select distinct categoria
+                        from vw_skproduto_categoria
+                    order by categoria";
+  
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
