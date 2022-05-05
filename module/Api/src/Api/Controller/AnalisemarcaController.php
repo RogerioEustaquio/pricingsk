@@ -824,12 +824,6 @@ class AnalisemarcaController extends AbstractRestfulController
             }
 
         }
-
-        if($categoria){
-            $andSql .= " and a.cod_produto in (select cod_produto
-                                                 from vw_skproduto_categoria
-                                               where categoria in ('$categoria'))";
-        }
         
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
@@ -935,34 +929,57 @@ class AnalisemarcaController extends AbstractRestfulController
                 $EstoqueSkud[]          = 0;
 
             }
-            
-            $sql = "select a.data,
-                           round(sum(estoque),2) estoque,
-                           case when sum(estoque) > 0 and sum(valor) > 0 then round(sum(valor)/sum(estoque),2) else 0 end custo_medio,
-                           round(sum(valor),2) valor,
-                           sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
-                    from vw_skestoque_master a
-                         $sqlMotadora
-                         $andSqltCurva
-                    where 1 = 1
-                    $sqlMotadoraRelaciona
-                    $andSql
-                    $andSqlCurva
-                    group by a.data
-                    order by a.data";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $results = $stmt->fetchAll();
-            $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('data', new ValueStrategy);
-            $hydrator->addStrategy('estoque', new ValueStrategy);
-            $hydrator->addStrategy('custo_medio', new ValueStrategy);
-            $hydrator->addStrategy('valor', new ValueStrategy);
-            $hydrator->addStrategy('sku_disp', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
 
-            $resultSet->initialize($results);
+            $conn->beginTransaction();
+
+            try {
+
+                if($categoria){
+                    $andSql .= " and a.cod_produto in (select cod_produto
+                                                         from vw_skproduto_categoria_tmp
+                                                       where categoria in ('$categoria'))";
+                }
+
+                $sqlTmp ="insert into vw_skproduto_categoria_tmp
+                    select cod_produto, categoria
+                    from vw_skproduto_categoria where categoria in ('$categoria')";
+
+                $stmt = $conn->prepare($sqlTmp);
+                $stmt->execute();
+            
+                $sql = "select a.data,
+                            round(sum(estoque),2) estoque,
+                            case when sum(estoque) > 0 and sum(valor) > 0 then round(sum(valor)/sum(estoque),2) else 0 end custo_medio,
+                            round(sum(valor),2) valor,
+                            sum(case when nvl(estoque,0) > 0 then 1 end) sku_disp
+                        from vw_skestoque_master a
+                            $sqlMotadora
+                            $andSqltCurva
+                        where 1 = 1
+                        $sqlMotadoraRelaciona
+                        $andSql
+                        $andSqlCurva
+                        group by a.data
+                        order by a.data";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('data', new ValueStrategy);
+                $hydrator->addStrategy('estoque', new ValueStrategy);
+                $hydrator->addStrategy('custo_medio', new ValueStrategy);
+                $hydrator->addStrategy('valor', new ValueStrategy);
+                $hydrator->addStrategy('sku_disp', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+
+                $resultSet->initialize($results);
+                $conn->commit();
+
+            } catch (\Exception $e) {
+                $conn->rollBack();
+                throw $e;
+            }
 
             $data2 = array();
             $contMes = 0;
@@ -1051,13 +1068,6 @@ class AnalisemarcaController extends AbstractRestfulController
                 }
             }
         }
-
-        if($categoria){
-            $andSql .= " and cod_produto in (select cod_produto
-                                                 from vw_skproduto_categoria
-                                               where categoria in ('$categoria'))";
-        }
-
 
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
@@ -1156,52 +1166,76 @@ class AnalisemarcaController extends AbstractRestfulController
 
             }
 
-            $sql = "select  to_date('01'||to_char(a.data,'/mm/yyyy')) as data, 
-                            sum(b.cc) as cc, 
-                            sum(c.nota ) as nf,
-                            sum(round(a.rol/b.cc,2)) tkm
-                            -- incluir cc dia por fora no php
-                    from (select data, sum(rol) as rol 
-                            from vm_skvendanota 
-                            where 1=1
-                            group by data) a,
-                            (select data, count(*) as cc
-                            from (select v.data, emp, cnpj_parceiro, sum(rol) as rol 
-                                    from vm_skvendanota v
-                                         $andSqltCurva
-                                    where 1=1
-                                    $andSql
-                                    $andSqlData
-                                    $andSqlCurva
-                                    group by v.data, emp, cnpj_parceiro)
-                            where rol > 0
-                            group by data) b,
-                            (select data, count(*) as nota
-                            from (select v.data, emp, nota, sum(rol) as rol 
-                                    from vm_skvendanota v
-                                         $andSqltCurva
-                                    where 1=1
-                                    $andSql
-                                    $andSqlData
-                                    $andSqlCurva
-                                    group by v.data, emp, nota)
-                            where rol > 0
-                            group by data) c
-                    where a.data = b.data
-                    and a.data = c.data
-                    group by '01'||to_char(a.data,'/mm/yyyy')
-                    order by data asc";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $results = $stmt->fetchAll();
-            $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('data', new ValueStrategy);
-            $hydrator->addStrategy('cc', new ValueStrategy);
-            $hydrator->addStrategy('nf', new ValueStrategy);
-            $hydrator->addStrategy('tkm', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
-            $resultSet->initialize($results);
+            $conn->beginTransaction();
+
+            try {
+
+                if($categoria){
+                    $andSql .= " and cod_produto in (select cod_produto
+                                                         from vw_skproduto_categoria_tmp
+                                                       where categoria in ('$categoria'))";
+                }
+
+                $sqlTmp ="insert into vw_skproduto_categoria_tmp
+                    select cod_produto, categoria
+                    from vw_skproduto_categoria where categoria in ('$categoria')";
+
+                $stmt = $conn->prepare($sqlTmp);
+                $stmt->execute();
+
+                $sql = "select  to_date('01'||to_char(a.data,'/mm/yyyy')) as data, 
+                                sum(b.cc) as cc, 
+                                sum(c.nota ) as nf,
+                                sum(round(a.rol/b.cc,2)) tkm
+                                -- incluir cc dia por fora no php
+                        from (select data, sum(rol) as rol 
+                                from vm_skvendanota 
+                                where 1=1
+                                group by data) a,
+                                (select data, count(*) as cc
+                                from (select v.data, emp, cnpj_parceiro, sum(rol) as rol 
+                                        from vm_skvendanota v
+                                            $andSqltCurva
+                                        where 1=1
+                                        $andSql
+                                        $andSqlData
+                                        $andSqlCurva
+                                        group by v.data, emp, cnpj_parceiro)
+                                where rol > 0
+                                group by data) b,
+                                (select data, count(*) as nota
+                                from (select v.data, emp, nota, sum(rol) as rol 
+                                        from vm_skvendanota v
+                                            $andSqltCurva
+                                        where 1=1
+                                        $andSql
+                                        $andSqlData
+                                        $andSqlCurva
+                                        group by v.data, emp, nota)
+                                where rol > 0
+                                group by data) c
+                        where a.data = b.data
+                        and a.data = c.data
+                        group by '01'||to_char(a.data,'/mm/yyyy')
+                        order by data asc";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('data', new ValueStrategy);
+                $hydrator->addStrategy('cc', new ValueStrategy);
+                $hydrator->addStrategy('nf', new ValueStrategy);
+                $hydrator->addStrategy('tkm', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $conn->commit();
+
+            } catch (\Exception $e) {
+                $conn->rollBack();
+                throw $e;
+            }
 
             $data2 = array();
             $contMes = 0;
@@ -1307,16 +1341,6 @@ class AnalisemarcaController extends AbstractRestfulController
             }
         }
 
-        if($categoria){
-            $andSql .= " and a.cod_produto in (select cod_produto
-                                                 from vw_skproduto_categoria
-                                               where categoria in ('$categoria'))";
-
-            $andSql2 .= " and COD_PRODUTO in (select cod_produto
-                                                    from vw_skproduto_categoria
-                                                where categoria in ('$categoria'))";
-        }
-
         $andSqlmarca = '';
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
@@ -1415,87 +1439,150 @@ class AnalisemarcaController extends AbstractRestfulController
 
             }
 
-            $sql = "select data,
-                           sum(valor) as estoque_valor, 
-                           sum(valor2) as estoque_valor_custo_anterior,
-                           --sum(valor2)/sum(valor) as idx,
-                           round((sum(valor)/sum(valor2)-1)*100,2) as idx
-                    from ( select a.data,
-                                  a.estoque as estoque,
-                                  round(a.valor/a.estoque,2) custo_medio,
-                                  round(a.estoque*a.custo_medio,2) valor,
-                                  round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
-                            from vw_skestoque_master a,
-                                 vw_skmarca m,
-                                 (select data, emp, cod_produto, estoque, custo_medio, valor
-                                    from vw_skestoque_master
-                                 where data = '01/12/2020') a2
-                                 $andSqltCurva
-                            where 1=1
-                            and a.marca = m.descricao_marca
-                            and a.emp = a2.emp(+)
-                            and a.cod_produto = a2.cod_produto(+)
-                            and a.data >= '01/01/2021' -- Não alterar essa data
-                            $andSql
-                            $andSqlCurva
-                            -- Aplicar filtro de produtos / marcas / lojas
-                            --and a.COD_PRODUTO = 397
-                            --and a.emp = 'SA'
-                            
-                            and a.data < '01012022'
-                            order by a.data
-                            ) a
-                    where 1 = 1 
-                    $andSqlData
-                    and a.data < '01012022'
-                    group by data
-                    union all
-                    select data,
-                           sum(valor) as estoque_valor, 
-                           sum(valor2) as estoque_valor_custo_anterior,
-                           --sum(valor2)/sum(valor) as idx,
-                           round((sum(valor)/sum(valor2)-1)*100,2) as idx
-                    from ( select a.data,
-                                  a.estoque as estoque,
-                                  round(a.valor/a.estoque,2) custo_medio,
-                                  round(a.estoque*a.custo_medio,2) valor,
-                                  round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
-                            from vw_skestoque_master a,
-                                 vw_skmarca m,
-                                 (select data, emp, cod_produto, estoque, custo_medio, valor
-                                    from vw_skestoque_master
-                                 where data = '01/12/2021') a2
-                                 $andSqltCurva
-                            where 1=1
-                            and a.marca = m.descricao_marca
-                            and a.emp = a2.emp(+)
-                            and a.cod_produto = a2.cod_produto(+)
-                            and a.data >= '01/01/2022' -- Não alterar essa data
-                            $andSql
-                            $andSqlCurva
-                            -- Aplicar filtro de produtos / marcas / lojas
-                            --and a.COD_PRODUTO = 397
-                            --and a.emp = 'SA'
-                            and a.data >= '01012022'
-                            order by a.data
-                            ) a
-                    where 1 = 1 
-                    $andSqlData
-                    and a.data >= '01012022'
-                    group by data
-                    order by data";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $results = $stmt->fetchAll();
-            $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('data', new ValueStrategy);
-            // $hydrator->addStrategy('estoque_valor', new ValueStrategy);
-            // $hydrator->addStrategy('estoque_valor_custo_anterior', new ValueStrategy);
-            $hydrator->addStrategy('idx', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
-            $resultSet->initialize($results);
+            $conn->beginTransaction();
+
+            try {
+
+                if($categoria){
+                    $andSql .= " and a.cod_produto in (select cod_produto
+                                                        from vw_skproduto_categoria_tmp
+                                                    where categoria in ('$categoria'))";
+
+                    $andSql2 .= " and COD_PRODUTO in (select cod_produto
+                                                            from vw_skproduto_categoria_tmp
+                                                        where categoria in ('$categoria'))";
+                }
+
+                $sqlTmp ="insert into vw_skproduto_categoria_tmp
+                    select cod_produto, categoria
+                    from vw_skproduto_categoria where categoria in ('$categoria')";
+
+                $stmt = $conn->prepare($sqlTmp);
+                $stmt->execute();
+
+
+                $sql = "select data,
+                            sum(valor) as estoque_valor, 
+                            sum(valor2) as estoque_valor_custo_anterior,
+                            --sum(valor2)/sum(valor) as idx,
+                            round((sum(valor)/sum(valor2)-1)*100,2) as idx
+                        from ( select a.data,
+                                    a.estoque as estoque,
+                                    round(a.valor/a.estoque,2) custo_medio,
+                                    round(a.estoque*a.custo_medio,2) valor,
+                                    round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
+                                from vw_skestoque_master a,
+                                    vw_skmarca m,
+                                    (select data, emp, cod_produto, estoque, custo_medio, valor
+                                        from vw_skestoque_master
+                                    where data = '01/12/2020') a2
+                                    $andSqltCurva
+                                where 1=1
+                                and a.marca = m.descricao_marca
+                                and a.emp = a2.emp(+)
+                                and a.cod_produto = a2.cod_produto(+)
+                                and a.data >= '01/01/2021' -- Não alterar essa data
+                                $andSql
+                                $andSqlCurva
+                                -- Aplicar filtro de produtos / marcas / lojas
+                                --and a.COD_PRODUTO = 397
+                                --and a.emp = 'SA'
+                                
+                                and a.data < '01012022'
+                                order by a.data
+                                ) a
+                        where 1 = 1 
+                        $andSqlData
+                        and a.data < '01012022'
+                        group by data
+                        union all
+                        select data,
+                            sum(valor) as estoque_valor, 
+                            sum(valor2) as estoque_valor_custo_anterior,
+                            --sum(valor2)/sum(valor) as idx,
+                            round((sum(valor)/sum(valor2)-1)*100,2) as idx
+                        from ( select a.data,
+                                    a.estoque as estoque,
+                                    round(a.valor/a.estoque,2) custo_medio,
+                                    round(a.estoque*a.custo_medio,2) valor,
+                                    round(a.estoque*nvl(a2.custo_medio,a.custo_medio),2) valor2
+                                from vw_skestoque_master a,
+                                    vw_skmarca m,
+                                    (select data, emp, cod_produto, estoque, custo_medio, valor
+                                        from vw_skestoque_master
+                                    where data = '01/12/2021') a2
+                                    $andSqltCurva
+                                where 1=1
+                                and a.marca = m.descricao_marca
+                                and a.emp = a2.emp(+)
+                                and a.cod_produto = a2.cod_produto(+)
+                                and a.data >= '01/01/2022' -- Não alterar essa data
+                                $andSql
+                                $andSqlCurva
+                                -- Aplicar filtro de produtos / marcas / lojas
+                                --and a.COD_PRODUTO = 397
+                                --and a.emp = 'SA'
+                                and a.data >= '01012022'
+                                order by a.data
+                                ) a
+                        where 1 = 1 
+                        $andSqlData
+                        and a.data >= '01012022'
+                        group by data
+                        order by data";
+                
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('data', new ValueStrategy);
+                // $hydrator->addStrategy('estoque_valor', new ValueStrategy);
+                // $hydrator->addStrategy('estoque_valor_custo_anterior', new ValueStrategy);
+                $hydrator->addStrategy('idx', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+                // $andSqlEmp;
+                // $andSqlmarca;
+                // $andSql2;
+                // $andSqlData;
+
+                $sql2 = "select a.data,
+                            sum(qtd_operacao) as qtd_operacao,
+                            round(sum(custo_operacao_pon_u)/sum(qtd_operacao),2) as custo_operacao_med_u,
+                            round(sum(custo_operacao_pon_n)/sum(qtd_operacao),2) as custo_operacao_med_n,
+                            round(sum(custo_operacao_pon_u),2) as custo_operacao_pon_u,
+                            round(sum(custo_operacao_pon_n),2) as custo_operacao_pon_n,
+                            round((sum(custo_operacao_pon_n)/sum(custo_operacao_pon_u)-1)*100,2) as idx
+                            from vm_idx_inflacao_compra_item a
+                                $andSqltCurva
+                        where custo_operacao_pon_u is not null
+                        -- Aplicar filtro de produtos / marcas / lojas
+                        $andSqlEmp
+                        $andSqlmarca
+                        $andSql2
+                        $andSqlData
+                        $andSqlCurva
+                        group by a.data
+                        order by a.data asc";
+                $stmt = $conn->prepare($sql2);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('data', new ValueStrategy);
+                // $hydrator->addStrategy('custo_operacao_pon_u', new ValueStrategy);
+                // $hydrator->addStrategy('custo_operacao_pon_n', new ValueStrategy);
+                $hydrator->addStrategy('idx', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet2 = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet2->initialize($results);
+
+                $conn->commit();
+
+            } catch (\Exception $e) {
+                $conn->rollBack();
+                throw $e;
+            }
 
             $contMes = 0;
 
@@ -1519,44 +1606,9 @@ class AnalisemarcaController extends AbstractRestfulController
 
             }
 
-            $andSqlEmp;
-            $andSqlmarca;
-            $andSql2;
-            $andSqlData;
-
-            $sql = "select a.data,
-                           sum(qtd_operacao) as qtd_operacao,
-                           round(sum(custo_operacao_pon_u)/sum(qtd_operacao),2) as custo_operacao_med_u,
-                           round(sum(custo_operacao_pon_n)/sum(qtd_operacao),2) as custo_operacao_med_n,
-                           round(sum(custo_operacao_pon_u),2) as custo_operacao_pon_u,
-                           round(sum(custo_operacao_pon_n),2) as custo_operacao_pon_n,
-                           round((sum(custo_operacao_pon_n)/sum(custo_operacao_pon_u)-1)*100,2) as idx
-                        from vm_idx_inflacao_compra_item a
-                             $andSqltCurva
-                    where custo_operacao_pon_u is not null
-                    -- Aplicar filtro de produtos / marcas / lojas
-                    $andSqlEmp
-                    $andSqlmarca
-                    $andSql2
-                    $andSqlData
-                    $andSqlCurva
-                    group by a.data
-                    order by a.data asc";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $results = $stmt->fetchAll();
-            $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('data', new ValueStrategy);
-            // $hydrator->addStrategy('custo_operacao_pon_u', new ValueStrategy);
-            // $hydrator->addStrategy('custo_operacao_pon_n', new ValueStrategy);
-            $hydrator->addStrategy('idx', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
-            $resultSet->initialize($results);
-
             $contMes = 0;
 
-            foreach ($resultSet as $row) {
+            foreach ($resultSet2 as $row) {
 
                 $elementos = $hydrator->extract($row);
 
@@ -1785,12 +1837,6 @@ class AnalisemarcaController extends AbstractRestfulController
                     $andSql .= " and i.cod_produto in ($codProdutos)";
                 }
             }
-
-            if($categoria){
-                $andSql .= " and i.cod_produto in (select cod_produto
-                                                     from vw_skproduto_categoria
-                                                   where categoria in ('$categoria'))";
-            }
             
             if($data){
                 $sysdate = "to_date('01/".$data."')";
@@ -1993,66 +2039,90 @@ class AnalisemarcaController extends AbstractRestfulController
                 $idxcompra          = $idxMes[1];
             }
 
-            $sql = "select du.data,
-                        a.rol,
-                        a.lb,
-                        a.mb,
-                        du.dias,
-                        a.qtde,
-                        a.cmv,
-                        a.rob,
-                        round((1-a.rol/a.rob)*100,2) as impostos,
-                        case when  du.dias > 0 then round(a.rol / du.dias, 2) else 0  end as rol_dia,
-                        case when  du.dias > 0 then round(a.lb / du.dias, 2) else 0  end as lb_dia,
-                        case when  du.dias > 0 then round(a.qtde / du.dias, 0) else 0  end as qtde_dia,
-                        case when  du.dias > 0 then round(a.cmv / du.dias, 2) else 0  end as cmv_dia,
-                        case when  du.dias > 0 then round(a.rob / du.dias, 2) else 0  end as rob_dia
-                    from VM_SKDIAS_UTEIS du,
-                        (select trunc(i.data, 'MM') as data,
-                                round(sum(rol),2) as rol,
-                                round(sum(lb),2) as lb,
-                                sum(qtde) as qtde,
-                                round(sum(custo),2) as cmv,
-                                --round((sum(lb) / sum(rol)) * 100, 2) as mb
-                                case when sum(rol) <> 0 then round((sum(lb) / sum(rol)) * 100, 2) else 0 end as mb,
-                                round(sum(rob),2) as rob
-                        from vm_skvendaitem_master i,
-                             tb_sk_produto_montadora m
-                             $andSqltCurva
-                        where 1 = 1
-                        $andSql
-                        $andSqlCurva
-                        and i.cod_produto = m.cod_produto(+)
-                        group by trunc(i.data, 'MM')) a
-                    where du.data = a.data(+)
-                    $andSqlPeriodo
-                    order by data";
+            $conn->beginTransaction();
 
-                    // print "$sql";
-                    // exit;
+            try {
 
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $results = $stmt->fetchAll();
+                if($categoria){
+                    $andSql .= " and i.cod_produto in (select cod_produto
+                                                         from vw_skproduto_categoria_tmp
+                                                       where categoria in ('$categoria'))";
+                }
 
-            $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('data', new ValueStrategy);
-            $hydrator->addStrategy('rol', new ValueStrategy);
-            $hydrator->addStrategy('lb', new ValueStrategy);
-            $hydrator->addStrategy('mb', new ValueStrategy);
-            $hydrator->addStrategy('dias', new ValueStrategy);
-            $hydrator->addStrategy('qtde', new ValueStrategy);
-            $hydrator->addStrategy('cmv', new ValueStrategy);
-            $hydrator->addStrategy('rob', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia', new ValueStrategy);
-            $hydrator->addStrategy('qtde_dia', new ValueStrategy);
-            $hydrator->addStrategy('cmv_dia', new ValueStrategy);
-            $hydrator->addStrategy('rob_dia', new ValueStrategy);
-            $hydrator->addStrategy('impostos', new ValueStrategy);
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
-            $resultSet->initialize($results);
+                $sqlTmp ="insert into vw_skproduto_categoria_tmp
+                    select cod_produto, categoria
+                    from vw_skproduto_categoria where categoria in ('$categoria')";
+
+                $stmt = $conn->prepare($sqlTmp);
+                $stmt->execute();
+
+                $sql = "select du.data,
+                            a.rol,
+                            a.lb,
+                            a.mb,
+                            du.dias,
+                            a.qtde,
+                            a.cmv,
+                            a.rob,
+                            round((1-a.rol/a.rob)*100,2) as impostos,
+                            case when  du.dias > 0 then round(a.rol / du.dias, 2) else 0  end as rol_dia,
+                            case when  du.dias > 0 then round(a.lb / du.dias, 2) else 0  end as lb_dia,
+                            case when  du.dias > 0 then round(a.qtde / du.dias, 0) else 0  end as qtde_dia,
+                            case when  du.dias > 0 then round(a.cmv / du.dias, 2) else 0  end as cmv_dia,
+                            case when  du.dias > 0 then round(a.rob / du.dias, 2) else 0  end as rob_dia
+                        from VM_SKDIAS_UTEIS du,
+                            (select trunc(i.data, 'MM') as data,
+                                    round(sum(rol),2) as rol,
+                                    round(sum(lb),2) as lb,
+                                    sum(qtde) as qtde,
+                                    round(sum(custo),2) as cmv,
+                                    --round((sum(lb) / sum(rol)) * 100, 2) as mb
+                                    case when sum(rol) <> 0 then round((sum(lb) / sum(rol)) * 100, 2) else 0 end as mb,
+                                    round(sum(rob),2) as rob
+                            from vm_skvendaitem_master i,
+                                tb_sk_produto_montadora m
+                                $andSqltCurva
+                            where 1 = 1
+                            $andSql
+                            $andSqlCurva
+                            and i.cod_produto = m.cod_produto(+)
+                            group by trunc(i.data, 'MM')) a
+                        where du.data = a.data(+)
+                        $andSqlPeriodo
+                        order by data";
+
+                        // print "$sql";
+                        // exit;
+
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll();
+
+                $hydrator = new ObjectProperty;
+                $hydrator->addStrategy('data', new ValueStrategy);
+                $hydrator->addStrategy('rol', new ValueStrategy);
+                $hydrator->addStrategy('lb', new ValueStrategy);
+                $hydrator->addStrategy('mb', new ValueStrategy);
+                $hydrator->addStrategy('dias', new ValueStrategy);
+                $hydrator->addStrategy('qtde', new ValueStrategy);
+                $hydrator->addStrategy('cmv', new ValueStrategy);
+                $hydrator->addStrategy('rob', new ValueStrategy);
+                $hydrator->addStrategy('rol_dia', new ValueStrategy);
+                $hydrator->addStrategy('lb_dia', new ValueStrategy);
+                $hydrator->addStrategy('qtde_dia', new ValueStrategy);
+                $hydrator->addStrategy('cmv_dia', new ValueStrategy);
+                $hydrator->addStrategy('rob_dia', new ValueStrategy);
+                $hydrator->addStrategy('impostos', new ValueStrategy);
+                $stdClass = new StdClass;
+                $resultSet = new HydratingResultSet($hydrator, $stdClass);
+                $resultSet->initialize($results);
+
+                $conn->commit();
+
+            } catch (\Exception $e) {
+                $conn->rollBack();
+                throw $e;
+            }
 
             $data = array();
             $cont = 0;

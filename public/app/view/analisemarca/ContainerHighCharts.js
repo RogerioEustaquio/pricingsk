@@ -96,15 +96,20 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                         }).show();
                                     }
 
-                                    me.buildChartContainer(el,rsarray.categories,rsarray.series,yaxis);
+                                    if(el){
+
+                                        me.buildChartContainer(el.id,rsarray.categories,rsarray.series,yaxis);
+                                    }
                                 },
                                 error: function() {
                                     
                                     me.setLoading(false);
                                     rsarray = [];
                                     yaxis = [];
-
-                                    me.buildChartContainer(el,rsarray.categories,rsarray.series,yaxis);
+                                    
+                                    if(el){
+                                        me.buildChartContainer(el.id,rsarray.categories,rsarray.series,yaxis);
+                                    }
 
                                     new Noty({
                                         theme: 'relax',
@@ -853,12 +858,12 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
         return arrayYaxis;
     },
 
-    buildChartContainer: function(el,meses,series,aYaxis){
+    buildChartContainer: function(el_id,meses,series,aYaxis){
         var me = this;
         var utilFormat = Ext.create('Ext.ux.util.Format');
 
 
-        me.chart =  Highcharts.chart(el.id, {
+        me.chart =  Highcharts.chart(el_id, {
             loading: {
                 labelStyle: {
                     color: 'gray'

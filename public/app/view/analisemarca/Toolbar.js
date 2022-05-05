@@ -260,10 +260,12 @@ Ext.define('App.view.analisemarca.Toolbar',{
             }
             
         }
-  
-        for(var i = seriesLength - 1; i > -1; i--)
-        {
-            charts.chart.series[i].remove();
+
+        if(seriesLength>0){
+            for(var i = seriesLength - 1; i > -1; i--)
+            {
+                charts.chart.series[i].remove();
+            }
         }
 
         charts.chart.update(false,false);
