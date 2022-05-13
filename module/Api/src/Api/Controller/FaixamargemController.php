@@ -264,33 +264,41 @@ class FaixamargemController extends AbstractRestfulController
                                             ,SUM(a.rol) AS rol
                                             ,SUM(a.lb) AS lb
                                             ,SUM(a.cmv) AS cmv
-                                            ,ROUND(SUM(a.lb)/SUM(rol)*100) AS mb
+                                            ,case when SUM(rol) >0 then ROUND(SUM(a.lb)/SUM(rol)*100) else 0 end AS mb
                                             ,a.cnpj_parceiro cc
                                             ,a.nota nf
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN 1
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) AS fx_mb_o1
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN '0-5' 
+                                            ,case when SUM(rol) >0 then
+                                                (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN 1
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) 
+                                            else 1 end AS fx_mb_o1
+                                            , case when SUM(rol) >0 then
+                                                (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN '0-5' 
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END) AS fx_mb_v1
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 1 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END)
+                                            else '0-5' end AS fx_mb_v1
+                                            ,case when SUM(rol) >0 then
+                                                (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN 1 
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) fx_mb_o2
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '0-15' 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) 
+                                            else 1 end AS fx_mb_o2
+                                            ,case when SUM(rol) >0 then
+                                                (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN '0-15' 
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
                                                 WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) AS fx_mb_v2
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) 
+                                            else '0-15' end AS fx_mb_v2
                                     from vm_skvendanota a, 
                                         -- Pareto ROL Marca
                                         (SELECT rede, marca, emp,
@@ -331,7 +339,7 @@ class FaixamargemController extends AbstractRestfulController
                                             ,mb
                                             ,qtd
                                             ,rol
-                                            ,(CASE WHEN mb <= 5 THEN 1
+                                            ,(CASE WHEN nvl(mb,0) <= 5 THEN 1
                                                 WHEN mb > 5 AND mb <= 10 THEN 2
                                                 WHEN mb > 10 AND mb <= 15 THEN 3
                                                 WHEN mb > 15 AND mb <= 20 THEN 4
@@ -339,7 +347,7 @@ class FaixamargemController extends AbstractRestfulController
                                                 WHEN mb > 25 AND mb <= 30 THEN 6
                                                 WHEN mb > 30 AND mb <= 35 THEN 7
                                                 WHEN mb > 35 THEN 8 END) AS fx_mb_o1
-                                            ,(CASE WHEN mb <= 5 THEN '0-5' 
+                                            ,(CASE WHEN nvl(mb,0) <= 5 THEN '0-5' 
                                                 WHEN mb > 5 AND mb <= 10 THEN '6-10'
                                                 WHEN mb > 10 AND mb <= 15 THEN '11-15'
                                                 WHEN mb > 15 AND mb <= 20 THEN '16-20'
@@ -347,11 +355,11 @@ class FaixamargemController extends AbstractRestfulController
                                                 WHEN mb > 25 AND mb <= 30 THEN '26-30'
                                                 WHEN mb > 30 AND mb <= 35 THEN '31-35'
                                                 WHEN mb > 35 THEN '36-x' END) AS fx_mb_v1
-                                            ,(CASE WHEN mb <= 15 THEN 1 
+                                            ,(CASE WHEN nvl(mb,0) <= 15 THEN 1 
                                                 WHEN mb > 15 AND mb <= 20 THEN 2
                                                 WHEN mb > 20 AND mb <= 29 THEN 3
                                                 WHEN mb >= 30 THEN 4 END) fx_mb_o2
-                                            ,(CASE WHEN mb <= 15 THEN '0-15' 
+                                            ,(CASE WHEN nvl(mb,0) <= 15 THEN '0-15' 
                                                 WHEN mb > 15 AND mb <= 20 THEN '16-20'
                                                 WHEN mb > 20 AND mb <= 29 THEN '21-29'
                                                 WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v2
@@ -405,33 +413,41 @@ class FaixamargemController extends AbstractRestfulController
                                             ,SUM(a.rol) AS rol
                                             ,SUM(a.lb) AS lb
                                             ,SUM(a.cmv) AS cmv
-                                            ,ROUND(SUM(a.lb)/SUM(rol)*100) AS mb
+                                            ,case when SUM(rol) >0 then ROUND(SUM(a.lb)/SUM(rol)*100) else 0 end AS mb
                                             ,a.cnpj_parceiro cc
                                             ,a.nota nf
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN 1
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) AS fx_mb_o1
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN '0-5' 
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END) AS fx_mb_v1
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 1 
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) fx_mb_o2
-                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '0-15' 
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
-                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) AS fx_mb_v2
+                                            ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN 1
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) 
+                                                else 1 end AS fx_mb_o1
+                                                , case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN '0-5' 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END)
+                                                else '0-5' end AS fx_mb_v1
+                                                ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN 1 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) 
+                                                else 1 end AS fx_mb_o2
+                                                ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN '0-15' 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) 
+                                                else '0-15' end AS fx_mb_v2
                                     from vm_skvendanota a, 
                                         -- Pareto ROL Marca
                                         (SELECT rede, marca, emp,
@@ -480,7 +496,7 @@ class FaixamargemController extends AbstractRestfulController
                                             ,lb
                                             ,nf
                                             ,cc
-                                            ,(CASE WHEN mb <= 5 THEN 1
+                                            ,(CASE WHEN nvl(mb,0) <= 5 THEN 1
                                                 WHEN mb > 5 AND mb <= 10 THEN 2
                                                 WHEN mb > 10 AND mb <= 15 THEN 3
                                                 WHEN mb > 15 AND mb <= 20 THEN 4
@@ -488,7 +504,7 @@ class FaixamargemController extends AbstractRestfulController
                                                 WHEN mb > 25 AND mb <= 30 THEN 6
                                                 WHEN mb > 30 AND mb <= 35 THEN 7
                                                 WHEN mb > 35 THEN 8 END) AS fx_mb_o1
-                                            ,(CASE WHEN mb <= 5 THEN '0-5' 
+                                            ,(CASE WHEN nvl(mb,0) <= 5 THEN '0-5' 
                                                 WHEN mb > 5 AND mb <= 10 THEN '6-10'
                                                 WHEN mb > 10 AND mb <= 15 THEN '11-15'
                                                 WHEN mb > 15 AND mb <= 20 THEN '16-20'
@@ -496,11 +512,11 @@ class FaixamargemController extends AbstractRestfulController
                                                 WHEN mb > 25 AND mb <= 30 THEN '26-30'
                                                 WHEN mb > 30 AND mb <= 35 THEN '31-35'
                                                 WHEN mb > 35 THEN '36-x' END) AS fx_mb_v1
-                                            ,(CASE WHEN mb <= 15 THEN 1 
+                                            ,(CASE WHEN nvl(mb,0) <= 15 THEN 1 
                                                 WHEN mb > 15 AND mb <= 20 THEN 2
                                                 WHEN mb > 20 AND mb <= 29 THEN 3
                                                 WHEN mb >= 30 THEN 4 END) fx_mb_o2
-                                            ,(CASE WHEN mb <= 15 THEN '0-15' 
+                                            ,(CASE WHEN nvl(mb,0) <= 15 THEN '0-15' 
                                                 WHEN mb > 15 AND mb <= 20 THEN '16-20'
                                                 WHEN mb > 20 AND mb <= 29 THEN '21-29'
                                                 WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v2
