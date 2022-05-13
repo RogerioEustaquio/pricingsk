@@ -374,7 +374,7 @@ class FaixamargemController extends AbstractRestfulController
                                                         ,SUM(cmv) AS cmv
                                                         ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
                                                     FROM VM_SKVENDANOTA a
-                                                WHERE TRUNC(a.data,'MM') >= '01/11/2021'
+                                                WHERE TRUNC(a.data,'MM') >= trunc(sysdate,'RRRR')
                                                 $andFilial
                                                 $andData
                                                 $andMarca
@@ -531,7 +531,7 @@ class FaixamargemController extends AbstractRestfulController
                                                 ,SUM(cmv) AS cmv
                                                 ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
                                             FROM VM_SKVENDANOTA a
-                                            where TRUNC(a.data,'MM') >= '01/11/2021'
+                                            where TRUNC(a.data,'MM') >= trunc(sysdate,'RRRR')
                                             $andFilial
                                             $andData
                                             $andMarca
