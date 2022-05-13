@@ -129,8 +129,8 @@ class FaixamargemController extends AbstractRestfulController
                 "emp", //Filial
                 "mb", //Margem
                 "fx_mb_v1", //Faixa Margem
-                "curva_rol", //"Pareto Faturamento",
-                "fx_mb_v2" //Faixa Margem 2,
+                "fx_mb_v2", //Faixa Margem 2,
+                "curva_rol" //"Pareto Faturamento",
                 // "Faixa Faturamento"
             ];
 
@@ -237,13 +237,15 @@ class FaixamargemController extends AbstractRestfulController
                 $adOrderXy = 'DESC';
                 if(substr($paramOrderY,0,5)  == 'fx_mb' ){
                     $paramOrderY = 'fx_mb_o'.substr($paramOrderY,7,1);
+                    // $adOrderXy = 'ASC';
                 }
 
                 if(substr($paramOrderX,0,5) == 'fx_mb' ){
                     $paramOrderX = 'fx_mb_o'.substr($paramOrderX,7,1);
+                    // $adOrderXy = 'ASC';
                 }
 
-                if( $dataXy[$y] == 'curva_rol' || $dataXy[$x] == 'curva_rol') {
+                if( $dataXy[$y] == 'curva_rol') {
                     $adOrderXy = 'ASC';
                 }
 
