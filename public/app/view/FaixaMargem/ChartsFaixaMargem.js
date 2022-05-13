@@ -252,11 +252,14 @@ Ext.define('App.view.faixamargem.ChartsFaixaMargem', {
             tooltip: {
                 formatter: function () {
                     
+                    var nameX = this.point.series.xAxis.axisTitle.textStr;
+                    var nameY = this.point.series.yAxis.axisTitle.textStr;
                     var nomeZ = this.point.series.options.nmPrincipal;
                     var valorFormat = Number(this.point.series.options.valorFormat);
 
-                    return '<b> Filial: </b>' +getPointCategoryName(this.point, 'x') + ' <br><b>'+nomeZ.toUpperCase()+': </b>'+
-                    utilFormat.Value2(Number(this.point.value),valorFormat) + '<br><b>Margem: </b>' + getPointCategoryName(this.point, 'y') ;
+                    return '<b> '+ nameY +': </b>' + getPointCategoryName(this.point, 'y') +
+                     '<br><b>'+ nameX +': </b>' + getPointCategoryName(this.point, 'x') +
+                     '<br><b>'+nomeZ.toUpperCase()+': </b>'+ utilFormat.Value2(Number(this.point.value),valorFormat) ;
                 }
             },
         

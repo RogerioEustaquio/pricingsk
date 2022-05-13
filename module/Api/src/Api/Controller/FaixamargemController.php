@@ -128,9 +128,10 @@ class FaixamargemController extends AbstractRestfulController
                 "rede", 
                 "emp", //Filial
                 "mb", //Margem
-                "fx_mb_v", //Faixa Margem
-                "Faixa Faturamento",
-                "Pareto Faturamento"
+                "fx_mb_v1", //Faixa Margem
+                "curva_rol", //"Pareto Faturamento",
+                "fx_mb_v2" //Faixa Margem 2,
+                // "Faixa Faturamento"
             ];
 
             $dataZ = [
@@ -170,8 +171,10 @@ class FaixamargemController extends AbstractRestfulController
                 $codEmpresa = implode(",",json_decode($codEmpresa));
             }
             $andFilial ='';
+            $andEmp ='';
             if($codEmpresa){
                 $andFilial = " and cod_empresa in ($codEmpresa)";
+                $andEmp = " and codemp in ($codEmpresa)";
             }
 
             if($codProdutos){
@@ -231,62 +234,150 @@ class FaixamargemController extends AbstractRestfulController
                 $paramOrderY = $dataXy[$y];
                 $paramOrderX = $dataXy[$x];
 
-                if($paramOrderY  == 'fx_mb_v' ){
-                    $paramOrderY = 'fx_mb_o';
+                $adOrderXy = 'DESC';
+                if(substr($paramOrderY,0,5)  == 'fx_mb' ){
+                    $paramOrderY = 'fx_mb_o'.substr($paramOrderY,7,1);
                 }
 
-                if($paramOrderX == 'fx_mb_v' ){
-                    $paramOrderX = 'fx_mb_o';
+                if(substr($paramOrderX,0,5) == 'fx_mb' ){
+                    $paramOrderX = 'fx_mb_o'.substr($paramOrderX,7,1);
                 }
 
-                $orderY = "ORDER BY $paramOrderY DESC";
-                $orderXY = "ORDER BY $paramOrderX , $paramOrderY DESC";
+                if( $dataXy[$y] == 'curva_rol' || $dataXy[$x] == 'curva_rol') {
+                    $adOrderXy = 'ASC';
+                }
 
-                $sql1 = "select $dataXy[$y] AS y
-                                ,$paramOrderY
-                            FROM (select 'REDE' as rede 
-                                        ,emp
-                                        ,mb
-                                        ,qtd
-                                        ,rol
-                                        ,(CASE WHEN mb <= 5 THEN 1
-                                               WHEN mb > 5 AND mb <= 10 THEN 2
-                                               WHEN mb > 10 AND mb <= 15 THEN 3
-                                               WHEN mb > 15 AND mb <= 20 THEN 4
-                                               WHEN mb > 20 AND mb <= 25 THEN 5
-                                               WHEN mb > 25 AND mb <= 30 THEN 6
-                                               WHEN mb > 30 AND mb <= 35 THEN 7
-                                               WHEN mb > 35 THEN 8 END) AS fx_mb_o
-                                        ,(CASE WHEN mb <= 5 THEN '0-5' 
-                                               WHEN mb > 5 AND mb <= 10 THEN '6-10'
-                                               WHEN mb > 10 AND mb <= 15 THEN '11-15'
-                                               WHEN mb > 15 AND mb <= 20 THEN '16-20'
-                                               WHEN mb > 20 AND mb <= 25 THEN '21-25'
-                                               WHEN mb > 25 AND mb <= 30 THEN '26-30'
-                                               WHEN mb > 30 AND mb <= 35 THEN '31-35'
-                                               WHEN mb > 35 THEN '36-x' END) AS fx_mb_v
-                                    FROM (SELECT TRUNC(a.data,'MM') AS data
-                                                    ,a.emp 
-                                                    ,a.cod_produto
-                                                    ,a.nota
-                                                    ,a.cnpj_parceiro as cc
-                                                    ,SUM(qtd) AS qtd
-                                                    ,SUM(rol) AS rol
-                                                    ,SUM(lb) AS lb
-                                                    ,SUM(cmv) AS cmv
-                                                    ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
-                                                FROM VM_SKVENDANOTA a
-                                            WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                                            $andFilial
-                                            $andData
-                                            $andMarca
-                                            $andProduto
-                                            GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
-                                    )
-                            GROUP BY $dataXy[$y]
-                                     ,$paramOrderY
-                            $orderY";
-                            
+                $orderY = "ORDER BY $paramOrderY $adOrderXy";
+                $orderXY = "ORDER BY $paramOrderX , $paramOrderY $adOrderXy";
+
+                if( $dataXy[$y] == 'curva_rol' || $dataXy[$x] == 'curva_rol') {
+
+                    $sql1 = " select $dataXy[$y] AS y
+                                    ,$paramOrderY
+                                from (select a.marca
+                                            ,'TOTAL' as rede
+                                            ,a.emp
+                                            ,ptm.curva_rol
+                                            ,SUM(a.qtd) AS qtd
+                                            ,SUM(a.rol) AS rol
+                                            ,SUM(a.lb) AS lb
+                                            ,SUM(a.cmv) AS cmv
+                                            ,ROUND(SUM(a.lb)/SUM(rol)*100) AS mb
+                                            ,a.cnpj_parceiro cc
+                                            ,a.nota nf
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN 1
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) AS fx_mb_o1
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN '0-5' 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END) AS fx_mb_v1
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 1 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) fx_mb_o2
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '0-15' 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) AS fx_mb_v2
+                                    from vm_skvendanota a, 
+                                        -- Pareto ROL Marca
+                                        (SELECT rede, marca, emp,
+                                                (CASE WHEN ac <= 50 THEN 'A' WHEN ac <= 80 THEN 'B' ELSE 'C' END) AS curva_rol
+                                            FROM (SELECT rede, emp, marca,
+                                                        SUM(SUM(fr)) over (PARTITION BY rede ORDER BY rol DESC rows unbounded preceding) AS ac
+                                                    FROM (
+                                                        SELECT rede, emp, marca, rol,
+                                                            100*RATIO_TO_REPORT((CASE WHEN rol > 0 THEN rol END)) over (PARTITION BY rede) fr
+                                                        FROM (SELECT 'TOTAL' AS rede, a.emp, a.marca,
+                                                                        ROUND(SUM(rol),2) AS rol
+                                                                FROM vm_skvendaitem_master a
+                                                                WHERE 1 =1
+                                                                $andData
+                                                                GROUP BY a.emp, a.marca)
+                                                    )
+                                        GROUP BY rede, emp, marca, rol)
+                                        ORDER BY marca, emp, ac ASC) ptm
+                                            
+                                    where a.marca = ptm.marca(+)
+                                    and a.emp = ptm.emp(+)
+                                    $andFilial
+                                    $andData
+                                    $andMarca
+                                    $andProduto
+                                    group by a.marca, a.emp, a.cnpj_parceiro, a.nota, ptm.curva_rol) a
+                                where 1 = 1
+                                group by $dataXy[$y]
+                                        ,$paramOrderY
+                                $orderY";
+
+                }else{
+                    
+                    $sql1 = "select $dataXy[$y] AS y
+                                    ,$paramOrderY
+                                FROM (select 'TOTAL' as rede 
+                                            ,emp
+                                            ,mb
+                                            ,qtd
+                                            ,rol
+                                            ,(CASE WHEN mb <= 5 THEN 1
+                                                WHEN mb > 5 AND mb <= 10 THEN 2
+                                                WHEN mb > 10 AND mb <= 15 THEN 3
+                                                WHEN mb > 15 AND mb <= 20 THEN 4
+                                                WHEN mb > 20 AND mb <= 25 THEN 5
+                                                WHEN mb > 25 AND mb <= 30 THEN 6
+                                                WHEN mb > 30 AND mb <= 35 THEN 7
+                                                WHEN mb > 35 THEN 8 END) AS fx_mb_o1
+                                            ,(CASE WHEN mb <= 5 THEN '0-5' 
+                                                WHEN mb > 5 AND mb <= 10 THEN '6-10'
+                                                WHEN mb > 10 AND mb <= 15 THEN '11-15'
+                                                WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                                WHEN mb > 20 AND mb <= 25 THEN '21-25'
+                                                WHEN mb > 25 AND mb <= 30 THEN '26-30'
+                                                WHEN mb > 30 AND mb <= 35 THEN '31-35'
+                                                WHEN mb > 35 THEN '36-x' END) AS fx_mb_v1
+                                            ,(CASE WHEN mb <= 15 THEN 1 
+                                                WHEN mb > 15 AND mb <= 20 THEN 2
+                                                WHEN mb > 20 AND mb <= 29 THEN 3
+                                                WHEN mb >= 30 THEN 4 END) fx_mb_o2
+                                            ,(CASE WHEN mb <= 15 THEN '0-15' 
+                                                WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                                WHEN mb > 20 AND mb <= 29 THEN '21-29'
+                                                WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v2
+                                        FROM (SELECT TRUNC(a.data,'MM') AS data
+                                                        ,a.emp 
+                                                        ,a.cod_produto
+                                                        ,a.nota
+                                                        ,a.cnpj_parceiro as cc
+                                                        ,SUM(qtd) AS qtd
+                                                        ,SUM(rol) AS rol
+                                                        ,SUM(lb) AS lb
+                                                        ,SUM(cmv) AS cmv
+                                                        ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
+                                                    FROM VM_SKVENDANOTA a
+                                                WHERE TRUNC(a.data,'MM') >= '01/11/2021'
+                                                $andFilial
+                                                $andData
+                                                $andMarca
+                                                $andProduto
+                                                GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
+                                        )
+                                GROUP BY $dataXy[$y]
+                                        ,$paramOrderY
+                                $orderY";
+                }
+                // print "$sql1";
+                // exit;
+
                 $stmt = $conn->prepare($sql1);
                 $stmt->execute();
                 $resultY = $stmt->fetchAll();
@@ -296,60 +387,148 @@ class FaixamargemController extends AbstractRestfulController
                 $stdClass = new StdClass;
                 $resultSetY = new HydratingResultSet($hydrator, $stdClass);
                 $resultSetY->initialize($resultY);
+
+                if($dataXy[$x] == 'curva_rol' || $dataXy[$y] == 'curva_rol') {
+
+                    $sql = "  select $dataXy[$x] as x
+                                    ,$dataXy[$y] as y
+                                    ,$dataZcol[$z] as z
+                                    ,$paramOrderY
+                                    ,$paramOrderX
+                            from (select a.marca
+                                        ,'TOTAL' as rede
+                                            ,a.emp
+                                            ,ptm.curva_rol
+                                            ,SUM(a.qtd) AS qtd
+                                            ,SUM(a.rol) AS rol
+                                            ,SUM(a.lb) AS lb
+                                            ,SUM(a.cmv) AS cmv
+                                            ,ROUND(SUM(a.lb)/SUM(rol)*100) AS mb
+                                            ,a.cnpj_parceiro cc
+                                            ,a.nota nf
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN 1
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) AS fx_mb_o1
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 5 THEN '0-5' 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END) AS fx_mb_v1
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 1 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) fx_mb_o2
+                                            ,(CASE WHEN ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '0-15' 
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
+                                                WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) AS fx_mb_v2
+                                    from vm_skvendanota a, 
+                                        -- Pareto ROL Marca
+                                        (SELECT rede, marca, emp,
+                                                (CASE WHEN ac <= 50 THEN 'A' WHEN ac <= 80 THEN 'B' ELSE 'C' END) AS curva_rol
+                                            FROM (SELECT rede, emp, marca,
+                                                        SUM(SUM(fr)) over (PARTITION BY rede ORDER BY rol DESC rows unbounded preceding) AS ac
+                                                    FROM (
+                                                        SELECT rede, emp, marca, rol,
+                                                            100*RATIO_TO_REPORT((CASE WHEN rol > 0 THEN rol END)) over (PARTITION BY rede) fr
+                                                        FROM (SELECT 'TOTAL' AS rede, a.emp, a.marca,
+                                                                        ROUND(SUM(rol),2) AS rol
+                                                                FROM vm_skvendaitem_master a
+                                                                WHERE 1 =1
+                                                                $andData
+                                                                GROUP BY a.emp, a.marca)
+                                                    )                                        
+                                        GROUP BY rede, emp, marca, rol)
+                                        ORDER BY marca, emp, ac ASC) ptm
+                                            
+                                    where a.marca = ptm.marca(+)
+                                    and a.emp = ptm.emp(+)
+                                    $andFilial
+                                    $andData
+                                    $andMarca
+                                    $andProduto
+                                    group by a.marca, a.emp, a.cnpj_parceiro, a.nota, ptm.curva_rol) a
+                            where 1 = 1
+                            group by $dataXy[$x]
+                                    ,$dataXy[$y]
+                                    ,$paramOrderX
+                                    ,$paramOrderY
+                            $orderXY";
+
+                }else{
+                    
+                    $sql = "select $dataXy[$x] as x
+                                    ,$dataXy[$y] as y
+                                    ,$dataZcol[$z] as z
+                                    ,$paramOrderY
+                                    ,$paramOrderX
+                            from  (select   'TOTAL' as rede
+                                            ,emp
+                                            ,mb
+                                            ,rol
+                                            ,qtd
+                                            ,lb
+                                            ,nf
+                                            ,cc
+                                            ,(CASE WHEN mb <= 5 THEN 1
+                                                WHEN mb > 5 AND mb <= 10 THEN 2
+                                                WHEN mb > 10 AND mb <= 15 THEN 3
+                                                WHEN mb > 15 AND mb <= 20 THEN 4
+                                                WHEN mb > 20 AND mb <= 25 THEN 5
+                                                WHEN mb > 25 AND mb <= 30 THEN 6
+                                                WHEN mb > 30 AND mb <= 35 THEN 7
+                                                WHEN mb > 35 THEN 8 END) AS fx_mb_o1
+                                            ,(CASE WHEN mb <= 5 THEN '0-5' 
+                                                WHEN mb > 5 AND mb <= 10 THEN '6-10'
+                                                WHEN mb > 10 AND mb <= 15 THEN '11-15'
+                                                WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                                WHEN mb > 20 AND mb <= 25 THEN '21-25'
+                                                WHEN mb > 25 AND mb <= 30 THEN '26-30'
+                                                WHEN mb > 30 AND mb <= 35 THEN '31-35'
+                                                WHEN mb > 35 THEN '36-x' END) AS fx_mb_v1
+                                            ,(CASE WHEN mb <= 15 THEN 1 
+                                                WHEN mb > 15 AND mb <= 20 THEN 2
+                                                WHEN mb > 20 AND mb <= 29 THEN 3
+                                                WHEN mb >= 30 THEN 4 END) fx_mb_o2
+                                            ,(CASE WHEN mb <= 15 THEN '0-15' 
+                                                WHEN mb > 15 AND mb <= 20 THEN '16-20'
+                                                WHEN mb > 20 AND mb <= 29 THEN '21-29'
+                                                WHEN mb >= 30 THEN '30-x' END) AS fx_mb_v2
+                                    FROM (SELECT TRUNC(a.data,'MM') AS data
+                                                ,a.emp
+                                                ,a.cod_produto
+                                                ,a.nota as nf
+                                                ,a.cnpj_parceiro as cc
+                                                ,SUM(qtd) AS qtd
+                                                ,SUM(rol) AS rol
+                                                ,SUM(lb) AS lb
+                                                ,SUM(cmv) AS cmv
+                                                ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
+                                            FROM VM_SKVENDANOTA a
+                                            where TRUNC(a.data,'MM') >= '01/11/2021'
+                                            $andFilial
+                                            $andData
+                                            $andMarca
+                                            $andProduto
+                                            GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
+                                    ) a
+                                    group by $dataXy[$x]
+                                            ,$dataXy[$y]
+                                            ,$paramOrderX
+                                            ,$paramOrderY
+                                    $orderXY";
+                }
                 
-                $sql = "select $dataXy[$x] as x
-                                ,$dataXy[$y] as y
-                                ,$dataZcol[$z] as z
-                                ,$paramOrderY
-                                ,$paramOrderX
-                        from  (select   'REDE' as rede
-                                        ,emp
-                                        ,mb
-                                        ,rol
-                                        ,qtd
-                                        ,lb
-                                        ,nf
-                                        ,cc
-                                        ,(CASE WHEN mb <= 5 THEN 1
-                                               WHEN mb > 5 AND mb <= 10 THEN 2
-                                               WHEN mb > 10 AND mb <= 15 THEN 3
-                                               WHEN mb > 15 AND mb <= 20 THEN 4
-                                               WHEN mb > 20 AND mb <= 25 THEN 5
-                                               WHEN mb > 25 AND mb <= 30 THEN 6
-                                               WHEN mb > 30 AND mb <= 35 THEN 7
-                                               WHEN mb > 35 THEN 8 END) AS fx_mb_o
-                                        ,(CASE WHEN mb <= 5 THEN '0-5' 
-                                               WHEN mb > 5 AND mb <= 10 THEN '6-10'
-                                               WHEN mb > 10 AND mb <= 15 THEN '11-15'
-                                               WHEN mb > 15 AND mb <= 20 THEN '16-20'
-                                               WHEN mb > 20 AND mb <= 25 THEN '21-25'
-                                               WHEN mb > 25 AND mb <= 30 THEN '26-30'
-                                               WHEN mb > 30 AND mb <= 35 THEN '31-35'
-                                               WHEN mb > 35 THEN '36-x' END) AS fx_mb_v
-                                FROM (SELECT TRUNC(a.data,'MM') AS data
-                                             ,a.emp
-                                             ,a.cod_produto
-                                             ,a.nota as nf
-                                             ,a.cnpj_parceiro as cc
-                                             ,SUM(qtd) AS qtd
-                                             ,SUM(rol) AS rol
-                                             ,SUM(lb) AS lb
-                                             ,SUM(cmv) AS cmv
-                                             ,ROUND(SUM(lb)/SUM(rol)*100) AS mb
-                                        FROM VM_SKVENDANOTA a
-                                        where TRUNC(a.data,'MM') >= '01/11/2021'
-                                        $andFilial
-                                        $andData
-                                        $andMarca
-                                        $andProduto
-                                        GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota, a.cnpj_parceiro)
-                                ) a
-                                group by $dataXy[$x]
-                                        ,$dataXy[$y]
-                                        ,$paramOrderX
-                                        ,$paramOrderY
-                                $orderXY";
-                
+                // print"$sql";
+                // exit;
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
                 $results = $stmt->fetchAll();

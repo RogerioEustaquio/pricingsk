@@ -15,12 +15,12 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
         var me = this;
 
         var dataXy = [
-            {"id":0, "name":"REDE"},
+            {"id":0, "name":"Rede"},
             {"id":1, "name":"Filial"},
             {"id":2, "name":"Margem"},
             {"id":3, "name":"Faixa Margem"},
-            // {"id":3, "name":"Faixa Faturamento"},
-            // {"id":4, "name":"Pareto Faturamento"}
+            {"id":4, "name":"Pareto Faturamento Marca"},
+            {"id":5, "name":"Faixa Margem 2"},
         ];
 
        var dataValor = [
