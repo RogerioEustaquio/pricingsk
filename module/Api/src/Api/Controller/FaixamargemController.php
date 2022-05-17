@@ -130,7 +130,8 @@ class FaixamargemController extends AbstractRestfulController
                 "mb", //Margem
                 "fx_mb_v1", //Faixa Margem
                 "fx_mb_v2", //Faixa Margem 2,
-                "curva_rol" //"Pareto Faturamento",
+                "curva_rol", //"Pareto Faturamento",
+                "curva_rol_cc" //"Pareto Faturamento",
                 // "Faixa Faturamento"
             ];
 
@@ -245,14 +246,90 @@ class FaixamargemController extends AbstractRestfulController
                     // $adOrderXy = 'ASC';
                 }
 
-                if( $dataXy[$y] == 'curva_rol') {
+                if( $dataXy[$y] == 'curva_rol' || $dataXy[$y] ==  'curva_rol_cc') {
                     $adOrderXy = 'ASC';
                 }
 
                 $orderY = "ORDER BY $paramOrderY $adOrderXy";
                 $orderXY = "ORDER BY $paramOrderX , $paramOrderY $adOrderXy";
 
-                if( $dataXy[$y] == 'curva_rol' || $dataXy[$x] == 'curva_rol') {
+                if( $dataXy[$y] == 'curva_rol_cc' || $dataXy[$x] == 'curva_rol_cc') {
+
+                    $sql1 = " select $dataXy[$y] AS y
+                                    ,$paramOrderY
+                                from (select 'TOTAL' as rede
+                                            ,a.emp
+                                            ,ptm.curva_rol_cc
+                                            ,SUM(a.qtd) AS qtd
+                                            ,SUM(a.rol) AS rol
+                                            ,SUM(a.lb) AS lb
+                                            ,SUM(a.cmv) AS cmv
+                                            ,case when SUM(rol) >0 then ROUND(SUM(a.lb)/SUM(rol)*100) else 0 end AS mb
+                                            ,a.cnpj_parceiro cc
+                                            ,a.nota nf
+                                            ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN 1
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) 
+                                                else 1 end AS fx_mb_o1
+                                                , case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN '0-5' 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END)
+                                                else '0-5' end AS fx_mb_v1
+                                                ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN 1 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) 
+                                                else 1 end AS fx_mb_o2
+                                                ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN '0-15' 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) 
+                                                else '0-15' end AS fx_mb_v2
+                                    from vm_skvendanota a, 
+                                        -- Pareto ROL Marca
+                                        (SELECT rede, cc, emp,
+                                                (CASE WHEN ac <= 50 THEN 'A' WHEN ac <= 80 THEN 'B' ELSE 'C' END) AS curva_rol_cc
+                                            FROM (SELECT rede, emp, cc,
+                                                        SUM(SUM(fr)) over (PARTITION BY rede ORDER BY rol DESC rows unbounded preceding) AS ac
+                                                    FROM (
+                                                        SELECT rede, emp, cc, rol,
+                                                            100*RATIO_TO_REPORT((CASE WHEN rol > 0 THEN rol END)) over (PARTITION BY rede) fr
+                                                        FROM (SELECT 'TOTAL' AS rede, a.emp, a.cnpj_parceiro as cc,
+                                                                        ROUND(SUM(rol),2) AS rol
+                                                                FROM vm_skvendanota a
+                                                                WHERE 1 =1
+                                                                $andData
+                                                                GROUP BY a.emp, a.cnpj_parceiro)
+                                                    )
+                                        GROUP BY rede, emp, cc, rol)
+                                        ORDER BY cc, emp, ac ASC) ptm
+                                    where a.cnpj_parceiro = ptm.cc(+)
+                                    and a.emp = ptm.emp(+)
+                                    $andFilial
+                                    $andData
+                                    $andMarca
+                                    $andProduto
+                                    group by a.emp, a.cnpj_parceiro, a.nota, ptm.curva_rol_cc) a
+                                where 1 = 1
+                                group by $dataXy[$y]
+                                        ,$paramOrderY
+                                $orderY";
+
+                }else if( $dataXy[$y] == 'curva_rol' || $dataXy[$x] == 'curva_rol') {
 
                     $sql1 = " select $dataXy[$y] AS y
                                     ,$paramOrderY
@@ -398,7 +475,88 @@ class FaixamargemController extends AbstractRestfulController
                 $resultSetY = new HydratingResultSet($hydrator, $stdClass);
                 $resultSetY->initialize($resultY);
 
-                if($dataXy[$x] == 'curva_rol' || $dataXy[$y] == 'curva_rol') {
+                if( $dataXy[$y] == 'curva_rol_cc' || $dataXy[$x] == 'curva_rol_cc') {
+
+                    $sql = " select $dataXy[$x] as x
+                                    ,$dataXy[$y] as y
+                                    ,$dataZcol[$z] as z
+                                    ,$paramOrderY
+                                    ,$paramOrderX
+                                from (select 'TOTAL' as rede
+                                            ,a.emp
+                                            ,ptm.curva_rol_cc
+                                            ,SUM(a.qtd) AS qtd
+                                            ,SUM(a.rol) AS rol
+                                            ,SUM(a.lb) AS lb
+                                            ,SUM(a.cmv) AS cmv
+                                            ,case when SUM(rol) >0 then ROUND(SUM(a.lb)/SUM(rol)*100) else 0 end AS mb
+                                            ,a.cnpj_parceiro cc
+                                            ,a.nota nf
+                                            ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN 1
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN 2
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN 3
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 4
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN 5
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN 6
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN 7
+                                                        WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN 8 END) 
+                                                else 1 end AS fx_mb_o1
+                                                , case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 5 THEN '0-5' 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 5 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 10 THEN '6-10'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 10 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 15 THEN '11-15'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 25 THEN '21-25'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 25 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 30 THEN '26-30'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 30 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 35 THEN '31-35'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 35 THEN '36-x' END)
+                                                else '0-5' end AS fx_mb_v1
+                                                ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN 1 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN 2
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN 3
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN 4 END) 
+                                                else 1 end AS fx_mb_o2
+                                                ,case when SUM(rol) >0 then
+                                                    (CASE WHEN nvl(ROUND(SUM(a.lb)/SUM(rol)*100) ,0) <= 15 THEN '0-15' 
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 15 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 20 THEN '16-20'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) > 20 AND ROUND(SUM(a.lb)/SUM(rol)*100) <= 29 THEN '21-29'
+                                                    WHEN ROUND(SUM(a.lb)/SUM(rol)*100) >= 30 THEN '30-x' END) 
+                                                else '0-15' end AS fx_mb_v2
+                                    from vm_skvendanota a, 
+                                        -- Pareto ROL Marca
+                                        (SELECT rede, cc, emp,
+                                                (CASE WHEN ac <= 50 THEN 'A' WHEN ac <= 80 THEN 'B' ELSE 'C' END) AS curva_rol_cc
+                                            FROM (SELECT rede, emp, cc,
+                                                        SUM(SUM(fr)) over (PARTITION BY rede ORDER BY rol DESC rows unbounded preceding) AS ac
+                                                    FROM (
+                                                        SELECT rede, emp, cc, rol,
+                                                            100*RATIO_TO_REPORT((CASE WHEN rol > 0 THEN rol END)) over (PARTITION BY rede) fr
+                                                        FROM (SELECT 'TOTAL' AS rede, a.emp, a.cnpj_parceiro as cc,
+                                                                        ROUND(SUM(rol),2) AS rol
+                                                                FROM vm_skvendanota a
+                                                                WHERE 1 =1
+                                                                $andData
+                                                                GROUP BY a.emp, a.cnpj_parceiro)
+                                                    )
+                                        GROUP BY rede, emp, cc, rol)
+                                        ORDER BY cc, emp, ac ASC) ptm
+                                    where a.cnpj_parceiro = ptm.cc(+)
+                                    and a.emp = ptm.emp(+)
+                                    $andFilial
+                                    $andData
+                                    $andMarca
+                                    $andProduto
+                                    group by a.emp, a.cnpj_parceiro, a.nota, ptm.curva_rol_cc) a
+                                where 1 = 1
+                                group by $dataXy[$x]
+                                        ,$dataXy[$y]
+                                        ,$paramOrderX
+                                        ,$paramOrderY
+                                $orderXY";
+
+                }else if($dataXy[$x] == 'curva_rol' || $dataXy[$y] == 'curva_rol') {
 
                     $sql = "  select $dataXy[$x] as x
                                     ,$dataXy[$y] as y

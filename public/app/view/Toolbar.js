@@ -84,13 +84,13 @@ Ext.define('App.view.Toolbar', {
                         window.document.location= BASEURL +'/#faixamargem';
                     }
                 },
-                // {
-                //     xtype: 'button',
-                //     text: 'Análise Performance',
-                //     handler: function(){
-                //         window.document.location= BASEURL +'/#analiseperformance';
-                //     }
-                // }
+                {
+                    xtype: 'button',
+                    text: 'Análise Performance',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#analiseperformance';
+                    }
+                }
             ]
         });
 

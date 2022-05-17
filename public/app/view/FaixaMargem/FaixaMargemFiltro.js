@@ -21,6 +21,7 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
             {"id":3, "name":"Faixa Margem 0-36"},
             {"id":4, "name":"Faixa Margem 0-30"},
             {"id":5, "name":"Pareto ROL Marca / Filial"},
+            {"id":6, "name":"Pareto ROL Cliente / Filial"}
         ];
 
        var dataValor = [
@@ -61,11 +62,19 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                 select : function(record,index){
 
                     var array = [];
+                    var bolleanEntra = true;
                     for (let i = 0; i < dataXy.length; i++) {
                         const element = dataXy[i];
 
-                        if(index.data.name != dataXy[i].name)
+                        if(index.data.id == 5 && dataXy[i].id == 6)
+                            bolleanEntra = false;
+                        if(index.data.id == 6 && dataXy[i].id == 5)
+                            bolleanEntra = false;
+
+                        if(bolleanEntra && index.data.name != dataXy[i].name)
                             array.push(element);
+
+                        bolleanEntra = true;
                         
                     }
                     this.up('panel').up('panel').down('#x').store.setData(array);
@@ -102,11 +111,19 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                 select : function(record,index){
 
                     var array = [];
+                    var bolleanEntra = true;
                     for (let i = 0; i < dataXy.length; i++) {
                         const element = dataXy[i];
 
-                        if(index.data.name != dataXy[i].name)
+                        if(index.data.id == 5 && dataXy[i].id == 6)
+                            bolleanEntra = false;
+                        if(index.data.id == 6 && dataXy[i].id == 5)
+                            bolleanEntra = false;
+
+                        if(bolleanEntra && index.data.name != dataXy[i].name)
                             array.push(element);
+                        
+                        bolleanEntra = true;
                         
                     }
                     this.up('panel').up('panel').down('#y').store.setData(array);
