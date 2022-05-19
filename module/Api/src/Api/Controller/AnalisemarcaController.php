@@ -825,10 +825,41 @@ class AnalisemarcaController extends AbstractRestfulController
 
         }
         
+        $andSqlMarca ="";
         if($idMarcas){
             $inmarca = $notmarca == 'true' ? 'not' : '';
 
-            $andSql .= "AND a.marca $inmarca IN ( SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas) )";
+            #$andSql .= "AND a.marca $inmarca IN ( SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas) )";
+
+            $sqlMarca = "SELECT descricao_marca FROM vw_skmarca WHERE cod_marca IN ($idMarcas)";
+
+            $em = $this->getEntityManager();
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sqlMarca);
+            $stmt->execute();
+            $resultMarca = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $hydrator->addStrategy('descricao_marca', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSetMarca = new HydratingResultSet($hydrator, $stdClass);
+            $resultSetMarca->initialize($resultMarca);
+
+            $stringMarca = '';
+            foreach ($resultSetMarca as $row) {
+                $data1 = $hydrator->extract($row);
+
+                if(!$stringMarca){
+                    $stringMarca = "'".$data1['descricaoMarca']."'";
+                }else{
+                    $stringMarca .= ",'".$data1['descricaoMarca']."'";
+                }
+
+            }
+
+            $andSqlMarca = "AND a.marca $inmarca IN ($stringMarca)";
+
+
         }
         $sqlMotadora = '';
         $sqlMotadoraRelaciona = '';
@@ -959,8 +990,13 @@ class AnalisemarcaController extends AbstractRestfulController
                         $sqlMotadoraRelaciona
                         $andSql
                         $andSqlCurva
+                        $andSqlMarca
                         group by a.data
                         order by a.data";
+                
+                // print "$sql";
+                // exit;
+
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
                 $results = $stmt->fetchAll();
@@ -2778,7 +2814,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     $andSql
                     $andSqlCurva
                     and round(es.VALOR,2) > 0
-                    --and rownum < 100
+                    and rownum < 100
                     ";
 
             $session = $this->getSession();
