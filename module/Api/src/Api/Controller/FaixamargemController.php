@@ -254,7 +254,7 @@ class FaixamargemController extends AbstractRestfulController
                     // $adOrderXy = 'ASC';
                 }
 
-                if( $dataXy[$y] == 'curva_rol' || $dataXy[$y] ==  'curva_rol_cc') {
+                if(substr($dataXy[$y],0,6)== 'pareto') {
                     $adOrderXy = 'ASC';
                 }
 

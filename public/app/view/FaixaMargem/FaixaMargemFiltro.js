@@ -195,7 +195,9 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                 elTagEmpresa.setDisabled(false);
             }
         );
-
+        
+        var dataIni = new Date().getFullYear();
+        dataIni = '01/01/'+dataIni;
         var fielDataInicio = Ext.create('Ext.form.field.Date',{
             name: 'datainicio',
             itemId: 'datainicio',
@@ -208,7 +210,7 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
             format: 'd/m/Y',
             altFormats: 'dmY',
             emptyText: '__/__/____',
-            // value: sysdate
+            value: dataIni
         });
         
         var fielDataFinal = Ext.create('Ext.form.field.Date',{
