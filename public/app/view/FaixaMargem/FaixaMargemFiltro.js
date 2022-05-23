@@ -17,11 +17,17 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
         var dataXy = [
             {"id":0, "name":"Rede"},
             {"id":1, "name":"Filial"},
-            {"id":2, "name":"Margem"},
-            {"id":3, "name":"Faixa Margem 0-36"},
-            {"id":4, "name":"Faixa Margem 0-30"},
-            {"id":5, "name":"Pareto ROL Marca / Filial"},
-            {"id":6, "name":"Pareto ROL Cliente / Filial"}
+            {"id":2, "name":"Margem Item"},
+            {"id":3, "name":"Margem Marca"},
+            {"id":4, "name":"Margem Cliente"},
+            {"id":5, "name":"Faixa MB Item / Nota 0-36"},
+            {"id":6, "name":"Faixa MB  Item / Nota 0-30"},
+            {"id":7, "name":"Pareto ROL Marca / Filial"},
+            {"id":8, "name":"Pareto ROL Cliente / Filial"},
+            {"id":9, "name":"Faixa MB Marca 0-36"},
+            {"id":10, "name":"Faixa MB Marca 0-30"},
+            {"id":11, "name":"Faixa MB Cliente 0-36"},
+            {"id":12, "name":"Faixa MB Cliente 0-30"}
         ];
 
        var dataValor = [
@@ -66,11 +72,6 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     for (let i = 0; i < dataXy.length; i++) {
                         const element = dataXy[i];
 
-                        if(index.data.id == 5 && dataXy[i].id == 6)
-                            bolleanEntra = false;
-                        if(index.data.id == 6 && dataXy[i].id == 5)
-                            bolleanEntra = false;
-
                         if(bolleanEntra && index.data.name != dataXy[i].name)
                             array.push(element);
 
@@ -114,11 +115,6 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                     var bolleanEntra = true;
                     for (let i = 0; i < dataXy.length; i++) {
                         const element = dataXy[i];
-
-                        if(index.data.id == 5 && dataXy[i].id == 6)
-                            bolleanEntra = false;
-                        if(index.data.id == 6 && dataXy[i].id == 5)
-                            bolleanEntra = false;
 
                         if(bolleanEntra && index.data.name != dataXy[i].name)
                             array.push(element);
