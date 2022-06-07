@@ -108,8 +108,6 @@ class ClienteposicionamentoController extends AbstractRestfulController
     public function clienteposicionamentoAction()
     {
         $data = array();
-        $margem = array();
-        $filiais = array();
         
         try {
 
@@ -125,6 +123,9 @@ class ClienteposicionamentoController extends AbstractRestfulController
             $idEixos    = $this->params()->fromPost('idEixos',null);
 
             $em = $this->getEntityManager();
+
+            $pDataInicio= '01/05/2021';
+            $pDataFim   = '31/05/2021';
 
             /////////////////////////////////////////////////////////////////
             if($filial){
@@ -146,7 +147,7 @@ class ClienteposicionamentoController extends AbstractRestfulController
                 $idEixos = json_decode($idEixos);
             }else{
                 $idEixos = new \stdClass;
-                $idEixos->x = 'rol';
+                $idEixos->x = 'data';
                 $idEixos->y = 'mb';
             }
             if($pareto){
@@ -211,62 +212,50 @@ class ClienteposicionamentoController extends AbstractRestfulController
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
             
-            $sql1 = "select distinct a.mb
-                        from (SELECT TRUNC(a.data,'MM') AS data,
-                                    a.emp, 
-                                    a.cod_produto,
-                                    a.nota,
-                                    SUM(qtd) AS qtd,
-                                    SUM(rol) AS rol,
-                                    SUM(lb) AS lb,
-                                    SUM(cmv) AS cmv,
-                                    ROUND(SUM(lb)/SUM(rol)*100) AS mb
-                                FROM VM_SKVENDANOTA a
-                                WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                                AND a.cod_produto = 397
-                                GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
-                    order by 1 desc";
+            $sysdateInicio = "'01/05/2022'";
+            $sysdateFim = "'10/05/2022'";
+            $sql1 = "select distinct to_char(data,'dd/mm/yyyy') as data
+                            , data as order_data
+                        from vm_skvendanota a 
+                    WHERE 1 = 1
+                    and data >= '01052022'
+                    and data <= '10052022'
+                    order by data";
+            // print"$sql1";
+            // exit;
 
             $stmt = $conn->prepare($sql1);
             $stmt->execute();
-            $resultMb = $stmt->fetchAll();
+            $resultCount = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('mb', new ValueStrategy);
+            $hydrator->addStrategy('data', new ValueStrategy);
             $stdClass = new StdClass;
-            $resultSetMb = new HydratingResultSet($hydrator, $stdClass);
-            $resultSetMb->initialize($resultMb);
+            $resultSetCont = new HydratingResultSet($hydrator, $stdClass);
+            $resultSetCont->initialize($resultCount);
 
-            $mbCategoria = array();
-            $posicaoMb = 0;
-            foreach ($resultSetMb as $row) {
+            $arrayX = [];
+            $stringX = [];
+            foreach ($resultSetCont as $row) {
                 $elementos = $hydrator->extract($row);
 
-                $mbCategoria[(string)$elementos['mb']] = $posicaoMb;
-                
-                $margem[]   = $elementos['mb'];
+                $newData = $elementos['data'];
 
-                $posicaoMb++;
+                $arrayX[] = $newData;
+
 
             }
 
-            $sql = "select a.emp,a.mb,round(sum(a.rol),0) rol from 
-                        (
-                        SELECT TRUNC(a.data,'MM') AS data,
-                            a.emp, 
-                            a.cod_produto,
-                            a.nota,
-                            SUM(qtd) AS qtd,
-                            SUM(rol) AS rol,
-                            SUM(lb) AS lb,
-                            SUM(cmv) AS cmv,
-                            ROUND(SUM(lb)/SUM(rol)*100) AS mb
-                        FROM VM_SKVENDANOTA a
-                        WHERE TRUNC(a.data,'MM') >= '01/11/2021'
-                        AND a.cod_produto = 397
-                        GROUP BY TRUNC(a.data,'MM'), a.emp, a.cod_produto, a.nota) a
-                        group by a.emp,a.mb
-                        order by 1,2 desc";
+            $sql = "select to_char(data,'dd/mm/yyyy') as data
+                            ,cnpj_parceiro cod_cliente
+                            ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
+                            , 2 decmb
+                            ,round(sum(nvl(rol,0)),0) as rol
+                        from vm_skvendanota a 
+                    WHERE 1 = 1
+                    and data >= '01052022'
+                    and data <= '10052022'
+                    group by data,cnpj_parceiro";
             // print "$sql";
             // exit;
             $stmt = $conn->prepare($sql);
@@ -276,72 +265,71 @@ class ClienteposicionamentoController extends AbstractRestfulController
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
-            // $hydrator->addStrategy('qtd', new ValueStrategy);
-            $hydrator->addStrategy('rol', new ValueStrategy);
-            // $hydrator->addStrategy('lb', new ValueStrategy);
+            $hydrator->addStrategy('data', new ValueStrategy);
+            $hydrator->addStrategy('rob', new ValueStrategy);
+            // $hydrator->addStrategy('rol', new ValueStrategy);
             // $hydrator->addStrategy('cmv', new ValueStrategy);
+            // $hydrator->addStrategy('lb', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
 
-            $arrayEmp = array();
-            $contLine = 0;
-            $contColuna = 0;
-            $empAnterior='';
+            $data = array();
+            $arrayPJ = array();
+            $arrayPF = array();
             foreach ($resultSet as $row) {
-                
                 $elementos = $hydrator->extract($row);
 
-                $paramMb = $elementos['mb'];
+                $newData = $elementos['data'];
 
-                if($empAnterior && $elementos['emp'] <> $empAnterior){
+                $arrayPJ[] = array(
+                    'x'=>  $newData,
+                    'y'=> (float)$elementos[$idEixos->y],
+                    'filial'=> $elementos['codCliente'],
+                    'idPessoa' => $elementos['codCliente'],
+                    'nome' => $elementos['codCliente'],
+                    'decx' => 0,
+                    'decy' => $elementos['dec'.$idEixos->y]
+                );
 
-                    while($contLine < count($mbCategoria)){// adiciona posição null (Caso ultima margem anterior nao seja final)
-
-                        $arrayEmp[] = [$contColuna,$contLine, null];
-                        $contLine++;
-                    }
-
-                    $filiais[]= $empAnterior;
-                    $contLine=0;
-                    $contColuna++;
-
-                }
-
-                if( count($mbCategoria) > 0){
-
-                    while($contLine < $mbCategoria[$paramMb] ){// adiciona posição null (Caso margem não seja a inicial)
-
-                        $arrayEmp[] = [$contColuna,$contLine, null];
-                        $contLine++;
-                    }
-                }
-
-                $arrayEmp[] = array($contColuna,$mbCategoria[$paramMb],$elementos['rol']);
-
-                $contLine++;
-                $empAnterior = $elementos['emp'];
 
             }
 
-            while($contLine < count($mbCategoria)){/// adiciona posição null (Caso ultima margem nao seja final na ultima coluna)
+            $arrayPF[] = array(
+                'x'=> $elementos[$idEixos->x],
+                'y'=> (float)$elementos[$idEixos->y],
+                'filial'=> $elementos['codCliente'],
+                'idPessoa' => $elementos['codCliente'],
+                'nome' => $elementos['codCliente'],
+                'decx' => 0,
+                'decy' => $elementos['dec'.$idEixos->y]
+            );
 
-                $arrayEmp[] = [$contColuna,$contLine, null];
-                $contLine++;
-            }
+            $data = array(
+                    array(
+                        'name' => 'Cliente',
+                        'color'=> 'rgba(223, 83, 83, .5)',
+                        'data' => $arrayPJ
+                    ),
+                    array(
+                        'name' => 'Pessoa Física',
+                        'color'=> 'rgba(119, 152, 191, .5)',
+                        'data' => $arrayPF
+                    )
+                )
+            ;
 
-            $filiais[]= $empAnterior;
-
-            $this->setCallbackData($arrayEmp);
+            // var_dump($data);
+            // exit;
+            $this->setCallbackData($data);
             
         } catch (\Exception $e) {
             $this->setCallbackError($e->getMessage());
         }
         $objReturn = $this->getCallbackModel();
-        $objReturn->yCategories = $margem;
-        $objReturn->xCategories = $filiais;
-        // $objReturn->referencia  = array('incio'=> $resultCount[0]['DATAINICIO'],'fim'=> $resultCount[0]['DATAFIM']);
+        $objReturn->xCategoria = $arrayX;
+        $objReturn->referencia = array('incio'=> $pDataInicio,'fim'=> $pDataFim);
 
         return $objReturn; 
     }
