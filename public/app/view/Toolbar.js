@@ -90,7 +90,14 @@ Ext.define('App.view.Toolbar', {
                     handler: function(){
                         window.document.location= BASEURL +'/#analiseperformance';
                     }
-                }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Dispersão Venda',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#dispersaovenda';
+                    }
+                },
             ]
         });
 
