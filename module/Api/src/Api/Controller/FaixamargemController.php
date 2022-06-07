@@ -132,6 +132,8 @@ class FaixamargemController extends AbstractRestfulController
                 "mb_cliente", //Margem Cliente
                 "fx_mb_it_1", //Faixa Margem item
                 "fx_mb_it_2", //Faixa Margem item 2,
+                "fx_mb_it_3", //Faixa Margem item 3
+                "fx_mb_it_4", //Faixa Margem item 4,
                 "pareto_abc_rol_marca", //"Pareto Faturamento",
                 "pareto_abc_rol_cc", //"Pareto Faturamento",
                 "fx_mb_ma_1", //Faixa Margem Marca
@@ -382,7 +384,70 @@ class FaixamargemController extends AbstractRestfulController
                                     WHEN vd.mb > 15 AND vd.mb <= 20 THEN 2
                                     WHEN vd.mb > 20 AND vd.mb <= 29 THEN 3
                                     WHEN vd.mb >= 30 THEN 4 END AS fx_mb_it_o2
-                                
+                                ,CASE WHEN nvl(vd.mb ,0) <= 5 THEN '0-5' 
+                                      WHEN vd.mb > 5 AND vd.mb <= 10 THEN '6-10'
+                                      WHEN vd.mb > 10 AND vd.mb <= 15 THEN '11-15'
+                                      WHEN vd.mb > 15 AND vd.mb <= 20 THEN '16-20'
+                                      WHEN vd.mb > 20 AND vd.mb <= 25 THEN '21-25'
+                                      WHEN vd.mb > 25 AND vd.mb <= 30 THEN '26-30'
+                                      WHEN vd.mb > 30 AND vd.mb <= 35 THEN '31-35'
+                                      WHEN vd.mb > 35 AND vd.mb <= 40 THEN '36-40'
+                                      WHEN vd.mb > 40 AND vd.mb <= 45 THEN '41-45'
+                                      WHEN vd.mb > 45 AND vd.mb <= 50 THEN '46-50'
+                                      WHEN vd.mb > 50 AND vd.mb <= 55 THEN '51-55'
+                                      WHEN vd.mb > 55 AND vd.mb <= 60 THEN '56-40'
+                                      WHEN vd.mb > 60 AND vd.mb <= 65 THEN '61-65'
+                                      WHEN vd.mb > 65 AND vd.mb <= 70 THEN '66-70'
+                                      WHEN vd.mb > 70 AND vd.mb <= 75 THEN '71-75'
+                                      WHEN vd.mb > 75 AND vd.mb <= 80 THEN '76-80'
+                                      WHEN vd.mb > 80 AND vd.mb <= 85 THEN '81-85'
+                                      WHEN vd.mb > 85 AND vd.mb <= 90 THEN '86-90'
+                                      WHEN vd.mb > 90 AND vd.mb <= 95 THEN '91-95'
+                                      WHEN vd.mb > 95 AND vd.mb <= 100 THEN '96-100'
+                                      WHEN vd.mb > 100 THEN '100-x' END as fx_mb_it_3
+                                ,CASE WHEN nvl(vd.mb ,0) <= 5 THEN 1
+                                      WHEN vd.mb > 5 AND vd.mb <= 10 THEN 2
+                                      WHEN vd.mb > 10 AND vd.mb <= 15 THEN 3
+                                      WHEN vd.mb > 15 AND vd.mb <= 20 THEN 4
+                                      WHEN vd.mb > 20 AND vd.mb <= 25 THEN 5
+                                      WHEN vd.mb > 25 AND vd.mb <= 30 THEN 6
+                                      WHEN vd.mb > 30 AND vd.mb <= 35 THEN 7
+                                      WHEN vd.mb > 35 AND vd.mb <= 40 THEN 8
+                                      WHEN vd.mb > 40 AND vd.mb <= 45 THEN 9
+                                      WHEN vd.mb > 45 AND vd.mb <= 50 THEN 10
+                                      WHEN vd.mb > 50 AND vd.mb <= 55 THEN 11
+                                      WHEN vd.mb > 55 AND vd.mb <= 60 THEN 12
+                                      WHEN vd.mb > 60 AND vd.mb <= 65 THEN 13
+                                      WHEN vd.mb > 65 AND vd.mb <= 70 THEN 14
+                                      WHEN vd.mb > 70 AND vd.mb <= 75 THEN 15
+                                      WHEN vd.mb > 75 AND vd.mb <= 80 THEN 16
+                                      WHEN vd.mb > 80 AND vd.mb <= 85 THEN 17
+                                      WHEN vd.mb > 85 AND vd.mb <= 90 THEN 18
+                                      WHEN vd.mb > 90 AND vd.mb <= 95 THEN 19
+                                      WHEN vd.mb > 95 AND vd.mb <= 100 THEN 20
+                                      WHEN vd.mb > 100 THEN 21 END as fx_mb_it_o3
+                                ,CASE WHEN nvl(vd.mb ,0) <= 10 THEN '0-10' 
+                                    WHEN vd.mb > 10 AND vd.mb <= 20 THEN '11-20'
+                                    WHEN vd.mb > 20 AND vd.mb <= 30 THEN '21-30'
+                                    WHEN vd.mb > 30 AND vd.mb <= 40 THEN '31-40'
+                                    WHEN vd.mb > 40 AND vd.mb <= 50 THEN '41-50'
+                                    WHEN vd.mb > 50 AND vd.mb <= 60 THEN '51-60'
+                                    WHEN vd.mb > 60 AND vd.mb <= 70 THEN '61-70'
+                                    WHEN vd.mb > 70 AND vd.mb <= 80 THEN '71-80'
+                                    WHEN vd.mb > 80 AND vd.mb <= 90 THEN '81-90'
+                                    WHEN vd.mb > 90 AND vd.mb <= 100 THEN '91-100'
+                                    WHEN vd.mb > 100 THEN '100-x' END as fx_mb_it_4
+                                ,CASE WHEN nvl(vd.mb ,0) <= 10 THEN 1
+                                    WHEN vd.mb > 10 AND vd.mb <= 20 THEN 2
+                                    WHEN vd.mb > 20 AND vd.mb <= 30 THEN 3
+                                    WHEN vd.mb > 30 AND vd.mb <= 40 THEN 4
+                                    WHEN vd.mb > 40 AND vd.mb <= 50 THEN 5
+                                    WHEN vd.mb > 50 AND vd.mb <= 60 THEN 6
+                                    WHEN vd.mb > 60 AND vd.mb <= 70 THEN 7
+                                    WHEN vd.mb > 70 AND vd.mb <= 80 THEN 8
+                                    WHEN vd.mb > 80 AND vd.mb <= 90 THEN 9
+                                    WHEN vd.mb > 90 AND vd.mb <= 100 THEN 10
+                                    WHEN vd.mb > 100 THEN 11 END as fx_mb_it_o4
                                 ,CASE WHEN nvl(mb_marca.mb ,0) <= 5 THEN '0-5' 
                                         WHEN mb_marca.mb > 5 AND mb_marca.mb <= 10 THEN '6-10'
                                         WHEN mb_marca.mb > 10 AND mb_marca.mb <= 15 THEN '11-15'
@@ -589,7 +654,70 @@ class FaixamargemController extends AbstractRestfulController
                                                 WHEN vd.mb > 15 AND vd.mb <= 20 THEN 2
                                                 WHEN vd.mb > 20 AND vd.mb <= 29 THEN 3
                                                 WHEN vd.mb >= 30 THEN 4 END AS fx_mb_it_o2
-                                            
+                                            ,CASE WHEN nvl(vd.mb ,0) <= 5 THEN '0-5' 
+                                                    WHEN vd.mb > 5 AND vd.mb <= 10 THEN '6-10'
+                                                    WHEN vd.mb > 10 AND vd.mb <= 15 THEN '11-15'
+                                                    WHEN vd.mb > 15 AND vd.mb <= 20 THEN '16-20'
+                                                    WHEN vd.mb > 20 AND vd.mb <= 25 THEN '21-25'
+                                                    WHEN vd.mb > 25 AND vd.mb <= 30 THEN '26-30'
+                                                    WHEN vd.mb > 30 AND vd.mb <= 35 THEN '31-35'
+                                                    WHEN vd.mb > 35 AND vd.mb <= 40 THEN '36-40'
+                                                    WHEN vd.mb > 40 AND vd.mb <= 45 THEN '41-45'
+                                                    WHEN vd.mb > 45 AND vd.mb <= 50 THEN '46-50'
+                                                    WHEN vd.mb > 50 AND vd.mb <= 55 THEN '51-55'
+                                                    WHEN vd.mb > 55 AND vd.mb <= 60 THEN '56-40'
+                                                    WHEN vd.mb > 60 AND vd.mb <= 65 THEN '61-65'
+                                                    WHEN vd.mb > 65 AND vd.mb <= 70 THEN '66-70'
+                                                    WHEN vd.mb > 70 AND vd.mb <= 75 THEN '71-75'
+                                                    WHEN vd.mb > 75 AND vd.mb <= 80 THEN '76-80'
+                                                    WHEN vd.mb > 80 AND vd.mb <= 85 THEN '81-85'
+                                                    WHEN vd.mb > 85 AND vd.mb <= 90 THEN '86-90'
+                                                    WHEN vd.mb > 90 AND vd.mb <= 95 THEN '91-95'
+                                                    WHEN vd.mb > 95 AND vd.mb <= 100 THEN '96-100'
+                                                    WHEN vd.mb > 100 THEN '100-x' END as fx_mb_it_3
+                                            ,CASE WHEN nvl(vd.mb ,0) <= 5 THEN 1
+                                                    WHEN vd.mb > 5 AND vd.mb <= 10 THEN 2
+                                                    WHEN vd.mb > 10 AND vd.mb <= 15 THEN 3
+                                                    WHEN vd.mb > 15 AND vd.mb <= 20 THEN 4
+                                                    WHEN vd.mb > 20 AND vd.mb <= 25 THEN 5
+                                                    WHEN vd.mb > 25 AND vd.mb <= 30 THEN 6
+                                                    WHEN vd.mb > 30 AND vd.mb <= 35 THEN 7
+                                                    WHEN vd.mb > 35 AND vd.mb <= 40 THEN 8
+                                                    WHEN vd.mb > 40 AND vd.mb <= 45 THEN 9
+                                                    WHEN vd.mb > 45 AND vd.mb <= 50 THEN 10
+                                                    WHEN vd.mb > 50 AND vd.mb <= 55 THEN 11
+                                                    WHEN vd.mb > 55 AND vd.mb <= 60 THEN 12
+                                                    WHEN vd.mb > 60 AND vd.mb <= 65 THEN 13
+                                                    WHEN vd.mb > 65 AND vd.mb <= 70 THEN 14
+                                                    WHEN vd.mb > 70 AND vd.mb <= 75 THEN 15
+                                                    WHEN vd.mb > 75 AND vd.mb <= 80 THEN 16
+                                                    WHEN vd.mb > 80 AND vd.mb <= 85 THEN 17
+                                                    WHEN vd.mb > 85 AND vd.mb <= 90 THEN 18
+                                                    WHEN vd.mb > 90 AND vd.mb <= 95 THEN 19
+                                                    WHEN vd.mb > 95 AND vd.mb <= 100 THEN 20
+                                                    WHEN vd.mb > 100 THEN 21 END as fx_mb_it_o3
+                                            ,CASE WHEN nvl(vd.mb ,0) <= 10 THEN '0-10' 
+                                                    WHEN vd.mb > 10 AND vd.mb <= 20 THEN '11-20'
+                                                    WHEN vd.mb > 20 AND vd.mb <= 30 THEN '21-30'
+                                                    WHEN vd.mb > 30 AND vd.mb <= 40 THEN '31-40'
+                                                    WHEN vd.mb > 40 AND vd.mb <= 50 THEN '41-50'
+                                                    WHEN vd.mb > 50 AND vd.mb <= 60 THEN '51-60'
+                                                    WHEN vd.mb > 60 AND vd.mb <= 70 THEN '61-70'
+                                                    WHEN vd.mb > 70 AND vd.mb <= 80 THEN '71-80'
+                                                    WHEN vd.mb > 80 AND vd.mb <= 90 THEN '81-90'
+                                                    WHEN vd.mb > 90 AND vd.mb <= 100 THEN '91-100'
+                                                    WHEN vd.mb > 100 THEN '100-x' END as fx_mb_it_4
+                                            ,CASE WHEN nvl(vd.mb ,0) <= 10 THEN 1
+                                                    WHEN vd.mb > 10 AND vd.mb <= 20 THEN 2
+                                                    WHEN vd.mb > 20 AND vd.mb <= 30 THEN 3
+                                                    WHEN vd.mb > 30 AND vd.mb <= 40 THEN 4
+                                                    WHEN vd.mb > 40 AND vd.mb <= 50 THEN 5
+                                                    WHEN vd.mb > 50 AND vd.mb <= 60 THEN 6
+                                                    WHEN vd.mb > 60 AND vd.mb <= 70 THEN 7
+                                                    WHEN vd.mb > 70 AND vd.mb <= 80 THEN 8
+                                                    WHEN vd.mb > 80 AND vd.mb <= 90 THEN 9
+                                                    WHEN vd.mb > 90 AND vd.mb <= 100 THEN 10
+                                                    WHEN vd.mb > 100 THEN 11 END as fx_mb_it_o4
                                             ,CASE WHEN nvl(mb_marca.mb ,0) <= 5 THEN '0-5' 
                                                     WHEN mb_marca.mb > 5 AND mb_marca.mb <= 10 THEN '6-10'
                                                     WHEN mb_marca.mb > 10 AND mb_marca.mb <= 15 THEN '11-15'

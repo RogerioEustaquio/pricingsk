@@ -22,12 +22,14 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
             {"id":4, "name":"Margem Cliente"},
             {"id":5, "name":"Faixa MB Item / Nota 0-36"},
             {"id":6, "name":"Faixa MB  Item / Nota 0-30"},
-            {"id":7, "name":"Pareto ROL Marca / Filial"},
-            {"id":8, "name":"Pareto ROL Cliente / Filial"},
-            {"id":9, "name":"Faixa MB Marca 0-36"},
-            {"id":10, "name":"Faixa MB Marca 0-30"},
-            {"id":11, "name":"Faixa MB Cliente 0-36"},
-            {"id":12, "name":"Faixa MB Cliente 0-30"}
+            {"id":7, "name":"Faixa MB Item / Nota 0..5-100"},
+            {"id":8, "name":"Faixa MB Item / Nota 0..10-100"},
+            {"id":9, "name":"Pareto ROL Marca / Filial"},
+            {"id":10, "name":"Pareto ROL Cliente / Filial"},
+            {"id":11, "name":"Faixa MB Marca 0-36"},
+            {"id":12, "name":"Faixa MB Marca 0-30"},
+            {"id":13, "name":"Faixa MB Cliente 0-36"},
+            {"id":14, "name":"Faixa MB Cliente 0-30"}
         ];
 
        var dataValor = [
