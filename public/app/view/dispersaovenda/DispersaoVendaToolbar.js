@@ -210,6 +210,17 @@ Ext.define('App.view.dispersaovenda.DispersaoVendaToolbar',{
                             marker: {
                                 radius: 3
                             }
+                        },
+                        {
+                            // boostThreshold: 0,
+                            turboThreshold : result.contTotal.loja+10,
+                            type: 'scatter',
+                            name: 'Loja',
+                            color: Highcharts.getOptions().colors[5],
+                            data : rsarray[5].data,
+                            marker: {
+                                radius: 3
+                            }
                         }
                     ];
 
@@ -218,6 +229,7 @@ Ext.define('App.view.dispersaovenda.DispersaoVendaToolbar',{
                     charts.chart.addSeries(arraySerie[2]);
                     charts.chart.addSeries(arraySerie[3]);
                     charts.chart.addSeries(arraySerie[4]);
+                    charts.chart.addSeries(arraySerie[5]);
 
                     var textSubtitle = {
                         subtitle:{

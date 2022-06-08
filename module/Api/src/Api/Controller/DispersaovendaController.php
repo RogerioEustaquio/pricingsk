@@ -43,10 +43,10 @@ class DispersaovendaController extends AbstractRestfulController
 
             $pNode = $this->params()->fromQuery('node',null);
 
-            $sql = "select e.apelido emp, e.id_empresa
-                        from ms.empresa e
-                    where e.id_empresa not in (26, 27, 28, 11, 20, 102, 101)
-                    order by e.apelido";
+            $sql = "select distinct emp, cod_empresa id_empresa
+                        from VW_SKEMPRESA
+                    where emp not in ('CD','EC','M2','PAR','PLA','SP','TL')
+                    order by emp";
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -143,29 +143,33 @@ class DispersaovendaController extends AbstractRestfulController
 
             $em = $this->getEntityManager();
             
-            $sql = "select  g.id_grupo_marca,
-                            m.id_marca,
-                            m.descricao as marca,
-                            count(*) as skus
-                    from ms.tb_estoque e,
-                            ms.tb_item i,
-                            ms.tb_categoria c,
-                            ms.tb_item_categoria ic,
-                            ms.tb_marca m,
-                            ms.tb_grupo_marca g,
-                            ms.empresa em
-                    where e.id_item = i.id_item
-                    and e.id_categoria = c.id_categoria
-                    and e.id_item = ic.id_item
-                    and e.id_categoria = ic.id_categoria
-                    and ic.id_marca = m.id_marca
-                    and m.id_grupo_marca = g.id_grupo_marca
-                    and e.id_empresa = em.id_empresa
-                    --and e.id_curva_abc = 'E'
-                    and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
-                    group by g.id_grupo_marca, m.id_marca, m.descricao
-                    order by skus desc
-            ";
+            // $sql = "select  g.id_grupo_marca,
+            //                 m.id_marca,
+            //                 m.descricao as marca,
+            //                 count(*) as skus
+            //         from ms.tb_estoque e,
+            //                 ms.tb_item i,
+            //                 ms.tb_categoria c,
+            //                 ms.tb_item_categoria ic,
+            //                 ms.tb_marca m,
+            //                 ms.tb_grupo_marca g,
+            //                 ms.empresa em
+            //         where e.id_item = i.id_item
+            //         and e.id_categoria = c.id_categoria
+            //         and e.id_item = ic.id_item
+            //         and e.id_categoria = ic.id_categoria
+            //         and ic.id_marca = m.id_marca
+            //         and m.id_grupo_marca = g.id_grupo_marca
+            //         and e.id_empresa = em.id_empresa
+            //         --and e.id_curva_abc = 'E'
+            //         and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
+            //         group by g.id_grupo_marca, m.id_marca, m.descricao
+            //         order by skus desc
+            // ";
+            
+            $sql = "select distinct cod_marca as id_marca, descricao_marca marca
+            from VW_SKMARCA
+           order by descricao_marca";
             
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -768,6 +772,23 @@ class DispersaovendaController extends AbstractRestfulController
                     --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
                     --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
                     --and round(SUM(nvl(rol,0)),0) < 300000
+                    union
+                    select  emp codigo
+                            ,'' descricao
+                            ,'LJ' grupo
+                            ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
+                            ,round(SUM(nvl(rol,0)),0) as rol
+                    from vm_skvendanota a 
+                    WHERE 1 = 1
+                    $andFilial
+                    $andData
+                    $andProduto
+                    $andMarca
+                    $andCategoria
+                    group by emp
+                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
+                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
+                    --and round(SUM(nvl(rol,0)),0) < 300000
                     order by grupo ";
             // print "$sql";
             // exit;
@@ -793,14 +814,14 @@ class DispersaovendaController extends AbstractRestfulController
             $arrayPD = array();
             $arrayCT = array();
             $arrayMC = array();
+            $arrayLJ = array();
             $contCC = $contNF = $contProd = 0;
-            $contCat = $contMarca = 0;
+            $contCat = $contMarca = $contLoja = 0;
             foreach ($resultSet as $row) {
                 $elementos = $hydrator->extract($row);
 
                 switch ($elementos['grupo']) {
                     case 'CC':
-
                         $arrayCC[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
@@ -809,11 +830,9 @@ class DispersaovendaController extends AbstractRestfulController
                         );
 
                         $contCC++;
-
                         break;
 
                     case 'NF':
-                        
                         $arrayNF[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
@@ -825,7 +844,6 @@ class DispersaovendaController extends AbstractRestfulController
                         break;
 
                     case 'PD':
-                        
                         $arrayPD[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
@@ -835,8 +853,8 @@ class DispersaovendaController extends AbstractRestfulController
 
                         $contProd++;
                         break;
+
                     case 'CT':
-                    
                         $arrayCT[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
@@ -846,6 +864,7 @@ class DispersaovendaController extends AbstractRestfulController
 
                         $contCat++;
                         break;
+
                     case 'MC':
                     
                         $arrayMC[] = array(
@@ -856,6 +875,17 @@ class DispersaovendaController extends AbstractRestfulController
                         );
 
                         $contMarca++;
+                        break;
+
+                    case 'LJ':
+                        $arrayLJ[] = array(
+                            'x'=>  (float)$elementos['rol'],
+                            'y'=> (float)$elementos['mb'],
+                            'nome' =>  $elementos['codigo'],
+                            'descricao' =>  $elementos['descricao']
+                        );
+
+                        $contLoja++;
                         break;
                     default:
                         # code...
@@ -884,6 +914,10 @@ class DispersaovendaController extends AbstractRestfulController
                     array(
                         'name' => 'Marca',
                         'data' => $arrayMC
+                    ),
+                    array(
+                        'name' => 'Loja',
+                        'data' => $arrayLJ
                     )
                 )
             ;
@@ -894,7 +928,8 @@ class DispersaovendaController extends AbstractRestfulController
                 'produto'   => $contProd,
                 'categoria' => $contCat,
                 'marca'     => $contMarca,
-                'total'     => $contCC + $contNF + $contProd + $contCat + $contMarca
+                'loja'      => $contLoja,
+                'total'     => $contCC + $contNF + $contProd + $contCat + $contMarca + $contLoja
             );
 
             $this->setCallbackData($data);

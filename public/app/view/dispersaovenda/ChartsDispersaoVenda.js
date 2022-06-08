@@ -114,6 +114,17 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
                                                 marker: {
                                                     radius: 3
                                                 }
+                                            },
+                                            {
+                                                // boostThreshold: 0,
+                                                turboThreshold : result.contTotal.loja+10,
+                                                type: 'scatter',
+                                                name: 'Loja',
+                                                color: Highcharts.getOptions().colors[5],
+                                                data : rsarray[5].data,
+                                                marker: {
+                                                    radius: 3
+                                                }
                                             }
                                         ];
 
@@ -144,6 +155,11 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
                                             {
                                                 name: 'Marca',
                                                 color: Highcharts.getOptions().colors[4],
+                                                data : []
+                                            },
+                                            {
+                                                name: 'Loja',
+                                                color: Highcharts.getOptions().colors[5],
                                                 data : []
                                             }
                                         ];
@@ -191,6 +207,11 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
                                         {
                                             name: 'Marca',
                                             color: Highcharts.getOptions().colors[4],
+                                            data : []
+                                        },
+                                        {
+                                            name: 'Loja',
+                                            color: Highcharts.getOptions().colors[5],
                                             data : []
                                         }
                                     ];
@@ -274,7 +295,10 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
 
             legend: {
                 enabled: true,
-                layout: 'vertical',
+                // layout: 'vertical',
+                layout: 'horizontal',
+                width: 200,
+                margin: '1 1 1 1',
                 align: 'left',
                 verticalAlign: 'top',
                 x: 100,
