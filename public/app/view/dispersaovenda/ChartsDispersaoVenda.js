@@ -297,7 +297,10 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
                 formatter: function () {
 
                     var pointFormat = '';
+                    var descricao = this.point.descricao ? this.point.descricao : '';
+                    
                     pointFormat += '<b>'+this.point.nome+' '+''+'</b><br>';
+                    pointFormat += '<p>'+descricao+' '+''+'</p><br>';
                     pointFormat += '<b>ROL: </b><label>'+utilFormat.Value2(this.point.x,0)+'</label><br>';
                     pointFormat += '<b>MB: </b><label>'+utilFormat.Value2(this.point.y,2)+'</label><br>';
 

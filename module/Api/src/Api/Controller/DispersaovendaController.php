@@ -75,20 +75,33 @@ class DispersaovendaController extends AbstractRestfulController
         return $objReturn;
     }
 
-    public function listaritenslojaAction()
+    public function listaridprodutoAction()
     {
         $data = array();
         
         try {
 
-            $pData    = $this->params()->fromQuery('data',null);
+            $pEmp    = $this->params()->fromQuery('emp',null);
+            $pCod    = $this->params()->fromQuery('idProduto',null);
+            $tipoSql = $this->params()->fromQuery('tipoSql',null);
+
+            if(!$pCod){
+                throw new \Exception('Parâmetros não informados.');
+            }
 
             $em = $this->getEntityManager();
-            
-            $sql = "
-            select 'RA' emp, '123,98' valor1, '20,65' valor2 from dual union
-            select 'PA' emp, '100,98' valor1, '-10' valor2 from dual union
-            select 'GO' emp, '64,00' valor1, '-1,65' valor2 from dual ";
+
+            if(!$tipoSql){
+                $filtroProduto = " in upper(".$pCod.")";
+            }else{
+                $produtos =  implode(",",json_decode($pCod));
+                $filtroProduto = " in ($produtos)";
+            }
+
+            $sql = "select distinct nvl(COD_PRODUTO,'') ID_PRODUTO, DESCRICAO
+                from VW_SKPRODUTO 
+            where 1 = 1 
+            and nvl(COD_PRODUTO,'') $filtroProduto";
 
             $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
@@ -98,8 +111,107 @@ class DispersaovendaController extends AbstractRestfulController
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('valor1', new ValueStrategy);
-            $hydrator->addStrategy('valor2', new ValueStrategy);
+            $hydrator->addStrategy('id_produto', new ValueStrategy);
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+
+    public function listarmarcaAction()
+    {
+        $data = array();
+
+        $emp = $this->params()->fromQuery('emp',null);
+
+        try {
+
+            $session = $this->getSession();
+            $usuario = $session['info'];
+
+            $em = $this->getEntityManager();
+            
+            $sql = "select  g.id_grupo_marca,
+                            m.id_marca,
+                            m.descricao as marca,
+                            count(*) as skus
+                    from ms.tb_estoque e,
+                            ms.tb_item i,
+                            ms.tb_categoria c,
+                            ms.tb_item_categoria ic,
+                            ms.tb_marca m,
+                            ms.tb_grupo_marca g,
+                            ms.empresa em
+                    where e.id_item = i.id_item
+                    and e.id_categoria = c.id_categoria
+                    and e.id_item = ic.id_item
+                    and e.id_categoria = ic.id_categoria
+                    and ic.id_marca = m.id_marca
+                    and m.id_grupo_marca = g.id_grupo_marca
+                    and e.id_empresa = em.id_empresa
+                    --and e.id_curva_abc = 'E'
+                    and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
+                    group by g.id_grupo_marca, m.id_marca, m.descricao
+                    order by skus desc
+            ";
+            
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
+            $stdClass = new StdClass;
+            $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            $resultSet->initialize($results);
+
+            $data = array();
+            foreach ($resultSet as $row) {
+                $data[] = $hydrator->extract($row);
+            }
+
+            $this->setCallbackData($data);
+            
+        } catch (\Exception $e) {
+            $this->setCallbackError($e->getMessage());
+        }
+        
+        return $this->getCallbackModel();
+    }
+    
+    public function listarcategoriaAction()
+    {
+        $data = array();
+        
+        try {
+
+            $em = $this->getEntityManager();
+
+            $sql = "select distinct categoria
+                        from vw_skproduto_categoria
+                    order by categoria";
+  
+            $conn = $em->getConnection();
+            $stmt = $conn->prepare($sql);
+            // $stmt->bindValue(1, $pEmp);
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $hydrator = new ObjectProperty;
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -494,11 +606,12 @@ class DispersaovendaController extends AbstractRestfulController
         
         try {
 
-            $idEmpresa      = $this->params()->fromPost('idEmpresas',null);
+            $idEmpresa  = $this->params()->fromPost('idEmpresas',null);
             $pDataInicio= $this->params()->fromPost('datainicio',null);
             $pDataFim   = $this->params()->fromPost('datafim',null);
-            // $idMarcas   = $this->params()->fromPost('idMarcas',null);
-            // $descMarca  = $this->params()->fromPost('descMarca',null);
+            $idProduto  = $this->params()->fromPost('produto',null);
+            $marca      = $this->params()->fromPost('marca',null);
+            $categoria  = $this->params()->fromPost('categoria',null);
 
             // $idEmpresa = 18;
             // $pDataInicio = '01/05/2022';
@@ -527,27 +640,31 @@ class DispersaovendaController extends AbstractRestfulController
                 $andData .= " and trunc(data) <= sysdate";
             }
 
-            // if($pData){
-            //     $sysdate = "to_date('01/".substr($pData,3,5)."')";
-            // }else{
-            //     $sysdate = "to_date('01/'||to_char(sysdate,'mm/yyyy'))";
-            // }
+            if($idProduto){
+                $idProduto =  implode(",",json_decode($idProduto));
+            }
+            $andProduto = '';
+            if($idProduto){
+                $andProduto = "and a.cod_produto in ($idProduto)";
+            }
 
-            // if($idMarcas){
-            //     $idMarcas =  implode(",",json_decode($idMarcas));
-            // }
-            // $andMarca = '';
-            // $and_accumulated = '';
-            // if($idMarcas){
-            //     $andMarca = "and ic.id_marca in ($idMarcas)";
-            // }
+            if($marca){
+                $marca =  implode("','",json_decode($marca));
+            }
+            $andMarca = '';
+            if($marca){
+                $andMarca = "and a.marca in ('$marca')";
+            }
             
-            // $andDescMarca= '';
-            // if($descMarca){
-            //     $andDescMarca = " and m.descricao = '$descMarca'";
-            // }else{
-            //     $andDescMarca = " and m.id_marca in (279,23,8)"; // para testes
-            // }
+            if($categoria){
+                $categoria =  implode("','",json_decode($categoria));
+            }
+            $andCategoria = $andCategoria2 = '';
+            if($categoria){
+                $andCategoria = "and a.cod_produto in (select cod_produto from vw_skproduto_categoria where categoria in ('$categoria'))";
+                $andCategoria2 = "and c.categoria in ('$categoria')";
+            }
+
             $em = $this->getEntityManager();
             $conn = $em->getConnection();
 
@@ -566,6 +683,7 @@ class DispersaovendaController extends AbstractRestfulController
             $resultSetCont->initialize($resultCount);
 
             $sql = "select  to_char(cnpj_parceiro) codigo
+                            ,nome_parceiro descricao
                             ,'CC' grupo
                             ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
                             ,round(SUM(nvl(rol,0)),0) as rol
@@ -573,12 +691,16 @@ class DispersaovendaController extends AbstractRestfulController
                     WHERE 1 = 1
                     $andFilial
                     $andData
-                    group by cnpj_parceiro
+                    $andProduto
+                    $andMarca
+                    $andCategoria
+                    group by cnpj_parceiro, nome_parceiro
                     --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
                     --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
                     --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  to_char(nota) codigo
+                            ,'' descricao
                             ,'NF' grupo
                             ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
                             ,round(SUM(nvl(rol,0)),0) as rol
@@ -586,12 +708,16 @@ class DispersaovendaController extends AbstractRestfulController
                     WHERE 1 = 1
                     $andFilial
                     $andData
+                    $andProduto
+                    $andMarca
+                    $andCategoria
                     group by nota
                     --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
                     --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
                     --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  to_char(cod_produto) codigo
+                            ,descricao
                             ,'PD' grupo
                             ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
                             ,round(SUM(nvl(rol,0)),0) as rol
@@ -599,12 +725,16 @@ class DispersaovendaController extends AbstractRestfulController
                     WHERE 1 = 1
                     $andFilial
                     $andData
-                    group by cod_produto
+                    $andProduto
+                    $andMarca
+                    $andCategoria
+                    group by cod_produto, descricao
                     --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
                     --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
                     --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  c.categoria codigo
+                            ,'' descricao
                             ,'CT' grupo
                             ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
                             ,round(SUM(nvl(rol,0)),0) as rol
@@ -614,12 +744,16 @@ class DispersaovendaController extends AbstractRestfulController
                     and a.cod_produto = c.cod_produto
                     $andFilial
                     $andData
+                    $andProduto
+                    $andMarca
+                    $andCategoria2
                     group by c.categoria
                     --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
                     --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
                     --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  marca codigo
+                            ,'' descricao
                             ,'MC' grupo
                             ,CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END AS mb
                             ,round(SUM(nvl(rol,0)),0) as rol
@@ -627,6 +761,9 @@ class DispersaovendaController extends AbstractRestfulController
                     WHERE 1 = 1
                     $andFilial
                     $andData
+                    $andProduto
+                    $andMarca
+                    $andCategoria
                     group by marca
                     --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
                     --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
@@ -667,7 +804,8 @@ class DispersaovendaController extends AbstractRestfulController
                         $arrayCC[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
-                            'nome' =>  $elementos['codigo']
+                            'nome' =>  $elementos['codigo'],
+                            'descricao' =>  $elementos['descricao']
                         );
 
                         $contCC++;
@@ -679,7 +817,8 @@ class DispersaovendaController extends AbstractRestfulController
                         $arrayNF[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
-                            'nome' =>  $elementos['codigo']
+                            'nome' =>  $elementos['codigo'],
+                            'descricao' =>  $elementos['descricao']
                         );
 
                         $contNF++;
@@ -690,7 +829,8 @@ class DispersaovendaController extends AbstractRestfulController
                         $arrayPD[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
-                            'nome' =>  $elementos['codigo']
+                            'nome' =>  $elementos['codigo'],
+                            'descricao' =>  $elementos['descricao']
                         );
 
                         $contProd++;
@@ -700,7 +840,8 @@ class DispersaovendaController extends AbstractRestfulController
                         $arrayCT[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
-                            'nome' =>  $elementos['codigo']
+                            'nome' =>  $elementos['codigo'],
+                            'descricao' =>  $elementos['descricao']
                         );
 
                         $contCat++;
@@ -710,7 +851,8 @@ class DispersaovendaController extends AbstractRestfulController
                         $arrayMC[] = array(
                             'x'=>  (float)$elementos['rol'],
                             'y'=> (float)$elementos['mb'],
-                            'nome' =>  $elementos['codigo']
+                            'nome' =>  $elementos['codigo'],
+                            'descricao' =>  $elementos['descricao']
                         );
 
                         $contMarca++;
@@ -796,66 +938,5 @@ class DispersaovendaController extends AbstractRestfulController
         return $this->getCallbackModel();
     }
 
-    public function listarmarcaAction()
-    {
-        $data = array();
-
-        $emp = $this->params()->fromQuery('emp',null);
-
-        try {
-
-            $session = $this->getSession();
-            $usuario = $session['info'];
-
-            $em = $this->getEntityManager();
-            
-            $sql = "select  g.id_grupo_marca,
-                            m.id_marca,
-                            m.descricao as marca,
-                            count(*) as skus
-                    from ms.tb_estoque e,
-                            ms.tb_item i,
-                            ms.tb_categoria c,
-                            ms.tb_item_categoria ic,
-                            ms.tb_marca m,
-                            ms.tb_grupo_marca g,
-                            ms.empresa em
-                    where e.id_item = i.id_item
-                    and e.id_categoria = c.id_categoria
-                    and e.id_item = ic.id_item
-                    and e.id_categoria = ic.id_categoria
-                    and ic.id_marca = m.id_marca
-                    and m.id_grupo_marca = g.id_grupo_marca
-                    and e.id_empresa = em.id_empresa
-                    --and e.id_curva_abc = 'E'
-                    and ( e.ultima_compra > add_months(sysdate, -6) or e.estoque > 0 )
-                    group by g.id_grupo_marca, m.id_marca, m.descricao
-                    order by skus desc
-            ";
-            
-            $conn = $em->getConnection();
-            $stmt = $conn->prepare($sql);
-            
-            $stmt->execute();
-            $results = $stmt->fetchAll();
-
-            $hydrator = new ObjectProperty;
-            $stdClass = new StdClass;
-            $resultSet = new HydratingResultSet($hydrator, $stdClass);
-            $resultSet->initialize($results);
-
-            $data = array();
-            foreach ($resultSet as $row) {
-                $data[] = $hydrator->extract($row);
-            }
-
-            $this->setCallbackData($data);
-            
-        } catch (\Exception $e) {
-            $this->setCallbackError($e->getMessage());
-        }
-        
-        return $this->getCallbackModel();
-    }
     
 }

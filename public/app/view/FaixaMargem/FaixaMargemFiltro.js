@@ -301,7 +301,6 @@ Ext.define('App.view.faixamargem.FaixaMargemFiltro',{
                 '{codItem} {descricao} {marca}',
                 '</tpl>'), 
             valueField: 'codItem',
-            // emptyText: 'Produto',
             fieldLabel: 'Produtos',
             emptyText: 'Código Item NBS',
             // matchFieldWidth: false,

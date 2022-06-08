@@ -106,9 +106,12 @@ Ext.define('App.view.dispersaovenda.DispersaoVendaToolbar',{
         
         var me = this.up('toolbar');
 
-        var idEmpresas      = me.up('panel').down('#dispersaovendafiltro').down('#elfilial').getValue();
-        var datainicio            = me.up('panel').down('#dispersaovendafiltro').down('#eldatainicio').getRawValue();
-        var datafim            = me.up('panel').down('#dispersaovendafiltro').down('#eldatafim').getRawValue();
+        var idEmpresas  = me.up('panel').down('#dispersaovendafiltro').down('#elfilial').getValue();
+        var datainicio  = me.up('panel').down('#dispersaovendafiltro').down('#eldatainicio').getRawValue();
+        var datafim     = me.up('panel').down('#dispersaovendafiltro').down('#eldatafim').getRawValue();
+        var produto     = me.up('panel').down('#dispersaovendafiltro').down('#elproduto').getValue();
+        var marca       = me.up('panel').down('#dispersaovendafiltro').down('#elmarca').getValue();
+        var categoria   = me.up('panel').down('#dispersaovendafiltro').down('#elcategoria').getValue();
 
         
         var charts = me.up('panel').down('#chartsdispersaovenda');
@@ -118,7 +121,10 @@ Ext.define('App.view.dispersaovenda.DispersaoVendaToolbar',{
         var params = {
             idEmpresas: Ext.encode(idEmpresas),
             datainicio: datainicio,
-            datafim:    datafim
+            datafim:    datafim,
+            produto: Ext.encode(produto),
+            marca: Ext.encode(marca),
+            categoria: Ext.encode(categoria)
         };
 
         var seriesLength = (charts.chart.series) ? charts.chart.series.length : 0 ;
