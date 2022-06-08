@@ -686,6 +686,8 @@ class DispersaovendaController extends AbstractRestfulController
             $resultSetCont = new HydratingResultSet($hydrator, $stdClass);
             $resultSetCont->initialize($resultCount);
 
+            $andPadrao ='and a.qtd > 0';
+
             $sql = "select  to_char(cnpj_parceiro) codigo
                             ,nome_parceiro descricao
                             ,'CC' grupo
@@ -693,15 +695,13 @@ class DispersaovendaController extends AbstractRestfulController
                             ,round(SUM(nvl(rol,0)),0) as rol
                     from vm_skvendanota a 
                     WHERE 1 = 1
+                    $andPadrao
                     $andFilial
                     $andData
                     $andProduto
                     $andMarca
                     $andCategoria
                     group by cnpj_parceiro, nome_parceiro
-                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
-                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
-                    --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  to_char(nota) codigo
                             ,'' descricao
@@ -710,15 +710,13 @@ class DispersaovendaController extends AbstractRestfulController
                             ,round(SUM(nvl(rol,0)),0) as rol
                     from vm_skvendanota a 
                     WHERE 1 = 1
+                    $andPadrao
                     $andFilial
                     $andData
                     $andProduto
                     $andMarca
                     $andCategoria
                     group by nota
-                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
-                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
-                    --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  to_char(cod_produto) codigo
                             ,descricao
@@ -727,15 +725,13 @@ class DispersaovendaController extends AbstractRestfulController
                             ,round(SUM(nvl(rol,0)),0) as rol
                     from vm_skvendanota a 
                     WHERE 1 = 1
+                    $andPadrao
                     $andFilial
                     $andData
                     $andProduto
                     $andMarca
                     $andCategoria
                     group by cod_produto, descricao
-                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
-                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
-                    --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  c.categoria codigo
                             ,'' descricao
@@ -746,15 +742,13 @@ class DispersaovendaController extends AbstractRestfulController
                         , vw_skproduto_categoria c
                     WHERE 1 = 1
                     and a.cod_produto = c.cod_produto
+                    $andPadrao
                     $andFilial
                     $andData
                     $andProduto
                     $andMarca
                     $andCategoria2
                     group by c.categoria
-                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
-                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
-                    --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  marca codigo
                             ,'' descricao
@@ -763,15 +757,13 @@ class DispersaovendaController extends AbstractRestfulController
                             ,round(SUM(nvl(rol,0)),0) as rol
                     from vm_skvendanota a 
                     WHERE 1 = 1
+                    $andPadrao
                     $andFilial
                     $andData
                     $andProduto
                     $andMarca
                     $andCategoria
                     group by marca
-                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
-                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
-                    --and round(SUM(nvl(rol,0)),0) < 300000
                     union
                     select  emp codigo
                             ,'' descricao
@@ -780,18 +772,15 @@ class DispersaovendaController extends AbstractRestfulController
                             ,round(SUM(nvl(rol,0)),0) as rol
                     from vm_skvendanota a 
                     WHERE 1 = 1
+                    $andPadrao
                     $andFilial
                     $andData
                     $andProduto
                     $andMarca
                     $andCategoria
                     group by emp
-                    --having CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END > 0
-                    --and CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END < 100
-                    --and round(SUM(nvl(rol,0)),0) < 300000
                     order by grupo ";
-            // print "$sql";
-            // exit;
+                    
             $stmt = $conn->prepare($sql);
             // $stmt->bindValue(1, $pEmp);
             
