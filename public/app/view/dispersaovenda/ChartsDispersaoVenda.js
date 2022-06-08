@@ -254,6 +254,9 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
                 gridLineWidth: 1,
                 startOnTick: true,
                 endOnTick: true,
+                title: {
+                    text: 'ROL'
+                },
                 labels: {
                     formatter: function () {
                         return utilFormat.ValueZero(this.value);
@@ -298,7 +301,7 @@ Ext.define('App.view.dispersaovenda.ChartsDispersaoVenda', {
 
                     var pointFormat = '';
                     var descricao = this.point.descricao ? this.point.descricao : '';
-                    
+
                     pointFormat += '<b>'+this.point.nome+' '+''+'</b><br>';
                     pointFormat += '<p>'+descricao+' '+''+'</p><br>';
                     pointFormat += '<b>ROL: </b><label>'+utilFormat.Value2(this.point.x,0)+'</label><br>';
