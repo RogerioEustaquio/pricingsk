@@ -672,9 +672,32 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
             },
             {
                 title: {
-                    text: 'CC',
+                    text: 'TRI',
                     style: {
                         color: colors[23],
+                        fontSize: '10px'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return utilFormat.Value2(this.value,2);
+                    },
+                    x: 0,
+                    y: 0,
+                    padding: 0,
+                    style: {
+                        color: colors[23],
+                        fontSize: '10px'
+                    }
+                },
+                opposite: true,
+                visible: false
+            },
+            {
+                title: {
+                    text: 'CC',
+                    style: {
+                        color: colors[24],
                         fontSize: '10px'
                     }
                 },
@@ -686,7 +709,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     y: 0,
                     padding: 0,
                     style: {
-                        color: colors[23],
+                        color: colors[24],
                         fontSize: '10px'
                     }
                 },
@@ -697,7 +720,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 title: {
                     text: 'NF',
                     style: {
-                        color: colors[24],
+                        color: colors[25],
                         fontSize: '10px'
                     }
                 },
@@ -709,7 +732,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     y: 0,
                     padding: 0,
                     style: {
-                        color: colors[24],
+                        color: colors[25],
                         fontSize: '10px'
                     }
                 },
@@ -720,7 +743,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 title: {
                     text: 'TKM',
                     style: {
-                        color: colors[25],
+                        color: colors[26],
                         fontSize: '10px'
                     }
                 },
@@ -732,7 +755,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     y: 0,
                     padding: 0,
                     style: {
-                        color: colors[25],
+                        color: colors[26],
                         fontSize: '10px'
                     }
                 },
@@ -743,7 +766,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 title: {
                     text: 'CC Dia',
                     style: {
-                        color: colors[26],
+                        color: colors[27],
                         fontSize: '10px'
                     }
                 },
@@ -755,7 +778,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     y: 0,
                     padding: 0,
                     style: {
-                        color: colors[26],
+                        color: colors[27],
                         fontSize: '10px'
                     }
                 },
@@ -766,7 +789,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 title: {
                     text: 'Inflação de Estoque',
                     style: {
-                        color: colors[27],
+                        color: colors[28],
                         fontSize: '10px'
                     }
                 },
@@ -778,7 +801,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     y: 0,
                     padding: 0,
                     style: {
-                        color: colors[27],
+                        color: colors[28],
                         fontSize: '10px'
                     }
                 },
@@ -789,7 +812,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 title: {
                     text: 'Inflação de Compra',
                     style: {
-                        color: colors[28],
+                        color: colors[29],
                         fontSize: '10px'
                     }
                 },
@@ -801,7 +824,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                     y: 0,
                     padding: 0,
                     style: {
-                        color: colors[28],
+                        color: colors[29],
                         fontSize: '10px'
                     }
                 },
@@ -1124,7 +1147,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                                     }
                                 }
 
-                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','CC','NF','TKM','CC Dia','Inflação de Estoque','Inflação de Compra'];
+                                var serieExtras = ['ES. QTD','ES. CUSTO MÉDIO','ES. VALOR','ES. FATOR','ES. GIRO','ES. DIAS','SKUD','TRI','CC','NF','TKM','CC Dia','Inflação de Estoque','Inflação de Compra'];
 
                                 for (let e = 0; e < serieExtras.length; e++) {
                                     if(serieExtras[e] == record.name){

@@ -1970,13 +1970,14 @@ class AnalisemarcaController extends AbstractRestfulController
             $arrayQtdedia       = array();
             $arrayCmvDia        = array();
             $arrayRobdia        = array();
-            $arrayImpostos       = array();
+            $arrayImpostos      = array();
             $arrayCcDia         = array();
             $estoqueFator       = array();
             $estoqueGiro        = array();
             $estoqueDias        = array();
             $idxEstoque         = array();
             $idxCompra          = array();
+            $estoqueTri         = array();
 
             foreach ($resultSet as $row) {
                 $data1 = $hydrator->extract($row);
@@ -2015,6 +2016,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     $estoqueFator[] = 0;
                     $estoqueGiro[]  = 0;
                     $estoqueDias[]  = 0;
+                    $estoqueTri[]   = 0;
                 }
 
                 if($consultaIndices){
@@ -2051,6 +2053,7 @@ class AnalisemarcaController extends AbstractRestfulController
                 $estoqueCustoMedio  = $estoqueMes[1];
                 $estoqueValor       = $estoqueMes[2];
                 $estoqueSkud        = $estoqueMes[3];
+
             }
 
             $cc     = array();
@@ -2218,9 +2221,12 @@ class AnalisemarcaController extends AbstractRestfulController
                         
                         if($estoqueValor[$cont] > 0){
 
-                            $estoqueFator[$cont] = $arrayCMV[$cont] > 0 ? round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2) : 0;
-                            $estoqueGiro[$cont]  = $arrayCMV[$cont] > 0 ? round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2) : 0;
+                            $estoqueFator[$cont]= $arrayCMV[$cont] > 0 ? round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2) : 0;
+                            $estoqueGiro[$cont] = $arrayCMV[$cont] > 0 ? round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2) : 0;
                             $estoqueDias[$cont] =  $arrayCMV[$cont] > 0 ? round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2) : 0;
+                            
+                            $estoqueTri[$cont]  = $estoqueGiro[$cont] * ($arrayMb[$cont]);
+                            $estoqueTri[$cont]  = round($estoqueTri[$cont],2);
 
                         }
                     }
@@ -2571,9 +2577,23 @@ class AnalisemarcaController extends AbstractRestfulController
                                     )
                             ),
                             array(
-                                'name' => 'CC',
+                                'name' => 'TRI',
                                 'yAxis'=> 23,
                                 'color'=> $colors[23],
+                                'data' => $estoqueTri,
+                                'vFormat' => '',
+                                'vDecimos' => '2',
+                                'visible' => false,
+                                'showInLegend' => false,
+                                'dataLabels' => array(
+                                     'enabled' => true,
+                                     'style' => array( 'fontSize' => '10')
+                                    )
+                            ),
+                            array(
+                                'name' => 'CC',
+                                'yAxis'=> 24,
+                                'color'=> $colors[24],
                                 'data' => $cc,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -2586,8 +2606,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'NF',
-                                'yAxis'=> 24,
-                                'color'=> $colors[24],
+                                'yAxis'=> 25,
+                                'color'=> $colors[25],
                                 'data' => $nf,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -2600,8 +2620,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'TKM',
-                                'yAxis'=> 25,
-                                'color'=> $colors[25],
+                                'yAxis'=> 26,
+                                'color'=> $colors[26],
                                 'data' => $tkm,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -2614,8 +2634,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'CC Dia',
-                                'yAxis'=> 26,
-                                'color'=> $colors[26],
+                                'yAxis'=> 27,
+                                'color'=> $colors[27],
                                 'data' => $arrayCcDia,
                                 'vFormat' => '',
                                 'vDecimos' => '0',
@@ -2628,8 +2648,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'Inflação de Estoque',
-                                'yAxis'=> 27,
-                                'color'=> $colors[27],
+                                'yAxis'=> 28,
+                                'color'=> $colors[28],
                                 'data' => $idxEstoque,
                                 'vFormat' => '',
                                 'vDecimos' => '2',
@@ -2642,8 +2662,8 @@ class AnalisemarcaController extends AbstractRestfulController
                             ),
                             array(
                                 'name' => 'Inflação de Compra',
-                                'yAxis'=> 28,
-                                'color'=> $colors[28],
+                                'yAxis'=> 29,
+                                'color'=> $colors[29],
                                 'data' => $idxCompra,
                                 'vFormat' => '',
                                 'vDecimos' => '2',
