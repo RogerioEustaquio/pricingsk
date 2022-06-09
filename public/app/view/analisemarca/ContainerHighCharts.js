@@ -671,6 +671,7 @@ Ext.define('App.view.analisemarca.ContainerHighCharts', {
                 visible: false
             },
             {
+                min: 0,
                 title: {
                     text: 'TRI',
                     style: {
