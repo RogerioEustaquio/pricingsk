@@ -78,9 +78,14 @@ class AnalisemarcaController extends AbstractRestfulController
         // $regionais[] = ['id'=> 'R2','idEmpresas'=> [12,10,15,16,21,3,22,8]];
         // $regionais[] = ['id'=> 'R3','idEmpresas'=> [6,4,5,17,18,14,7]];
 
-        $regionais[] = ['id'=> 'R1','idEmpresas'=> ['AR','BX','CG','JN','MA','NA','RE','SA']];
-        $regionais[] = ['id'=> 'R2','idEmpresas'=> ['FZ','IM','AP','MB','M1','SL','TE']];
-        $regionais[] = ['id'=> 'R3','idEmpresas'=> ['BH','CB','LE','GO','JF','RJ','SN','VC']];
+        // $regionais[] = ['id'=> 'R1','idEmpresas'=> ['AR','BX','CG','JN','MA','NA','RE','SA']];
+        // $regionais[] = ['id'=> 'R2','idEmpresas'=> ['FZ','IM','AP','MB','M1','SL','TE']];
+        // $regionais[] = ['id'=> 'R3','idEmpresas'=> ['BH','CB','LE','GO','JF','RJ','SN','VC']];
+        
+        // 13/06/2022
+        $regionais[] = ['id'=> 'R1','idEmpresas'=> ['AR','BX','CG','FZ','JN','MA','NA','RE']];
+        $regionais[] = ['id'=> 'R2','idEmpresas'=> ['IM','AP','MB','M1','RJ','SL','TE']];
+        $regionais[] = ['id'=> 'R3','idEmpresas'=> ['BH','CB','LE','GO','JF','SA','SN','VC']];
 
         foreach($regionais as $row){
 
