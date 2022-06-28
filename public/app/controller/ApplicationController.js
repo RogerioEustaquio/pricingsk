@@ -14,7 +14,8 @@ Ext.define('App.controller.ApplicationController', {
         'App.view.acompanhamentovenda.AcompanhaVendaPanel',
         'App.view.faixamargem.FaixaMargemPanel',
         'App.view.analiseperformance.AnalisePerformancePanel',
-        'App.view.dispersaovenda.DispersaoVendaPanel'
+        'App.view.dispersaovenda.DispersaoVendaPanel',
+        'App.view.bolhasvendas.BolhasvendasPanel'
     ],
 
     control: {
@@ -33,7 +34,8 @@ Ext.define('App.controller.ApplicationController', {
         'acompanhavenda': { action: 'acompanhavendaAction' },
         'faixamargem': { action: 'faixamargemAction' },
         'analiseperformance': { action: 'analiseperformanceAction' },
-        'dispersaovenda': { action: 'dispersaovendaAction' }
+        'dispersaovenda': { action: 'dispersaovendaAction' },
+        'bolhasvendas': { action: 'bolhasvendasAction' }
     },
 
     controllerEvent: function(){
@@ -105,6 +107,10 @@ Ext.define('App.controller.ApplicationController', {
 
     dispersaovendaAction: function(){
         this.goActionMasterTab('dispersaovenda', true)
+    },
+
+    bolhasvendasAction: function(){
+        this.goActionMasterTab('bolhasvendas', true)
     },
 
     configViewport: function(){

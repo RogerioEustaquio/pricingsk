@@ -471,13 +471,10 @@ class AnalisemarcaController extends AbstractRestfulController
                 $andsql .= " and e.emp in ('$emp') ";
             }
 
-            
-
             if($descproduto){
                 
                 $andsql .= " and upper(p.descricao) like upper('%$descproduto%') ";
             }
-
 
             $codproduto= json_decode($codproduto);
             if($codproduto){
@@ -545,7 +542,7 @@ class AnalisemarcaController extends AbstractRestfulController
                     where 1 = 1
                     order by data desc";
   
-            $conn = $em->getConnection();
+            $conn = $em->getConnection ();
             $stmt = $conn->prepare($sql);
             // $stmt->bindValue(1, $pEmp);
             

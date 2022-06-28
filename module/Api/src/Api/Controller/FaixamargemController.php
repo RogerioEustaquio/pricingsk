@@ -767,10 +767,8 @@ class FaixamargemController extends AbstractRestfulController
                                                 WHEN mb_cliente.mb > 15 AND mb_cliente.mb <= 20 THEN 2
                                                 WHEN mb_cliente.mb > 20 AND mb_cliente.mb <= 29 THEN 3
                                                 WHEN mb_cliente.mb >= 30 THEN 4 END AS fx_mb_cc_o2
-                                            
                                             ,pcc.pareto_abc_rol_cc
                                             ,pma.pareto_abc_rol_marca
-                                            
                                         from vd, pcc, pma, mb_marca, mb_cliente
                                     where vd.emp = pcc.emp(+)
                                     and vd.cod_cliente = pcc.cod_cliente(+)

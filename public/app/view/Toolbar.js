@@ -98,6 +98,13 @@ Ext.define('App.view.Toolbar', {
                         window.document.location= BASEURL +'/#dispersaovenda';
                     }
                 },
+                {
+                    xtype: 'button',
+                    text: 'Bolhas Vendas',
+                    handler: function(){
+                        window.document.location= BASEURL +'/#bolhasvendas';
+                    }
+                }
             ]
         });
 
