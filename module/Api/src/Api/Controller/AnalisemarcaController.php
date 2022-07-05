@@ -2118,7 +2118,7 @@ class AnalisemarcaController extends AbstractRestfulController
                                     sum(qtde) as qtde,
                                     round(sum(custo),2) as cmv,
                                     --round((sum(lb) / sum(rol)) * 100, 2) as mb
-                                    case when sum(rol) <> 0 then round((sum(lb) / sum(rol)) * 100, 2) else 0 end as mb,
+                                    case when sum(rol) <> 0 then round((sum(lb) / sum(rol)) * 100, 4) else 0 end as mb,
                                     round(sum(rob),2) as rob
                             from vm_skvendaitem_master i,
                                 tb_sk_produto_montadora m
@@ -2224,10 +2224,10 @@ class AnalisemarcaController extends AbstractRestfulController
                         if($estoqueValor[$cont] > 0){
 
                             $estoqueFator[$cont]= $arrayCMV[$cont] > 0 ? round( $estoqueValor[$cont] / $arrayCMV[$cont] ,2) : 0;
-                            $estoqueGiro[$cont] = $arrayCMV[$cont] > 0 ? round( ($arrayCMV[$cont]*12)/ $estoqueValor[$cont] ,2) : 0;
+                            $estoqueGiro[$cont] = $arrayCMV[$cont] > 0 ?  ($arrayCMV[$cont]*12)/ $estoqueValor[$cont]  : 0;
                             $estoqueDias[$cont] =  $arrayCMV[$cont] > 0 ? round( ($estoqueValor[$cont] / $arrayCMV[$cont])*30 ,2) : 0;
                             
-                            $estoqueTri[$cont]  = $estoqueGiro[$cont] * ($arrayMb[$cont]);
+                            $estoqueTri[$cont]  = $estoqueGiro[$cont] * $arrayMb[$cont];
                             $estoqueTri[$cont]  = round($estoqueTri[$cont],2);
 
                         }

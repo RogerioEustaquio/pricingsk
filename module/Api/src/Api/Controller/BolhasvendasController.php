@@ -298,6 +298,9 @@ class BolhasvendasController extends AbstractRestfulController
             $data[] = ['id'=> 'LB','name'=> 'LB','vExemplo'=> 1000000];
             $data[] = ['id'=> 'MB','name'=> 'MB','vExemplo'=> 30];
             $data[] = ['id'=> 'CC','name'=> 'CC','vExemplo'=> 1000];
+            $data[] = ['id'=> 'CMV','name'=> 'CMV','vExemplo'=> 1000];
+            $data[] = ['id'=> 'GIRO','name'=> 'GIRO','vExemplo'=> 300];
+            $data[] = ['id'=> 'TRI','name'=> 'TRI','vExemplo'=> 3000];
             $data[] = ['id'=> 'ESTOQUEVALOR','name'=> 'Estoque Valor','vExemplo'=> 200];
 
             $this->setCallbackData($data);
@@ -354,7 +357,7 @@ class BolhasvendasController extends AbstractRestfulController
             }
             
             $andData = '';
-            $andDataFim = " and add_months(trunc(data,'MM'),-0) = add_months(trunc(sysdate,'MM'),-0)";
+            $andDataFim = " and trunc(data,'MM') = trunc(sysdate,'MM')";
             if($pDataInicio){
                 $andData = "and trunc(data) >= to_date('".$pDataInicio."')";
                 $sysdateInicio = "to_date('".$pDataInicio."')";
@@ -366,7 +369,7 @@ class BolhasvendasController extends AbstractRestfulController
                 $andData .= " and trunc(data) <= to_date('".$pDataFim."')";
                 $sysdateFim = "to_date('".$pDataFim."')";
 
-                $andDataFim = " and add_months(trunc(data,'MM'),-0) = add_months(trunc($sysdateFim,'MM'),-0)";
+                $andDataFim = " and trunc(data,'MM') = trunc($sysdateFim,'MM')";
             }else{
                 $sysdateFim = 'sysdate';
                 $andData .= " and trunc(data) <= sysdate";
@@ -441,15 +444,22 @@ class BolhasvendasController extends AbstractRestfulController
 
                 $conn->beginTransaction();
 
+                // $sqlTmp ="insert into vw_skproduto_categoria_tmp
+                // (select distinct c.cod_produto, c.categoria
+                //     from vw_skproduto_categoria c
+                //         ,vm_skvendaitem_master i
+                //  where c.cod_produto = i.cod_produto
+                //  $andEmpItem
+                //  $andData
+                //  $andMarca
+                //  $andProdutoItem
+                //  $andCategorias
+                //  )";
+
                 $sqlTmp ="insert into vw_skproduto_categoria_tmp
                 (select distinct c.cod_produto, c.categoria
                     from vw_skproduto_categoria c
-                        ,vm_skvendaitem_master i
-                 where c.cod_produto = i.cod_produto
-                 $andEmpItem
-                 $andData
-                 $andMarca
-                 $andProdutoItem
+                 where 1 = 1
                  $andCategorias
                  )";
 
@@ -462,6 +472,34 @@ class BolhasvendasController extends AbstractRestfulController
 
                 $tableCategoria = ", vw_skproduto_categoria_tmp c ";
                 $andTableCategoria   = 'and a.cod_produto = c.cod_produto';
+
+
+
+            #####################################################################################
+
+            // $sql = "select distinct c.cod_produto, c.categoria
+            //             from vw_skproduto_categoria_tmp c";
+            // $stmt = $conn->prepare($sql);
+            // $stmt->execute();
+            // $results = $stmt->fetchAll();
+            // $hydrator = new ObjectProperty;
+            // $hydrator->addStrategy('cod_produto', new ValueStrategy);
+            // $stdClass = new StdClass;
+            // $resultSet = new HydratingResultSet($hydrator, $stdClass);
+            // $resultSet->initialize($results);
+
+            // foreach ($resultSet as $row) {
+
+            //     $elementos = $hydrator->extract($row);
+
+                
+            //     print"".$elementos['codProduto'] .", ". $elementos['categoria'].":";
+
+            // }
+            
+            // exit;
+            #########################################################################################
+
             }
 
             $sql = "select  descricao ds,
@@ -472,12 +510,20 @@ class BolhasvendasController extends AbstractRestfulController
                             0 declb,
                             mb,
                             2 decmb,
+                            ultimamb,
+                            2 decultimamb,
                             qtde as qtd,
                             0 decqtd,
                             nf,
                             0 decnf,
                             cc,
                             0 deccc,
+                            cmv,
+                            0 deccmv,
+                            0 giro,
+                            2 decgiro,
+                            0 tri,
+                            2 dectri,
                             estoque_valor as estoquevalor,
                             0 decestoque_valor,
                             
@@ -486,9 +532,11 @@ class BolhasvendasController extends AbstractRestfulController
                             rol,
                             lb,
                             mb,
+                            ultimamb,
                             qtde,
                             nf,
                             cc,
+                            cmv,
                             estoque_valor,
                             fr_rol,
                             sum(sum(fr_rol)) over (partition by rede order by rol desc rows unbounded preceding) as med_accumulated  
@@ -496,23 +544,48 @@ class BolhasvendasController extends AbstractRestfulController
                                     rol,
                                     lb,
                                     mb,
+                                    ultimamb,
                                     qtde,
                                     nf,
                                     cc,
+                                    cmv,
                                     estoque_valor,
                                     100*ratio_to_report((case when rol > 0 then rol end)) over (partition by rede) fr_rol
                             from (select ax.*, bx.estoque_valor 
                                     from (select 'JS' as rede,
-                                                    $colDs as ds,
-                                                    $colDescricao as descricao,
-                                                    round(sum(rob) ,2) as rob,
-                                                    round(sum(rol),2) as rol,
-                                                    round(sum(cmv),2) as cmv,
-                                                    round(sum(lb),2) as lb,
-                                                    CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END as mb,
-                                                    sum(qtd) as qtde,
-                                                    count(distinct nota) as nf,
-                                                    count(distinct cnpj_parceiro) as cc
+                                                 $colDs as ds,
+                                                 $colDescricao as descricao,
+                                                 round(sum(rob) ,2) as rob,
+                                                 round(sum(rol),2) as rol,
+                                                 round(sum(
+                                                    case when trunc(data,'MM') = trunc($sysdateFim,'MM')
+                                                        then cmv
+                                                        else 0
+                                                    end
+                                                 ),2) as cmv,
+                                                 round(sum(lb),2) as lb,
+                                                 CASE WHEN SUM(nvl(rol,0))>0 THEN ROUND(SUM(lb)/SUM(rol)*100 ,2) ELSE 0 END as mb,
+                                                 CASE WHEN SUM(case when trunc(data,'MM') = trunc($sysdateFim,'MM')
+                                                                    then 
+                                                                        rol
+                                                                    else 0
+                                                                end)<>0
+                                                 THEN
+                                                     ROUND(
+                                                        SUM(case when trunc(data,'MM') = trunc($sysdateFim,'MM')
+                                                            then 
+                                                                lb
+                                                            else 0
+                                                        end)/
+                                                        SUM(case when trunc(data,'MM') = trunc($sysdateFim,'MM')
+                                                            then 
+                                                                rol
+                                                            else 0
+                                                        end)*100 ,4)
+                                                 ELSE 0 END as ultimamb,
+                                                 sum(qtd) as qtde,
+                                                 count(distinct nota) as nf,
+                                                 count(distinct cnpj_parceiro) as cc
                                             from vm_skvendanota a
                                                  $tableCategoria
                                             where 1 =1
@@ -537,8 +610,8 @@ class BolhasvendasController extends AbstractRestfulController
                                              $andCategorias
                                             group by $colDs) bx
                                     where ax.ds = bx.ds))
-                group by rede, ds, descricao, rol, lb, mb, qtde, nf, cc, estoque_valor, fr_rol)
-                where 1=1
+                group by rede, ds, descricao, rol, lb, mb, ultimamb, qtde, nf, cc, cmv, estoque_valor, fr_rol)
+                where 1 = 1
                 -- Remover esse filtro se utilizar o filtro de marca
                 -- med_accumulated <= 80
                 order by med_accumulated asc";
@@ -556,6 +629,8 @@ class BolhasvendasController extends AbstractRestfulController
             $hydrator->addStrategy('cmv', new ValueStrategy);
             $hydrator->addStrategy('lb', new ValueStrategy);
             $hydrator->addStrategy('mb', new ValueStrategy);
+            $hydrator->addStrategy('estoquevalor', new ValueStrategy);
+            $hydrator->addStrategy('ultimamb', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -564,15 +639,12 @@ class BolhasvendasController extends AbstractRestfulController
             foreach ($resultSet as $row) {
                 $elementos = $hydrator->extract($row);
 
-                $data[] = $elementos;
+                $elementos['giro'] = $elementos['cmv'] > 0 ?  ($elementos['cmv'] *12)/ $elementos['estoquevalor']  : 0;
 
-                // $data[] = [
-                //             'x'=> (float)$elementos['rol'],
-                //             'y'=> (float)$elementos['mb'],
-                //             'z'=> (float)$elementos['cc'],
-                //             'desc'=> $elementos['ds'],
-                //             'descricao'=> $elementos['descricao']
-                // ];
+                $elementos['tri']  = $elementos['giro'] * $elementos['ultimamb'];
+
+                $data[] = $elementos;
+                
             }
 
             if($colDs ==  'categoria' || $andCategorias){
