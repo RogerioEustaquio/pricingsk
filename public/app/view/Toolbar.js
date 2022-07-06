@@ -14,20 +14,20 @@ Ext.define('App.view.Toolbar', {
         
         Ext.applyIf(me, {
             items: [
-                {
-                    xtype: 'button',
-                    text: 'Home',
-                    handler: function(){
-                        window.document.location= BASEURL +'/#home';
-                    }
-                },
-                {
-                    xtype: 'button',
-                    text: 'Base Preço',
-                    handler: function(){
-                        window.document.location= BASEURL +'/#basepreco';
-                    }
-                },
+                // {
+                //     xtype: 'button',
+                //     text: 'Home',
+                //     handler: function(){
+                //         window.document.location= BASEURL +'/#home';
+                //     }
+                // },
+                // {
+                //     xtype: 'button',
+                //     text: 'Base Preço',
+                //     handler: function(){
+                //         window.document.location= BASEURL +'/#basepreco';
+                //     }
+                // },
                 {
                     xtype: 'button',
                     text: 'Produto',
@@ -70,13 +70,13 @@ Ext.define('App.view.Toolbar', {
                         window.document.location= BASEURL +'/#analisemarca';
                     }
                 },
-                {
-                    xtype: 'button',
-                    text: 'Acompanhamento Venda',
-                    handler: function(){
-                        window.document.location= BASEURL +'/#acompanhavenda';
-                    }
-                },
+                // {
+                //     xtype: 'button',
+                //     text: 'Acompanhamento Venda',
+                //     handler: function(){
+                //         window.document.location= BASEURL +'/#acompanhavenda';
+                //     }
+                // },
                 {
                     xtype: 'button',
                     text: 'Faixa Margem',
@@ -84,13 +84,13 @@ Ext.define('App.view.Toolbar', {
                         window.document.location= BASEURL +'/#faixamargem';
                     }
                 },
-                {
-                    xtype: 'button',
-                    text: 'Análise Performance',
-                    handler: function(){
-                        window.document.location= BASEURL +'/#analiseperformance';
-                    }
-                },
+                // {
+                //     xtype: 'button',
+                //     text: 'Análise Performance',
+                //     handler: function(){
+                //         window.document.location= BASEURL +'/#analiseperformance';
+                //     }
+                // },
                 {
                     xtype: 'button',
                     text: 'Dispersão Venda',
