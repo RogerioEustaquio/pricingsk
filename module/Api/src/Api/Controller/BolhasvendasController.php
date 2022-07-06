@@ -420,7 +420,7 @@ class BolhasvendasController extends AbstractRestfulController
                     break;
                 case 4:
                     $colDs = 'a.cod_produto';
-                    $colDescricao = 'a.descricao';
+                    $colDescricao = "a.cod_produto||' '||substr(a.descricao,0,20)||'...'";
                     break;
                 default:
                     # code...
