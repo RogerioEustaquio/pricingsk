@@ -38,6 +38,11 @@ Ext.define('App.view.bolhasvendas.VendaBubbleTab', {
                             tooltip: 'Consultar',
                             handler: function() {
 
+                                meThis = this;
+                                meThis.setDisabled(true);
+                                setTimeout(function(){
+                                    meThis.setDisabled(false);
+                                },2000);
                                 var me = this.up('toolbar').up('container').up('panel');
                                 var panelBolha =  this.up('toolbar').up('container');
 
