@@ -1226,36 +1226,38 @@ class AnalisemarcaController extends AbstractRestfulController
                                 sum(c.nota ) as nf,
                                 sum(round(a.rol/b.cc,2)) tkm
                                 -- incluir cc dia por fora no php
-                        from (select data, sum(rol) as rol 
+                        from (select trunc(data,'MM') data, sum(rol) as rol 
                                 from vm_skvendanota 
                                 where 1=1
-                                group by data) a,
+                                group by trunc(data,'MM')) a,
                                 (select data, count(*) as cc
-                                from (select v.data, emp, cnpj_parceiro, sum(rol) as rol 
+                                from (select trunc(v.data,'MM') data, emp, cnpj_parceiro, sum(rol) as rol 
                                         from vm_skvendanota v
                                             $andSqltCurva
                                         where 1=1
                                         $andSql
                                         $andSqlData
                                         $andSqlCurva
-                                        group by v.data, emp, cnpj_parceiro)
+                                        group by trunc(v.data,'MM'), emp, cnpj_parceiro)
                                 where rol > 0
                                 group by data) b,
                                 (select data, count(*) as nota
-                                from (select v.data, emp, nota, sum(rol) as rol 
+                                from (select trunc(v.data,'MM') data, emp, nota, sum(rol) as rol 
                                         from vm_skvendanota v
                                             $andSqltCurva
                                         where 1=1
                                         $andSql
                                         $andSqlData
                                         $andSqlCurva
-                                        group by v.data, emp, nota)
+                                        group by trunc(v.data,'MM'), emp, nota)
                                 where rol > 0
                                 group by data) c
                         where a.data = b.data
                         and a.data = c.data
                         group by '01'||to_char(a.data,'/mm/yyyy')
                         order by data asc";
+                // print"$sql";
+                // exit;
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
                 $results = $stmt->fetchAll();
