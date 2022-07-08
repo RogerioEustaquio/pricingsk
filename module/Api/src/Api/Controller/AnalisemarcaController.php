@@ -1224,12 +1224,16 @@ class AnalisemarcaController extends AbstractRestfulController
                 $sql = "select  to_date('01'||to_char(a.data,'/mm/yyyy')) as data, 
                                 sum(b.cc) as cc, 
                                 sum(c.nota ) as nf,
-                                sum(round(a.rol/b.cc,2)) tkm
+                                round(sum(a.rol)/sum(b.cc),2) tkm
                                 -- incluir cc dia por fora no php
-                        from (select trunc(data,'MM') data, sum(rol) as rol 
-                                from vm_skvendanota 
+                        from (select trunc(v.data,'MM') data, sum(rol) as rol 
+                                from vm_skvendanota v
+                                    $andSqltCurva
                                 where 1=1
-                                group by trunc(data,'MM')) a,
+                                $andSql
+                                $andSqlData
+                                $andSqlCurva
+                                group by trunc(v.data,'MM')) a,
                                 (select data, count(*) as cc
                                 from (select trunc(v.data,'MM') data, emp, cnpj_parceiro, sum(rol) as rol 
                                         from vm_skvendanota v
