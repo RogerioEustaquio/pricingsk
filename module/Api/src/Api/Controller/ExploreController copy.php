@@ -28,12 +28,9 @@ class ExploreController extends AbstractRestfulController
         $regionais = array();
 
         // 13/06/2022
-        // $regionais[] = ['id'=> 'R1','idEmpresas'=> ['AR','BX','CG','FZ','JN','MA','NA','RE']];
-        $regionais[] = ['id'=> 'R1','idEmpresas'=> [8,9,11,12,15,16,20,21]];
-        // $regionais[] = ['id'=> 'R2','idEmpresas'=> ['IM','AP','MB','M1','RJ','SL','TE']];
-        $regionais[] = ['id'=> 'R2','idEmpresas'=> [2,5,6,14,17,18,23]];
-        // $regionais[] = ['id'=> 'R3','idEmpresas'=> ['BH','CB','LE','GO','JF','SA','SN','VC']];
-        $regionais[] = ['id'=> 'R3','idEmpresas'=> [3,7,10,13,19,22,24,28]];
+        $regionais[] = ['id'=> 'R1','idEmpresas'=> ['AR','BX','CG','FZ','JN','MA','NA','RE']];
+        $regionais[] = ['id'=> 'R2','idEmpresas'=> ['IM','AP','MB','M1','RJ','SL','TE']];
+        $regionais[] = ['id'=> 'R3','idEmpresas'=> ['BH','CB','LE','GO','JF','SA','SN','VC']];
 
         foreach($regionais as $row){
 
@@ -87,44 +84,54 @@ class ExploreController extends AbstractRestfulController
             if($emps){
                 $emps   =  implode(",",json_decode($emps));
             }
-            if($regional){
-
-                $arrayEmps = json_decode($regional);
-                $regional = '';
-                foreach($arrayEmps as $idRow){
-                    
-                    $arrayLinha = $this->funcregionais($idRow);
-    
-                    $regional .= implode(",",$arrayLinha);
-                }
-                
-                $emps = $emps ? $emps . ($regional ? ",". $regional: "") : $regional;
-            }
             if($marcas){
                 $marcas =  implode(",",json_decode($marcas));
             }
             if($produtos){
-                $produtos =  implode(",",json_decode($produtos));
-            }
-            if($categorias){
-                $categorias = implode("','",json_decode($categorias));
+                $produtos =  implode("','",json_decode($produtos));
             }
 
             $andSql = '';
-            if($datareferencia){
-                $datareferencia = '01/'.$datareferencia;
+            $datainicioa='';
+            if($datainicioa){
+                $datainicioa = "'$datainicioa'";
+            }else{
+                $datainicioa = "'01/02/2021'";
+            }
+            $datafinala ='';
+            if($datafinala){
+                $datafinala = "'$datafinala'";
+                $andSql = " and trunc(vi.data_emissao,'MM') <= $datafinala";
+            }else{
+                $datafinala = "'28/02/2021'";
+                $andSql = " and trunc(vi.data_emissao,'MM') <= $datafinala";
+            }
+            $datainiciob='';
+            if($datainiciob){
+                $datainiciob = "'$datainiciob'";
+                $andSql = "and trunc(vi.data_emissao,'MM') <= $datainiciob";
+            }else{
+                $datainiciob = "'01/02/2021'";
+                $andSql = "and trunc(vi.data_emissao,'MM') <= $datainiciob";
+            }
+            $datafinalb='';
+            if($datafinalb){
+                $datafinalb = "'$datafinalb'";
+            }else{
+                $datafinalb = "'28/02/2021'";
             }
 
+
             if($emps){
-                $andSql .= " and e.cod_empresa in ($emps)";
+                $andSql .= " and vi.id_empresa in ($emps)";
             }
 
             if($marcas){
-                $andSql .= " and p.cod_marca in ($marcas)";
+                $andSql .= " and ic.id_marca in ($marcas)";
             }
 
             if($produtos){
-                $andSql .= " and e.cod_produto in ($produtos)";
+                $andSql .= " and i.cod_item||c.descricao in ('$produtos')";
             }
 
             $pNiveis = $this->params()->fromQuery('niveis',null);
@@ -168,11 +175,6 @@ class ExploreController extends AbstractRestfulController
             $groupDescription = $nodes[$nodeId][1];
             $groupId = $nodes[$nodeId][2];
             $groupAndWhere = "";
-
-            // print "$groupBy - ";
-            // print "$groupDescription -";
-            // print "$groupId";
-            // exit;
 
             //loop order by//
             $orderBy = '';
@@ -227,217 +229,65 @@ class ExploreController extends AbstractRestfulController
             
             $leaf = ( (count($lvs) === 1 || $nodeId === $lvs[count($lvs)-2]) ? "'true'" : "'false'" );
 
-            $conn = $em->getConnection();
-
-            $andSqlCategoria = '';
-            $tableCategoria = '';
-            $groupCategoria = '';
-            if(strpos($groupId,"CATEGORIA") !== false || $categorias){
-                $tableCategoria = ', vw_skproduto_categoria_tmp ctmp';
-                $andSqlCategoria = " and e.cod_produto = ctmp.cod_produto";
-                $groupCategoria = "
-                ctmp.categoria as id_categoria,
-                ctmp.categoria as categoria,";
-
-                if($categorias){
-                
-                    $sqlTmp ="insert into vw_skproduto_categoria_tmp
-                    select distinct cod_produto, categoria
-                        from vw_skproduto_categoria
-                    where categoria in ('$categorias')";
-                    
-                }else{
-                    $sqlTmp ="insert into vw_skproduto_categoria_tmp
-                    select distinct cod_produto, categoria
-                        from vw_skproduto_categoria";
-                }
-
-                $conn->beginTransaction();
-                
-                $stmt = $conn->prepare($sqlTmp);
-                $stmt->execute();
-
-            }
-
-            
-
             $sql = "select id,
                          grupo,
                          leaf,
-                         rol_dia_m0,
-                         lb_dia_m0,
-                         mb_m0,
-                         rol_dia_m1,
-                         lb_dia_m1,
-                         mb_m1,
-                         rol_dia_ac_at,
-                         lb_dia_ac_at,
-                         rol_dia_ac_an,
-                         lb_dia_ac_an,
-                         mb_ac_an,
-                         var_rd_m0_m1,
-                         var_ld_m0_m1,
-                         var_mb_m0_m1,
-                         var_rd_ac_at_an,
-                         var_ld_ac_at_an
+                         preco_medioa preco_medio, preco_mediob, round(100*(preco_mediob/preco_medioa-1),2) as preco_mediox,
+                         mba mb, mbb, round(100*(mbb/mba-1),2) as mbx,
+                         roba rob, robb, round(100*(robb/roba-1),2) as robx,
+                         qtdea qtde, qtdeb, round(100*(qtdeb/qtdea-1),2) as qtdex,
+                         rola rol, rolb, round(100*(rolb/rola-1),2) as rolx,
+                         cmva cmv, cmvb, round(100*(cmvb/cmva-1),2) as cmvx,
+                         lba lb, lbb, round(100*(lbb/lba-1),2) as lbx
                     from (
                         select $groupId as id,
                             $groupDescription as grupo,
                             $leaf as leaf,
-                                        
-                            sum(rol_dia_m0) as rol_dia_m0,
-                            sum(lb_dia_m0) as lb_dia_m0,
-                            sum(lb_dia_m0)/sum(rol_dia_m0)*100 as mb_m0,
-                            
-                            sum(rol_dia_m1) as rol_dia_m1,
-                            sum(lb_dia_m1) as lb_dia_m1,
-                            sum(lb_dia_m1)/sum(rol_dia_m1)*100 as mb_m1,
-                            
-                            sum(rol_dia_ac_at) as rol_dia_ac_at,
-                            sum(lb_dia_ac_at) as lb_dia_ac_at,
-                            sum(lb_dia_ac_at)/sum(rol_dia_ac_at)*100 as mb_ac_at,
-                                    
-                            sum(rol_dia_ac_an) as rol_dia_ac_an,
-                            sum(lb_dia_ac_an) as lb_dia_ac_an,
-                            sum(lb_dia_ac_an)/sum(rol_dia_ac_an)*100 as mb_ac_an,
-                            
-                            /*Rol dia mês atual x mês anterior*/
-                            round(case when nvl(sum(rol_dia_m0),0) > 0 then ((sum(rol_dia_m0)/sum(rol_dia_m1))-1)*100 end,2) as var_rd_m0_m1,
-                            
-                            /*Lb dia mês atual x mês anterior*/
-                            round(case when nvl(sum(lb_dia_m0),0) > 0 then ((sum(lb_dia_m0)/sum(lb_dia_m1))-1)*100 end,2) as var_ld_m0_m1,
-                            
-                            round(case when nvl(sum(rol_dia_m0),0) > 0 and nvl(sum(rol_dia_m1),0) > 0 then ( ( sum(lb_dia_m0)/sum(rol_dia_m0) ) - ( sum(lb_dia_m1)/sum(rol_dia_m1) ) )*100 end,2) as var_mb_m0_m1,
-                            
-                            /*Rol dia ac ano atual x ac ano anterior*/
-                            round(case when nvl(sum(rol_dia_ac_at),0) > 0 then ((sum(rol_dia_ac_at)/sum(rol_dia_ac_an))-1)*100 end,2) as var_rd_ac_at_an,
-                            
-                            /*Lb dia ac ano atual x ac ano anterior*/
-                            round(case when nvl(sum(lb_dia_ac_at),0) > 0 then ((sum(lb_dia_ac_at)/sum(lb_dia_ac_an))-1)*100 end,2) as var_ld_ac_at_an
-
-                        from (
-                            with
-                        
-                            vm0 as (
-                                select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                    from vw_skvenda_dia
-                                where data = trunc(add_months(sysdate,-0),'MM')
-                            ),
-                        
-                            vm1 as (
-                                select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                    from vw_skvenda_dia
-                                where data = trunc(add_months(sysdate,-1),'MM')
-                            ),
-      
-                            vac_at as (
-                               select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 from vw_skvenda_dia
-                                where data <= trunc(add_months(sysdate,-0),'MM')
-                                  and data >= trunc(add_months(sysdate,-0),'RRRR')
-                            ),
-                      
-                            vac_an as (
-                               select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 from vw_skvenda_dia
-                                where data <= trunc(add_months(sysdate,-12),'MM')
-                                  and data >= trunc(add_months(sysdate,-12),'RRRR')
-                            ),
-      
-                            v12m AS (
-                               SELECT cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 FROM vw_skvenda_dia
-                                WHERE data <= TRUNC(ADD_MONTHS(SYSDATE,-1),'MM')
-                                  AND data >= TRUNC(ADD_MONTHS(SYSDATE,-12),'MM')
-                            ),
-                            
-                            v6m AS (
-                               SELECT cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 FROM vw_skvenda_dia
-                                WHERE data <= TRUNC(ADD_MONTHS(SYSDATE,-1),'MM')
-                                  AND data >= TRUNC(ADD_MONTHS(SYSDATE,-6),'MM')
-                            ),
-                            
-                            v3m AS (
-                               SELECT cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 FROM vw_skvenda_dia
-                                WHERE data <= TRUNC(ADD_MONTHS(SYSDATE,-1),'MM')
-                                  AND data >= TRUNC(ADD_MONTHS(SYSDATE,-3),'MM')
-                            )
-                        
-                            select 'REDE' as id_rede,
-                                    'REDE' as rede,  
-                                    e.cod_empresa as id_empresa,
-                                    em.emp as empresa,
-                                    e.cod_produto as id_produto,
-                                    p.descricao as produto,
-                                    p.cod_marca as id_marca,
-                                    m.descricao_marca as marca,
-                                    $groupCategoria
-
-                                    e.estoque as qtd_estoque_atual,
-                                    e.custo_medio as custo_medio_estoque_atual,
-                                    e.valor as valor_estoque_atual,
-                                    
-                                    vm0.rol_dia as rol_dia_m0,
-                                    vm0.lb_dia as lb_dia_m0,
-                                    
-                                    vm1.rol_dia as rol_dia_m1,
-                                    vm1.lb_dia as lb_dia_m1,
-                                    
-                                    vac_at.rol_dia as rol_dia_ac_at,
-                                    vac_at.lb_dia as lb_dia_ac_at,
-                                    
-                                    vac_an.rol_dia as rol_dia_ac_an,
-                                    vac_an.lb_dia as lb_dia_ac_an,
-                                    
-                                    v12m.rol_dia AS rol_dia_12m,
-                                    v12m.lb_dia AS lb_dia_12m,
-                                    
-                                    v6m.rol_dia AS rol_dia_6m,
-                                    v6m.lb_dia AS lb_dia_6m,
-                                    
-                                    v3m.rol_dia AS rol_dia_3m,
-                                    v3m.lb_dia AS lb_dia_3m
-                                    
-                                from vm_skestoque e,
-                                     vw_skempresa em,
-                                     vw_skproduto p,
-                                     vw_skmarca m,
-                                     vm0, vm1,
-                                     vac_at, vac_an
-                                     , v12m, v6m, v3m
-                                     $tableCategoria
-                                where e.cod_empresa = em.cod_empresa
-                                  and e.cod_produto = p.cod_produto
-                                  and p.cod_marca = m.cod_marca
-                                  
-                                  and e.cod_empresa = vm0.cod_empresa(+)
-                                  and e.cod_produto = vm0.cod_produto(+)
-                                  
-                                  and e.cod_empresa = vm1.cod_empresa(+)
-                                  and e.cod_produto = vm1.cod_produto(+)
-                                  
-                                  and e.cod_empresa = vac_at.cod_empresa(+)
-                                  and e.cod_produto = vac_at.cod_produto(+)
-                                  
-                                  and e.cod_empresa = vac_an.cod_empresa(+)
-                                  and e.cod_produto = vac_an.cod_produto(+)
-                                  
-                                  AND e.cod_empresa = v12m.cod_empresa(+)
-                                  AND e.cod_produto = v12m.cod_produto(+)
-                                  
-                                  AND e.cod_empresa = v6m.cod_empresa(+)
-                                  AND e.cod_produto = v6m.cod_produto(+)
-                                  
-                                  AND e.cod_empresa = v3m.cod_empresa(+)
-                                  AND e.cod_produto = v3m.cod_produto(+)
-                                  $andSqlCategoria
-                                  $andSql
-                                --and e.cod_empresa = 7
-                                --and e.cod_produto = 397
-                        
-                        )
+                            round(sum(case when data >= '01/01/2021' and data <= '31/01/2021' then rob end)/sum(case when data >= '01/01/2021' and data <= '31/01/2021' then qtde end),2) as preco_medioa,
+                            round((case when sum(case when data >= '01/01/2021' and data <= '31/01/2021' then qtde end) > 0 then (sum(nvl(case when data >= '01/01/2021' and data <= '31/01/2021' then rol end,0)-nvl(case when data >= '01/01/2021' and data <= '31/01/2021' then cmv end,0))/sum(case when data >= '01/01/2021' and data <= '31/01/2021' then rol end))*100 end),2) as mba,
+                            sum(case when data >= '01/01/2021' and data <= '31/01/2021' then rob end) as roba,
+                            sum(case when data >= '01/01/2021' and data <= '31/01/2021' then qtde end) as qtdea,
+                            sum(case when data >= '01/01/2021' and data <= '31/01/2021' then rol end) as rola,
+                            sum(case when data >= '01/01/2021' and data <= '31/01/2021' then cmv end) as cmva,
+                            sum(case when data >= '01/01/2021' and data <= '31/01/2021' then lb end) as lba,
+                            round(sum(case when data >= $datainicioa and data <= $datafinala then rob end)/sum(case when data >= $datainicioa and data <= $datafinala then qtde end),2) as preco_mediob,
+                            round((case when sum(case when data >= $datainicioa and data <= $datafinala then qtde end) > 0 then (sum(nvl(case when data >= $datainicioa and data <= $datafinala then rol end,0)-nvl(case when data >= $datainicioa and data <= $datafinala then cmv end,0))/sum(case when data >= $datainicioa and data <= $datafinala then rol end))*100 end),2) as mbb,
+                            sum(case when data >= $datainicioa and data <= $datafinala then rob end) as robb,
+                            sum(case when data >= $datainicioa and data <= $datafinala then qtde end) as qtdeb,
+                            sum(case when data >= $datainicioa and data <= $datafinala then rol end) as rolb,
+                            sum(case when data >= $datainicioa and data <= $datafinala then cmv end) as cmvb,
+                            sum(case when data >= $datainicioa and data <= $datafinala then lb end) as lbb
+                        from (select 'REDE' as id_rede, 'REDE' as rede, vi.id_empresa, em.apelido as empresa, ic.id_marca, m.descricao as marca, nvl(mg.gestor,'G5 N/D') id_gestor, nvl(mg.gestor,'G5 N/D') as gestor,
+                                    --vi.id_empresa, em.apelido as empresa, ic.id_marca, m.descricao as marca, 
+                                    trunc(vi.data_emissao,'MM') as data,
+                                    sum(vi.rob) as rob,
+                                    sum(vi.qtde) as qtde,
+                                    sum(vi.rol) as rol,
+                                    sum(vi.custo) as cmv,
+                                    sum(nvl(vi.rol,0)-nvl(vi.custo,0)) as lb
+                                from pricing.vm_ie_ve_venda_item vi,
+                                    ms.tb_item_categoria ic,
+                                    ms.tb_item i,
+                                    ms.tb_categoria c,
+                                    ms.empresa em,
+                                    ms.tb_marca m,
+                                    pricing.tb_marca_gestor mg
+                                where vi.id_item = ic.id_item
+                                and vi.id_categoria = ic.id_categoria
+                                and vi.id_item = i.id_item
+                                and vi.id_categoria = c.id_categoria
+                                and vi.id_empresa = em.id_empresa
+                                and ic.id_marca = m.id_marca
+                                and ic.id_marca = mg.id_marca(+)
+                                and vi.id_operacao in (4,7)
+                                and vi.status_venda = 'A'
+                                $andSql
+                                -- Data inicial B
+                                and trunc(vi.data_emissao,'MM') >= '01/01/2021'
+                                -- Data final A
+                                and trunc(vi.data_emissao,'MM') <= $datafinala
+                                --and i.cod_item||c.descricao = 'JS00506.0'
+                            group by trunc(vi.data_emissao,'MM'), vi.id_empresa, em.apelido, ic.id_marca, m.descricao, mg.gestor)
                         where 1=1
                         $groupAndWhere
                         group by $groupBy, $groupId)
@@ -446,29 +296,31 @@ class ExploreController extends AbstractRestfulController
 
         //   print "$sql";
         //   exit;
-
+            $conn = $em->getConnection();
             $stmt = $conn->prepare($sql);
             
             $stmt->execute();
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('rol_dia_m0', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_m0', new ValueStrategy);
-            $hydrator->addStrategy('mb_m0', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia_m1', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_m1', new ValueStrategy);
-            $hydrator->addStrategy('mb_m1', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia_ac_at', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_ac_at', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia_ac_an', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_ac_an', new ValueStrategy);
-            $hydrator->addStrategy('mb_ac_an', new ValueStrategy);
-            $hydrator->addStrategy('var_rd_m0_m1', new ValueStrategy);
-            $hydrator->addStrategy('var_ld_m0_m1', new ValueStrategy);
-            $hydrator->addStrategy('var_mb_m0_m1', new ValueStrategy);
-            $hydrator->addStrategy('var_rd_ac_at_an', new ValueStrategy);
-            $hydrator->addStrategy('var_ld_ac_at_an', new ValueStrategy);
+            $hydrator->addStrategy('preco_medio', new ValueStrategy);
+            $hydrator->addStrategy('preco_mediob', new ValueStrategy);
+            $hydrator->addStrategy('preco_mediox', new ValueStrategy);
+            $hydrator->addStrategy('mb', new ValueStrategy);
+            $hydrator->addStrategy('mbb', new ValueStrategy);
+            $hydrator->addStrategy('mbx', new ValueStrategy);
+            $hydrator->addStrategy('qtde', new ValueStrategy);
+            $hydrator->addStrategy('qtdeb', new ValueStrategy);
+            $hydrator->addStrategy('qtdex', new ValueStrategy);
+            $hydrator->addStrategy('rol', new ValueStrategy);
+            $hydrator->addStrategy('rolb', new ValueStrategy);
+            $hydrator->addStrategy('rolx', new ValueStrategy);
+            $hydrator->addStrategy('cmv', new ValueStrategy);
+            $hydrator->addStrategy('cmvb', new ValueStrategy);
+            $hydrator->addStrategy('cmvx', new ValueStrategy);
+            $hydrator->addStrategy('lb', new ValueStrategy);
+            $hydrator->addStrategy('lbb', new ValueStrategy);
+            $hydrator->addStrategy('lbx', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -479,10 +331,6 @@ class ExploreController extends AbstractRestfulController
                 $l = $hydrator->extract($row);
 
                 $data[] = $l;
-            }
-
-            if($categorias){
-                $conn->commit();
             }
 
             // var_dump($data);

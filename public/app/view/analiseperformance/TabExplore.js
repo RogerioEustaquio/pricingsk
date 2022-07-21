@@ -5,6 +5,7 @@ Ext.define('App.view.analiseperformance.TabExplore', {
     closable: false,
     requires: [
         'App.view.analiseperformance.ToolbarExplore',
+        'App.view.analiseperformance.ExploreFiltro',
         'App.view.analiseperformance.TreeGridExplore'
     ],
     
@@ -22,10 +23,14 @@ Ext.define('App.view.analiseperformance.TabExplore', {
                 {
                     xtype: 'panel',
                     region: 'center',
-                    layout: 'fit',
+                    layout: 'border',
                     items: [
                         {
-                            xtype: 'treegridexplore'
+                            xtype:'explorefiltro'
+                        },
+                        {
+                            xtype: 'treegridexplore',
+                            region: 'center'
                         }
                     ]
                 }

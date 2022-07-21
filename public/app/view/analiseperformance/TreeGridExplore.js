@@ -3,6 +3,8 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
     xtype: 'treegridexplore',
     itemId: 'treegridexplore',
     rootVisible: false,
+    width: '100%',
+    height: '40%',
 
     constructor: function() {
         var me = this;
@@ -24,32 +26,24 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
 
         var myModel = Ext.create('Ext.data.TreeModel', {
                             fields: [
-                                        { name: 'grupo', type: 'string'},
-                                        {name:'filial', type: 'string'},
-                                        {name:'diasUteisM0', type: 'number'},
-                                        {name:'diasUteisM1', type: 'number'},
-                                        {name:'rolM0', type: 'number'},
+                                        {name: 'grupo', type: 'string'},
                                         {name:'rolDiaM0', type: 'number'},
-                                        {name:'rolDiaM01', type: 'number'},
-                                        {name:'rolDiaM0X_1m', type: 'number'},
-                                        {name:'lbM0', type: 'number'},
                                         {name:'lbDiaM0', type: 'number'},
-                                        {name:'lbDiaM0X_1m', type: 'number'},
                                         {name:'mbM0', type: 'number'},
-                                        {name:'mbM0X_1m', type: 'number'},
-                                        {name:'qtdeM0', type: 'number'},
-                                        {name:'qtdeDiaM0', type: 'number'},
-                                        {name:'qtdeDiaM0X_1m', type: 'number'},
-                                        {name:'ccM0', type: 'number'},
-                                        {name:'ccDiaM0', type: 'number'},
-                                        {name:'ccDiaM0X_1m', type: 'number'},
-                                        {name:'nfM0', type: 'number'},
-                                        {name:'nfDiaM0', type: 'number'},
-                                        {name:'nfDiaM0X_1m', type: 'number'},
-                                        {name:'skuM0', type: 'number'},
-                                        {name:'estoqueQtde', type: 'number'},
-                                        {name:'estoqueValor', type: 'number'},
-                                        {name:'estoqueSkuDisp', type: 'number'}
+                                        {name:'rolDiaM1', type: 'number'},
+                                        {name:'lbDiaM1', type: 'number'},
+                                        {name:'mbM1', type: 'number'},
+
+                                        {name:'rolDiaAcAt', type: 'number'},
+                                        {name:'lbDiaAcAt', type: 'number'},
+                                        {name:'rolDiaAcAn', type: 'number'},
+                                        {name:'lbDiaAcAn', type: 'number'},
+                                        {name:'mbAcAn', type: 'number'},
+                                        {name:'varRdM0M1', type: 'number'},
+                                        {name:'varLbM0M1', type: 'number'},
+                                        {name:'varMbM0M1', type: 'number'},
+                                        {name:'varRdAcAtAn', type: 'number'},
+                                        {name:'varLdAcAtAn', type: 'number'}
                                     ]
                         });
 
@@ -60,7 +54,7 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                 type: 'ajax',
                 url: BASEURL + '/api/explore/listartreepvd',
                 encode: true,
-                timeout: 240000,
+                timeout: 480000,
                 reader: {
                     type: 'json',
                     successProperty: 'success',
@@ -89,9 +83,9 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     sortable: true
                 },
                 {
-                    text: 'ROL/DIA',
-                    dataIndex: 'rolDia',
-                    width: 90,
+                    text: 'ROL/DIA Mês',
+                    dataIndex: 'rolDiaM0',
+                    width: 120,
                     align: 'right',
                     hidden: false,
                     renderer: function (v) {
@@ -99,301 +93,72 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'Ac. Ano Anterior',
-                    dataIndex: 'acanoanterior',
+                    text: 'LB/DIA Mês',
+                    dataIndex: 'lbDiaM0',
                     width: 120,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
+                    align: 'right',
+                    hidden: false,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
                     }
                 },
                 {
-                    text: 'Ano Anterior',
-                    dataIndex: 'anoanterior',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Méd. 12 Meses',
-                    dataIndex: 'med_12Meses',
-                    width: 110,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Méd. 6 Meses',
-                    dataIndex: 'med_6Meses',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Méd. 3 Meses',
-                    dataIndex: 'med_3Meses',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Mês Ano Anterior',
-                    dataIndex: 'mesAnoAnterior',
-                    width: 130,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Mês Anterior',
-                    dataIndex: 'mesAnterior',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'LB/DIA',
-                    dataIndex: 'lbDia',
+                    text: 'MB Mês',
+                    dataIndex: 'mbM0',
                     width: 80,
+                    align: 'right',
+                    hidden: false,
+                    renderer: function (v) {
+                        return utilFormat.Value2(v,2);
+                    }
+                },
+                {
+                    text: 'ROL/DIA Mês Anterior',
+                    dataIndex: 'rolDiaM1',
+                    width: 150,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
-
                         return valor;
                     }
                 },
                 {
-                    text: 'Ac. Ano Anterior',
-                    dataIndex: 'lbAcanoanterior',
+                    text: 'LB/DIA Mês Anterior',
+                    dataIndex: 'lbDiaM1',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'MB Mês Anterior',
+                    dataIndex: 'mbM1',
                     width: 120,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
+                        return utilFormat.Value2(v,2);
                     }
                 },
                 {
-                    text: 'Ano Anterior',
-                    dataIndex: 'LbAnoanterior',
-                    width: 100,
+                    text: 'ROL/DIA Ano Atual',
+                    dataIndex: 'rolDiaAcAt',
+                    width: 160,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
                         return valor;
                     }
                 },
                 {
-                    text: 'Méd. 12 Meses',
-                    dataIndex: 'LbMed_12Meses',
-                    width: 110,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Méd. 6 Meses',
-                    dataIndex: 'LbMed_6Meses',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Méd. 3 Meses',
-                    dataIndex: 'LbMed_3Meses',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Mês Ano Anterior',
-                    dataIndex: 'LbMesAnoAnterior',
-                    width: 130,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Mês Anterior',
-                    dataIndex: 'LbMesAnterior',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'MB/DIA',
-                    dataIndex: 'mbDia',
-                    width: 80,
+                    text: 'LB/DIA Ano Atual',
+                    dataIndex: 'lbDiaAcAt',
+                    width: 160,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
@@ -403,19 +168,53 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'Ac. Ano Anterior',
-                    dataIndex: 'mbAcanoanterior',
+                    text: 'ROL/DIA Ano Anterior',
+                    dataIndex: 'rolDiaAcAn',
+                    width: 160,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA Ano Anterior',
+                    dataIndex: 'lbDiaAcAn',
+                    width: 160,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'MB Ano Anterior',
+                    dataIndex: 'mbAcAn',
                     width: 120,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
+                        return utilFormat.Value2(v,2);
+                    }
+                },
+                {
+                    text: 'ROL/DIA Mês Atual x Anterior',
+                    dataIndex: 'varRdM0M1',
+                    width: 190,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
                         var valor = utilFormat.Value(v);
                         if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
+                            valor = pathMaior +' '+ valor ;
                             metaData.style = 'color: #26C953;';
                         }
                         if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
+                            valor = pathMenor +' '+valor;
                             metaData.style = 'color: #FF5B5B;';
                         }
 
@@ -423,19 +222,19 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'Ano Anterior',
-                    dataIndex: 'mbAnoanterior',
-                    width: 100,
+                    text: 'LB/DIA Mês Atual x Anterior',
+                    dataIndex: 'varLbM0M1',
+                    width: 180,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
                         if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
+                            valor = pathMaior +' '+ valor ;
                             metaData.style = 'color: #26C953;';
                         }
                         if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
+                            valor = pathMenor +' '+valor;
                             metaData.style = 'color: #FF5B5B;';
                         }
 
@@ -443,19 +242,39 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'Méd. 12 Meses',
-                    dataIndex: 'mbMed_12Meses',
-                    width: 110,
+                    text: 'MB Mês Atual x Anterior',
+                    dataIndex: 'varMbM0M1',
+                    width: 160,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
                         if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
+                            valor = pathMaior +' '+ valor ;
                             metaData.style = 'color: #26C953;';
                         }
                         if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
+                            valor = pathMenor +' '+valor;
+                            metaData.style = 'color: #FF5B5B;';
+                        }
+
+                        return utilFormat.Value2(valor,2);
+                    }
+                },
+                {
+                    text: 'ROL/DIA Ano Atual x Anterior',
+                    dataIndex: 'varRdAcAtAn',
+                    width: 190,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        if (v > 0){
+                            valor = pathMaior +' '+ valor ;
+                            metaData.style = 'color: #26C953;';
+                        }
+                        if (v < 0){
+                            valor = pathMenor +' '+valor;
                             metaData.style = 'color: #FF5B5B;';
                         }
 
@@ -463,79 +282,19 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'Méd. 6 Meses',
-                    dataIndex: 'mbMed_6Meses',
-                    width: 100,
+                    text: 'LB/DIA Ano Atual x Anterior',
+                    dataIndex: 'varLdAcAtAn',
+                    width: 180,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
                         if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
+                            valor = pathMaior +' '+ valor ;
                             metaData.style = 'color: #26C953;';
                         }
                         if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Méd. 3 Meses',
-                    dataIndex: 'mbMed_3Meses',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Mês Ano Anterior',
-                    dataIndex: 'mbMesAnoAnterior',
-                    width: 130,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'Mês Anterior',
-                    dataIndex: 'mbMesAnterior',
-                    width: 100,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor +'%';
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor +'%';
+                            valor = pathMenor +' '+valor;
                             metaData.style = 'color: #FF5B5B;';
                         }
 

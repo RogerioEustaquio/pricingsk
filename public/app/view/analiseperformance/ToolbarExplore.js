@@ -55,18 +55,9 @@ Ext.define('App.view.analiseperformance.ToolbarExplore',{
                 '->',
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Período A',
-                    name: 'dataRefa',
-                    itemId: 'dataRefa',
-                    labelWidth: 64,
-                    margin: '1 20 1 1',
-                    // value: sysdate
-                },
-                {
-                    xtype: 'displayfield',
-                    fieldLabel: 'Período B',
-                    name: 'dataRefb',
-                    itemId: 'dataRefb',
+                    fieldLabel: 'Referência',
+                    name: 'dtreferencia',
+                    itemId: 'dtreferencia',
                     labelWidth: 64,
                     margin: '1 20 1 1',
                     // value: sysdate
@@ -124,81 +115,13 @@ Ext.define('App.view.analiseperformance.ToolbarExplore',{
     onBtnFiltros: function(btn){
         var me = this.up('toolbar');
 
-        var objWindow = Ext.create('App.view.analiseperformance.FiltrosWindowExplore');
-        objWindow.show();
+        var filtro = me.up('panel').down('panel').down('#explorefiltro');
 
-        if(me.vdatainicioa){
-            objWindow.down('#datainicioa').setValue(me.vdatainicioa);
+        if(filtro.hidden){
+            filtro.setHidden(false);
+        }else{
+            filtro.setHidden(true);
         }
-        if(me.vdatafinala){
-            objWindow.down('#datafinala').setValue(me.vdatafinala);
-        }
-        if(me.vdatainiciob){
-            objWindow.down('#datainiciob').setValue(me.vdatainiciob);
-        }
-        if(me.vdatafinalb){
-            objWindow.down('#datafinalb').setValue(me.vdatafinalb);
-        }
-
-        if(me.vEmps)
-            objWindow.down('#elEmp').setValue(me.vEmps);
-
-        if(me.vMarcas)
-            objWindow.down('#elMarca').setValue(me.vMarcas);
-        
-        if(me.vMarcas)
-            objWindow.down('#elgrupomarca').setValue(me.vMarcas);
-        
-        if(me.vCurvas)
-            objWindow.down('#elCurva').setValue(me.vCurvas);
-        
-        if(me.vProdutos.length){
-
-            var objProduto = objWindow.down('#elProduto');
-            //Load na tag dos produtos selecionados //
-            objProduto.getStore().getProxy().setExtraParams({tipoSql:2, codItem: Ext.encode(me.vProdutos)});
-            objProduto.getStore().load();
-
-            objProduto.setValue(me.vProdutos);
-        }
-
-        objWindow.down('button[name=confirmar]').on('click',function(){
-
-            var dataValue = objWindow.down('#datainicioa').getRawValue();
-            me.vdatainicioa = dataValue;
-            var dataValue = objWindow.down('#datafinala').getRawValue();
-            me.vdatafinala = dataValue;
-
-            var datainicioa = me.vdatainicioa ? me.vdatainicioa : '' ;
-            var datafinala = me.vdatafinala ? me.vdatafinala : '' ;
-            me.down('#dataRefa').setValue(datainicioa+' até '+ datafinala);
-
-            var dataValue = objWindow.down('#datainiciob').getRawValue();
-            me.vdatainiciob = dataValue;
-            var dataValue = objWindow.down('#datafinalb').getRawValue();
-            me.vdatafinalb = dataValue;
-
-            var datainiciob = me.vdatainiciob ? me.vdatainiciob : '' ;
-            var datafinalb = me.vdatafinalb ? me.vdatafinalb : '' ;
-            me.down('#dataRefb').setValue(datainiciob+' até '+datafinalb);
-
-            var empSelect = objWindow.down('#elEmp').getValue();
-            me.vEmps = empSelect;
-
-            var marcaSelect = objWindow.down('#elMarca').getValue();
-            me.vMarcas = marcaSelect;
-
-            var marcaSelect = objWindow.down('#elgrupomarca').getValue();
-            me.vMarcas = marcaSelect;
-
-            var curvaSelect = objWindow.down('#elCurva').getValue();
-            me.vCurvas = curvaSelect;
-
-            var produtoSelect = objWindow.down('#elProduto').getValue();
-            me.vProdutos = produtoSelect;
-
-            objWindow.close();
-        });
 
     },
 
@@ -206,19 +129,27 @@ Ext.define('App.view.analiseperformance.ToolbarExplore',{
         var me = this.up('toolbar');
 
         var grid = me.up('container').down('panel').down('treepanel');
+        
+        var filtro = me.up('panel').down('panel').down('#explorefiltro');
+
+        var idEmpresa       = filtro.down('#elfilial').getValue();
+        var regional        = filtro.down('#elregional').getValue();
+        var dataReferencia  = filtro.down('#datareferencia').getRawValue();
+        var produtos        = filtro.down('#elproduto').getValue();
+        var marcas          = filtro.down('#elmarca').getValue();
+        var categorias      = filtro.down('#elcategoria').getValue();
 
         var params = {
-            datainicioa : me.vdatainicioa,
-            datafinala  : me.vdatafinala,
-            datainiciob : me.vdatainiciob,
-            datafinalb  : me.vdatafinalb,
-            emps : Ext.encode(me.vEmps),
-            marcas: Ext.encode(me.vMarcas),
-            curvas: Ext.encode(me.vCurvas),
+            idempresa : Ext.encode(idEmpresa),
+            regional: Ext.encode(regional),
+            datareferencia: dataReferencia,
+            produtos: Ext.encode(produtos),
+            marcas: Ext.encode(marcas),
+            categorias: Ext.encode(categorias),
             niveis: Ext.encode(me.vNiveis),
-            produtos: Ext.encode(me.vProdutos),
             ordem : Ext.encode(me.vOrdem)
         };
+        me.down('#dtreferencia').setValue(dataReferencia);
 
         grid.getStore().getProxy().setExtraParams(params);
         grid.getStore().load();

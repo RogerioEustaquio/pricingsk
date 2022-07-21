@@ -11,7 +11,6 @@ Ext.define('App.view.Toolbar', {
             user = JSON.parse(USUARIO);
         }
 
-        
         Ext.applyIf(me, {
             items: [
                 // {
