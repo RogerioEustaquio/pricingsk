@@ -27,23 +27,87 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
         var myModel = Ext.create('Ext.data.TreeModel', {
                             fields: [
                                         {name: 'grupo', type: 'string'},
-                                        {name:'rolDiaM0', type: 'number'},
-                                        {name:'lbDiaM0', type: 'number'},
-                                        {name:'mbM0', type: 'number'},
-                                        {name:'rolDiaM1', type: 'number'},
-                                        {name:'lbDiaM1', type: 'number'},
-                                        {name:'mbM1', type: 'number'},
+                                        {name:'cmvAcan', type: 'number'},
+                                        {name:'cmvAcat', type: 'number'},
+                                        {name:'cmvM0', type: 'number'},
+                                        {name:'cmvM1', type: 'number'},
+                                        {name:'cmvM2', type: 'number'},
+                                        {name:'cmvM3', type: 'number'},
+                                        {name:'cmv_3m', type: 'number'},
+                                        {name:'cmv_6m', type: 'number'},
+                                        {name:'cmv_12m', type: 'number'},
+                                        {name:'cmvdiaAcan', type: 'number'},
+                                        {name:'cmvdiaAcat', type: 'number'},
+                                        {name:'cmvdiaM0', type: 'number'},
+                                        {name:'cmvdiaM1', type: 'number'},
+                                        {name:'cmvdiaM2', type: 'number'},
+                                        {name:'cmvdiaM3', type: 'number'},
+                                        {name:'cmvdia_3m', type: 'number'},
+                                        {name:'cmvdia_6m', type: 'number'},
+                                        {name:'cmvdia_12m', type: 'number'},
 
-                                        {name:'rolDiaAcAt', type: 'number'},
-                                        {name:'lbDiaAcAt', type: 'number'},
-                                        {name:'rolDiaAcAn', type: 'number'},
-                                        {name:'lbDiaAcAn', type: 'number'},
-                                        {name:'mbAcAn', type: 'number'},
-                                        {name:'varRdM0M1', type: 'number'},
-                                        {name:'varLbM0M1', type: 'number'},
-                                        {name:'varMbM0M1', type: 'number'},
-                                        {name:'varRdAcAtAn', type: 'number'},
-                                        {name:'varLdAcAtAn', type: 'number'}
+                                        {name:'lbAcan', type: 'number'},
+                                        {name:'lbAcat', type: 'number'},
+                                        {name:'lbM0', type: 'number'},
+                                        {name:'lbM1', type: 'number'},
+                                        {name:'lbM2', type: 'number'},
+                                        {name:'lbM3', type: 'number'},
+                                        {name:'lb_3m', type: 'number'},
+                                        {name:'lb_6m', type: 'number'},
+                                        {name:'lb_12m', type: 'number'},
+                                        {name:'lbdiaAcan', type: 'number'},
+                                        {name:'lbdiaAcat', type: 'number'},
+                                        {name:'lbdiaM0', type: 'number'},
+                                        {name:'lbdiaM1', type: 'number'},
+                                        {name:'lbdiaM2', type: 'number'},
+                                        {name:'lbdiaM3', type: 'number'},
+                                        {name:'lbdia_3m', type: 'number'},
+                                        {name:'lbdia_6m', type: 'number'},
+                                        {name:'lbdia_12m', type: 'number'},
+
+                                        {name:'qtdAcan', type: 'number'},
+                                        {name:'qtdAcat', type: 'number'},
+                                        {name:'qtdM0', type: 'number'},
+                                        {name:'qtdM1', type: 'number'},
+                                        {name:'qtdM2', type: 'number'},
+                                        {name:'qtdM3', type: 'number'},
+                                        {name:'qtd_3m', type: 'number'},
+                                        {name:'qtd_6m', type: 'number'},
+                                        {name:'qtd_12m', type: 'number'},
+                                        {name:'qtddiaAcan', type: 'number'},
+                                        {name:'qtddiaAcat', type: 'number'},
+                                        {name:'qtddiaM0', type: 'number'},
+                                        {name:'qtddiaM1', type: 'number'},
+                                        {name:'qtddiaM2', type: 'number'},
+                                        {name:'qtddiaM3', type: 'number'},
+                                        {name:'qtddia_3m', type: 'number'},
+                                        {name:'qtddia_6m', type: 'number'},
+                                        {name:'qtddia_12m', type: 'number'},
+
+                                        {name:'rolAcan', type: 'number'},
+                                        {name:'rolAcat', type: 'number'},
+                                        {name:'rolM0', type: 'number'},
+                                        {name:'rolM1', type: 'number'},
+                                        {name:'rolM2', type: 'number'},
+                                        {name:'rolM3', type: 'number'},
+                                        {name:'rol_3m', type: 'number'},
+                                        {name:'rol_6m', type: 'number'},
+                                        {name:'rol_12m', type: 'number'},
+                                        {name:'roldiaAcan', type: 'number'},
+                                        {name:'roldiaAcat', type: 'number'},
+                                        {name:'roldiaM0', type: 'number'},
+                                        {name:'roldiaM1', type: 'number'},
+                                        {name:'roldiaM2', type: 'number'},
+                                        {name:'roldiaM3', type: 'number'},
+                                        {name:'roldia_3m', type: 'number'},
+                                        {name:'roldia_6m', type: 'number'},
+                                        {name:'roldia_12m', type: 'number'},
+                                        
+                                        {name:'varLbdAcatAcan', type: 'number'},
+                                        {name:'varLbdM0M1', type: 'number'},
+                                        {name:'varMbdM0M1', type: 'number'},
+                                        {name:'varRoldAcatAcan', type: 'number'},
+                                        {name:'varRoldM0M1', type: 'number'},
                                     ]
                         });
 
@@ -54,7 +118,7 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                 type: 'ajax',
                 url: BASEURL + '/api/explore/listartreepvd',
                 encode: true,
-                timeout: 480000,
+                timeout: 1200000,
                 reader: {
                     type: 'json',
                     successProperty: 'success',
@@ -65,7 +129,6 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
             root: {
                 expanded: true,
                 text: "",
-                // children: [],
                 "data": []
             }
         });
@@ -82,9 +145,378 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     minWidth: 228,
                     sortable: true
                 },
+                //----------------ROL-------------------------
+                {
+                    text: 'ROL Mês',
+                    dataIndex: 'rolM0',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL Ant.',
+                    dataIndex: 'rolM1',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL M2',
+                    dataIndex: 'rolM2',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL M3',
+                    dataIndex: 'rolM3',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL 3M',
+                    dataIndex: 'rol_3m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL 6M',
+                    dataIndex: 'rol_6m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL 12M',
+                    dataIndex: 'rol_12m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL Ac Ant.',
+                    dataIndex: 'rolAcan',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'ROL Ac Atual',
+                    dataIndex: 'rolAcat',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                //------------------------------------------
+                //----------------CMV-------------------------
+                {
+                    text: 'CMV Mês',
+                    dataIndex: 'cmvM0',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV Ant.',
+                    dataIndex: 'cmvM1',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV M2',
+                    dataIndex: 'cmvM2',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV M3',
+                    dataIndex: 'cmvM3',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV 3M',
+                    dataIndex: 'cmv_3m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV 6M',
+                    dataIndex: 'cmv_6m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV 12M',
+                    dataIndex: 'cmv_12m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV Ac Ant.',
+                    dataIndex: 'cmvAcan',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'CMV Ac Atual',
+                    dataIndex: 'cmvAcat',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                //------------------------------------------
+                //----------------LB-------------------------
+                {
+                    text: 'LB Mês',
+                    dataIndex: 'lbM0',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB Ant.',
+                    dataIndex: 'lbM1',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB M2',
+                    dataIndex: 'lbM2',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB M3',
+                    dataIndex: 'lbM3',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB 3M',
+                    dataIndex: 'lb_3m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB 6M',
+                    dataIndex: 'lb_6m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB 12M',
+                    dataIndex: 'lb_12m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB Ac Ant.',
+                    dataIndex: 'lbAcan',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB Ac Atual',
+                    dataIndex: 'lbAcat',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                //------------------------------------------
+                //----------------QTD-------------------------
+                {
+                    text: 'QTD Mês',
+                    dataIndex: 'qtdM0',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD Ant.',
+                    dataIndex: 'qtdM1',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD M2',
+                    dataIndex: 'qtdM2',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD M3',
+                    dataIndex: 'qtdM3',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD 3M',
+                    dataIndex: 'qtd_3m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD 6M',
+                    dataIndex: 'qtd_6m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD 12M',
+                    dataIndex: 'qtd_12m',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD Ac Ant.',
+                    dataIndex: 'qtdAcan',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD Ac Atual',
+                    dataIndex: 'qtdAcat',
+                    width: 90,
+                    align: 'right',
+                    hidden: true,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                //------------------------------------------
+                //------------------ROL DIA ------------------------
                 {
                     text: 'ROL/DIA Mês',
-                    dataIndex: 'rolDiaM0',
+                    dataIndex: 'roldiaM0',
                     width: 120,
                     align: 'right',
                     hidden: false,
@@ -93,29 +525,9 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'LB/DIA Mês',
-                    dataIndex: 'lbDiaM0',
-                    width: 120,
-                    align: 'right',
-                    hidden: false,
-                    renderer: function (v) {
-                        return utilFormat.ValueZero(v);
-                    }
-                },
-                {
-                    text: 'MB Mês',
-                    dataIndex: 'mbM0',
-                    width: 80,
-                    align: 'right',
-                    hidden: false,
-                    renderer: function (v) {
-                        return utilFormat.Value2(v,2);
-                    }
-                },
-                {
-                    text: 'ROL/DIA Mês Anterior',
-                    dataIndex: 'rolDiaM1',
-                    width: 150,
+                    text: 'ROL/DIA Mês Ant.',
+                    dataIndex: 'roldiaM1',
+                    width: 130,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
@@ -124,8 +536,75 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'LB/DIA Mês Anterior',
-                    dataIndex: 'lbDiaM1',
+                    text: 'ROL/DIA M2',
+                    dataIndex: 'roldiaM2',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'ROL/DIA M3',
+                    dataIndex: 'roldiaM3',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'ROL/DIA 3M',
+                    dataIndex: 'roldia_3m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'ROL/DIA 6M',
+                    dataIndex: 'roldia_6m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'ROL/DIA 12M',
+                    dataIndex: 'roldia_12m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'ROL/DIA Ano Ant.',
+                    dataIndex: 'roldiaAcan',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'ROL/DIA Ano Atual',
+                    dataIndex: 'roldiaAcat',
                     width: 140,
                     align: 'left',
                     renderer: function (v, metaData, record) {
@@ -134,76 +613,315 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                         return valor;
                     }
                 },
+                //--------------------------------------------------------
+                //------------------CMV DIA ------------------------------
                 {
-                    text: 'MB Mês Anterior',
-                    dataIndex: 'mbM1',
+                    text: 'CMV/DIA Mês',
+                    dataIndex: 'cmvdiaM0',
                     width: 120,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        return utilFormat.Value2(v,2);
+                    align: 'right',
+                    hidden: false,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
                     }
                 },
                 {
-                    text: 'ROL/DIA Ano Atual',
-                    dataIndex: 'rolDiaAcAt',
-                    width: 160,
+                    text: 'CMV/DIA Mês Ant.',
+                    dataIndex: 'cmvdiaM1',
+                    width: 130,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA M2',
+                    dataIndex: 'cmvdiaM2',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA M3',
+                    dataIndex: 'cmvdiaM3',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA 3M',
+                    dataIndex: 'cmvdia_3m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA 6M',
+                    dataIndex: 'cmvdia_6m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA 12M',
+                    dataIndex: 'cmvdia_12m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA Ano Ant.',
+                    dataIndex: 'cmvdiaAcan',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'CMV/DIA Ano Atual',
+                    dataIndex: 'cmvdiaAcat',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                //--------------------------------------------------------
+                //------------------LB DIA ------------------------------
+                {
+                    text: 'LB/DIA Mês',
+                    dataIndex: 'lbdiaM0',
+                    width: 120,
+                    align: 'right',
+                    hidden: false,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'LB/DIA Mês Ant.',
+                    dataIndex: 'lbdiaM1',
+                    width: 130,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA M2',
+                    dataIndex: 'lbdiaM2',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA M3',
+                    dataIndex: 'lbdiaM3',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA 3M',
+                    dataIndex: 'lbdia_3m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA 6M',
+                    dataIndex: 'lbdia_6m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA 12M',
+                    dataIndex: 'lbdia_12m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA Ano Ant.',
+                    dataIndex: 'lbdiaAcan',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+
                         return valor;
                     }
                 },
                 {
                     text: 'LB/DIA Ano Atual',
-                    dataIndex: 'lbDiaAcAt',
-                    width: 160,
+                    dataIndex: 'lbdiaAcat',
+                    width: 140,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
-
                         return valor;
                     }
                 },
+                //--------------------------------------------------------
+                //------------------QTD DIA ------------------------------
                 {
-                    text: 'ROL/DIA Ano Anterior',
-                    dataIndex: 'rolDiaAcAn',
-                    width: 160,
+                    text: 'QTD/DIA Mês',
+                    dataIndex: 'qtddiaM0',
+                    width: 120,
+                    align: 'right',
+                    hidden: false,
+                    renderer: function (v) {
+                        return utilFormat.ValueZero(v);
+                    }
+                },
+                {
+                    text: 'QTD/DIA Mês Ant.',
+                    dataIndex: 'qtddiaM1',
+                    width: 130,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
-
                         return valor;
                     }
                 },
                 {
-                    text: 'LB/DIA Ano Anterior',
-                    dataIndex: 'lbDiaAcAn',
-                    width: 160,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'MB Ano Anterior',
-                    dataIndex: 'mbAcAn',
+                    text: 'QTD/DIA M2',
+                    dataIndex: 'qtddiaM2',
                     width: 120,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
-                        return utilFormat.Value2(v,2);
+                        var valor = utilFormat.Value(v);
+                        return valor;
                     }
                 },
                 {
-                    text: 'ROL/DIA Mês Atual x Anterior',
-                    dataIndex: 'varRdM0M1',
+                    text: 'QTD/DIA M3',
+                    dataIndex: 'qtddiaM3',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'QTD/DIA 3M',
+                    dataIndex: 'qtddia_3m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'QTD/DIA 6M',
+                    dataIndex: 'qtddia_6m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'QTD/DIA 12M',
+                    dataIndex: 'qtddia_12m',
+                    width: 120,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                {
+                    text: 'QTD/DIA Ano Ant.',
+                    dataIndex: 'qtddiaAcan',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'QTD/DIA Ano Atual',
+                    dataIndex: 'qtddiaAcat',
+                    width: 140,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        return valor;
+                    }
+                },
+                //--------------------------------------------------------
+                //----------------- Variáveis ----------------------------//
+                
+                {
+                    text: 'ROL/DIA Ano Atual x Anterior',
+                    dataIndex: 'varRoldAcatAcan',
                     width: 190,
                     align: 'left',
                     renderer: function (v, metaData, record) {
@@ -222,48 +940,8 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                     }
                 },
                 {
-                    text: 'LB/DIA Mês Atual x Anterior',
-                    dataIndex: 'varLbM0M1',
-                    width: 180,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor ;
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor;
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return valor;
-                    }
-                },
-                {
-                    text: 'MB Mês Atual x Anterior',
-                    dataIndex: 'varMbM0M1',
-                    width: 160,
-                    align: 'left',
-                    renderer: function (v, metaData, record) {
-
-                        var valor = utilFormat.Value(v);
-                        if (v > 0){
-                            valor = pathMaior +' '+ valor ;
-                            metaData.style = 'color: #26C953;';
-                        }
-                        if (v < 0){
-                            valor = pathMenor +' '+valor;
-                            metaData.style = 'color: #FF5B5B;';
-                        }
-
-                        return utilFormat.Value2(valor,2);
-                    }
-                },
-                {
-                    text: 'ROL/DIA Ano Atual x Anterior',
-                    dataIndex: 'varRdAcAtAn',
+                    text: 'ROL/DIA Mês Atual x Anterior',
+                    dataIndex: 'varRoldM0M1',
                     width: 190,
                     align: 'left',
                     renderer: function (v, metaData, record) {
@@ -283,12 +961,52 @@ Ext.define('App.view.analiseperformance.TreeGridExplore',{
                 },
                 {
                     text: 'LB/DIA Ano Atual x Anterior',
-                    dataIndex: 'varLdAcAtAn',
+                    dataIndex: 'varLbdAcatAcan',
                     width: 180,
                     align: 'left',
                     renderer: function (v, metaData, record) {
 
                         var valor = utilFormat.Value(v);
+                        if (v > 0){
+                            valor = pathMaior +' '+ valor ;
+                            metaData.style = 'color: #26C953;';
+                        }
+                        if (v < 0){
+                            valor = pathMenor +' '+valor;
+                            metaData.style = 'color: #FF5B5B;';
+                        }
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'LB/DIA Mês Atual x Anterior',
+                    dataIndex: 'varLbdM0M1',
+                    width: 180,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value(v);
+                        if (v > 0){
+                            valor = pathMaior +' '+ valor ;
+                            metaData.style = 'color: #26C953;';
+                        }
+                        if (v < 0){
+                            valor = pathMenor +' '+valor;
+                            metaData.style = 'color: #FF5B5B;';
+                        }
+
+                        return valor;
+                    }
+                },
+                {
+                    text: 'MB Mês Atual x Anterior',
+                    dataIndex: 'varMbdM0M1',
+                    width: 160,
+                    align: 'left',
+                    renderer: function (v, metaData, record) {
+
+                        var valor = utilFormat.Value2(v,2);
                         if (v > 0){
                             valor = pathMaior +' '+ valor ;
                             metaData.style = 'color: #26C953;';

@@ -259,191 +259,484 @@ class ExploreController extends AbstractRestfulController
 
             }
 
-            
-
             $sql = "select id,
-                         grupo,
-                         leaf,
-                         rol_dia_m0,
-                         lb_dia_m0,
-                         mb_m0,
-                         rol_dia_m1,
-                         lb_dia_m1,
-                         mb_m1,
-                         rol_dia_ac_at,
-                         lb_dia_ac_at,
-                         rol_dia_ac_an,
-                         lb_dia_ac_an,
-                         mb_ac_an,
-                         var_rd_m0_m1,
-                         var_ld_m0_m1,
-                         var_mb_m0_m1,
-                         var_rd_ac_at_an,
-                         var_ld_ac_at_an
+                           grupo,
+                           leaf,
+                           round(rol_m0,4) as rol_m0
+                           ,round(rol_m1,4) as rol_m1
+                           ,round(rol_m2,4) as rol_m2
+                           ,round(rol_m3,4) as rol_m3
+                           ,round(rol_3m,4) as rol_3m
+                           ,round(rol_6m,4) as rol_6m
+                           ,round(rol_12m,4) as rol_12m
+                           ,round(rol_acat,4) as rol_acat
+                           ,round(rol_acan,4) as rol_acan
+
+                           ,round(cmv_m0,4) as cmv_m0
+                           ,round(cmv_m1,4) as cmv_m1
+                           ,round(cmv_m2,4) as cmv_m2
+                           ,round(cmv_m3,4) as cmv_m3
+                           ,round(cmv_3m,4) as cmv_3m
+                           ,round(cmv_6m,4) as cmv_6m
+                           ,round(cmv_12m,4) as cmv_12m
+                           ,round(cmv_acat,4) as cmv_acat
+                           ,round(cmv_acan,4) as cmv_acan
+
+                           ,round(lb_m0,4) as lb_m0
+                           ,round(lb_m1,4) as lb_m1
+                           ,round(lb_m2,4) as lb_m2
+                           ,round(lb_m3,4) as lb_m3
+                           ,round(lb_3m,4) as lb_3m
+                           ,round(lb_6m,4) as lb_6m
+                           ,round(lb_12m,4) as lb_12m
+                           ,round(lb_acat,4) as lb_acat
+                           ,round(lb_acan,4) as lb_acan
+
+                           ,round(qtd_m0,4) as qtd_m0
+                           ,round(qtd_m1,4) as qtd_m1
+                           ,round(qtd_m2,4) as qtd_m2
+                           ,round(qtd_m3,4) as qtd_m3
+                           ,round(qtd_3m,4) as qtd_3m
+                           ,round(qtd_6m,4) as qtd_6m
+                           ,round(qtd_12m,4) as qtd_12m
+                           ,round(qtd_acat,4) as qtd_acat
+                           ,round(qtd_acan,4) as qtd_acan
+
+                           ,round(roldia_m0,4) as roldia_m0
+                           ,round(roldia_m1,4) as roldia_m1
+                           ,round(roldia_m2,4) as roldia_m2
+                           ,round(roldia_m3,4) as roldia_m3
+                           ,round(roldia_3m,4) as roldia_3m
+                           ,round(roldia_6m,4) as roldia_6m
+                           ,round(roldia_12m,4) as roldia_12m
+                           ,round(roldia_acat,4) as roldia_acat
+                           ,round(roldia_acan,4) as roldia_acan
+
+                           ,round(cmvdia_m0,4) as cmvdia_m0
+                           ,round(cmvdia_m1,4) as cmvdia_m1
+                           ,round(cmvdia_m2,4) as cmvdia_m2
+                           ,round(cmvdia_m3,4) as cmvdia_m3
+                           ,round(cmvdia_3m,4) as cmvdia_3m
+                           ,round(cmvdia_6m,4) as cmvdia_6m
+                           ,round(cmvdia_12m,4) as cmvdia_12m
+                           ,round(cmvdia_acat,4) as cmvdia_acat
+                           ,round(cmvdia_acan,4) as cmvdia_acan
+
+                           ,round(lbdia_m0,4) as lbdia_m0
+                           ,round(lbdia_m1,4) as lbdia_m1
+                           ,round(lbdia_m2,4) as lbdia_m2
+                           ,round(lbdia_m3,4) as lbdia_m3
+                           ,round(lbdia_3m,4) as lbdia_3m
+                           ,round(lbdia_6m,4) as lbdia_6m
+                           ,round(lbdia_12m,4) as lbdia_12m
+                           ,round(lbdia_acat,4) as lbdia_acat
+                           ,round(lbdia_acan,4) as lbdia_acan
+
+                           ,round(qtddia_m0,4) as qtddia_m0
+                           ,round(qtddia_m1,4) as qtddia_m1
+                           ,round(qtddia_m2,4) as qtddia_m2
+                           ,round(qtddia_m3,4) as qtddia_m3
+                           ,round(qtddia_3m,4) as qtddia_3m
+                           ,round(qtddia_6m,4) as qtddia_6m
+                           ,round(qtddia_12m,4) as qtddia_12m
+                           ,round(qtddia_acat,4) as qtddia_acat
+                           ,round(qtddia_acan,4) as qtddia_acan
+
+                            ,round(var_rold_m0_m1,4) as var_rold_m0_m1
+                            ,round(var_lbd_m0_m1,4) as var_lbd_m0_m1
+                            ,round(var_mbd_m0_m1,4) as var_mbd_m0_m1
+                            ,round(var_rold_acat_acan,4) as var_rold_acat_acan
+                            ,round(var_lbd_acat_acan,4) as var_lbd_acat_acan
+
                     from (
                         select $groupId as id,
-                            $groupDescription as grupo,
-                            $leaf as leaf,
-                                        
-                            sum(rol_dia_m0) as rol_dia_m0,
-                            sum(lb_dia_m0) as lb_dia_m0,
-                            sum(lb_dia_m0)/sum(rol_dia_m0)*100 as mb_m0,
-                            
-                            sum(rol_dia_m1) as rol_dia_m1,
-                            sum(lb_dia_m1) as lb_dia_m1,
-                            sum(lb_dia_m1)/sum(rol_dia_m1)*100 as mb_m1,
-                            
-                            sum(rol_dia_ac_at) as rol_dia_ac_at,
-                            sum(lb_dia_ac_at) as lb_dia_ac_at,
-                            sum(lb_dia_ac_at)/sum(rol_dia_ac_at)*100 as mb_ac_at,
-                                    
-                            sum(rol_dia_ac_an) as rol_dia_ac_an,
-                            sum(lb_dia_ac_an) as lb_dia_ac_an,
-                            sum(lb_dia_ac_an)/sum(rol_dia_ac_an)*100 as mb_ac_an,
-                            
-                            /*Rol dia mês atual x mês anterior*/
-                            round(case when nvl(sum(rol_dia_m0),0) > 0 then ((sum(rol_dia_m0)/sum(rol_dia_m1))-1)*100 end,2) as var_rd_m0_m1,
-                            
-                            /*Lb dia mês atual x mês anterior*/
-                            round(case when nvl(sum(lb_dia_m0),0) > 0 then ((sum(lb_dia_m0)/sum(lb_dia_m1))-1)*100 end,2) as var_ld_m0_m1,
-                            
-                            round(case when nvl(sum(rol_dia_m0),0) > 0 and nvl(sum(rol_dia_m1),0) > 0 then ( ( sum(lb_dia_m0)/sum(rol_dia_m0) ) - ( sum(lb_dia_m1)/sum(rol_dia_m1) ) )*100 end,2) as var_mb_m0_m1,
-                            
-                            /*Rol dia ac ano atual x ac ano anterior*/
-                            round(case when nvl(sum(rol_dia_ac_at),0) > 0 then ((sum(rol_dia_ac_at)/sum(rol_dia_ac_an))-1)*100 end,2) as var_rd_ac_at_an,
-                            
-                            /*Lb dia ac ano atual x ac ano anterior*/
-                            round(case when nvl(sum(lb_dia_ac_at),0) > 0 then ((sum(lb_dia_ac_at)/sum(lb_dia_ac_an))-1)*100 end,2) as var_ld_ac_at_an
+                                $groupDescription as grupo,
+                                $leaf as leaf
 
+                                ,sum(rol_m0) as rol_m0
+                                ,sum(rol_m1) as rol_m1
+                                ,sum(rol_m2) as rol_m2
+                                ,sum(rol_m3) as rol_m3
+                                ,sum(rol_3m) as rol_3m
+                                ,sum(rol_6m) as rol_6m
+                                ,sum(rol_12m) as rol_12m
+                                ,sum(rol_acat) as rol_acat
+                                ,sum(rol_acan) as rol_acan
+                                
+                                ,sum(cmv_m0) as cmv_m0
+                                ,sum(cmv_m1) as cmv_m1
+                                ,sum(cmv_m2) as cmv_m2
+                                ,sum(cmv_m3) as cmv_m3
+                                ,sum(cmv_3m) as cmv_3m
+                                ,sum(cmv_6m) as cmv_6m
+                                ,sum(cmv_12m) as cmv_12m
+                                ,sum(cmv_acat) as cmv_acat
+                                ,sum(cmv_acan) as cmv_acan
+
+                                ,sum(lb_m0) as lb_m0
+                                ,sum(lb_m1) as lb_m1
+                                ,sum(lb_m2) as lb_m2
+                                ,sum(lb_m3) as lb_m3
+                                ,sum(lb_3m) as lb_3m
+                                ,sum(lb_6m) as lb_6m
+                                ,sum(lb_12m) as lb_12m
+                                ,sum(lb_acat) as lb_acat
+                                ,sum(lb_acan) as lb_acan
+
+                                ,sum(qtd_m0) as qtd_m0
+                                ,sum(qtd_m1) as qtd_m1
+                                ,sum(qtd_m2) as qtd_m2
+                                ,sum(qtd_m3) as qtd_m3
+                                ,sum(qtd_3m) as qtd_3m
+                                ,sum(qtd_6m) as qtd_6m
+                                ,sum(qtd_12m) as qtd_12m
+                                ,sum(qtd_acat) as qtd_acat
+                                ,sum(qtd_acan) as qtd_acan
+
+                                ,sum(roldia_m0) as roldia_m0
+                                ,sum(roldia_m1) as roldia_m1
+                                ,sum(roldia_m2) as roldia_m2
+                                ,sum(roldia_m3) as roldia_m3
+                                ,sum(roldia_3m) as roldia_3m
+                                ,sum(roldia_6m) as roldia_6m
+                                ,sum(roldia_12m) as roldia_12m
+                                ,sum(roldia_acat) as roldia_acat
+                                ,sum(roldia_acan) as roldia_acan
+                            
+                                ,sum(cmvdia_m0) as cmvdia_m0
+                                ,sum(cmvdia_m1) as cmvdia_m1
+                                ,sum(cmvdia_m2) as cmvdia_m2
+                                ,sum(cmvdia_m3) as cmvdia_m3
+                                ,sum(cmvdia_3m) as cmvdia_3m
+                                ,sum(cmvdia_6m) as cmvdia_6m
+                                ,sum(cmvdia_12m) as cmvdia_12m
+                                ,sum(cmvdia_acat) as cmvdia_acat
+                                ,sum(cmvdia_acan) as cmvdia_acan
+
+                                ,sum(lbdia_m0) as lbdia_m0
+                                ,sum(lbdia_m1) as lbdia_m1
+                                ,sum(lbdia_m2) as lbdia_m2
+                                ,sum(lbdia_m3) as lbdia_m3
+                                ,sum(lbdia_3m) as lbdia_3m
+                                ,sum(lbdia_6m) as lbdia_6m
+                                ,sum(lbdia_12m) as lbdia_12m
+                                ,sum(lbdia_acat) as lbdia_acat
+                                ,sum(lbdia_acan) as lbdia_acan
+
+                                ,sum(qtddia_m0) as qtddia_m0
+                                ,sum(qtddia_m1) as qtddia_m1
+                                ,sum(qtddia_m2) as qtddia_m2
+                                ,sum(qtddia_m3) as qtddia_m3
+                                ,sum(qtddia_3m) as qtddia_3m
+                                ,sum(qtddia_6m) as qtddia_6m
+                                ,sum(qtddia_12m) as qtddia_12m
+                                ,sum(qtddia_acat) as qtddia_acat
+                                ,sum(qtddia_acan) as qtddia_acan
+                            
+                                /*Rol dia mês atual x mês anterior*/
+                                ,round(case when nvl(sum(roldia_m0),0) > 0 then ((sum(roldia_m0)/sum(roldia_m1))-1)*100 end,2) as var_rold_m0_m1
+                                /*Lb dia mês atual x mês anterior*/
+                                ,round(case when nvl(sum(lbdia_m0),0) > 0 then ((sum(lbdia_m0)/sum(lbdia_m1))-1)*100 end,2) as var_lbd_m0_m1
+                                /* MB diamês atual x mês anterior*/
+                                ,round(case when nvl(sum(roldia_m0),0) > 0 and nvl(sum(roldia_m1),0) > 0 then ( ( sum(lbdia_m0)/sum(roldia_m0) ) - ( sum(lbdia_m1)/sum(roldia_m1) ) )*100 end,2) as var_mbd_m0_m1
+                                /*Rol dia ac ano atual x ac ano anterior*/
+                                ,round(case when nvl(sum(roldia_acat),0) > 0 then ((sum(roldia_acat)/sum(roldia_acan))-1)*100 end,2) as var_rold_acat_acan
+                                /*Lb dia ac ano atual x ac ano anterior*/
+                                ,round(case when nvl(sum(lbdia_acat),0) > 0 then ((sum(lbdia_acat)/sum(lbdia_acan))-1)*100 end,2) as var_lbd_acat_acan
+
+                                
                         from (
-                            with
-                        
-                            vm0 as (
-                                select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                    from vw_skvenda_dia
-                                where data = trunc(add_months(sysdate,-0),'MM')
-                            ),
-                        
-                            vm1 as (
-                                select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                    from vw_skvenda_dia
-                                where data = trunc(add_months(sysdate,-1),'MM')
-                            ),
-      
-                            vac_at as (
-                               select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 from vw_skvenda_dia
-                                where data <= trunc(add_months(sysdate,-0),'MM')
-                                  and data >= trunc(add_months(sysdate,-0),'RRRR')
-                            ),
-                      
-                            vac_an as (
-                               select cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 from vw_skvenda_dia
-                                where data <= trunc(add_months(sysdate,-12),'MM')
-                                  and data >= trunc(add_months(sysdate,-12),'RRRR')
-                            ),
-      
-                            v12m AS (
-                               SELECT cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 FROM vw_skvenda_dia
-                                WHERE data <= TRUNC(ADD_MONTHS(SYSDATE,-1),'MM')
-                                  AND data >= TRUNC(ADD_MONTHS(SYSDATE,-12),'MM')
-                            ),
-                            
-                            v6m AS (
-                               SELECT cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 FROM vw_skvenda_dia
-                                WHERE data <= TRUNC(ADD_MONTHS(SYSDATE,-1),'MM')
-                                  AND data >= TRUNC(ADD_MONTHS(SYSDATE,-6),'MM')
-                            ),
-                            
-                            v3m AS (
-                               SELECT cod_empresa, cod_produto, du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia 
-                                 FROM vw_skvenda_dia
-                                WHERE data <= TRUNC(ADD_MONTHS(SYSDATE,-1),'MM')
-                                  AND data >= TRUNC(ADD_MONTHS(SYSDATE,-3),'MM')
-                            )
-                        
-                            select 'REDE' as id_rede,
-                                    'REDE' as rede,  
-                                    e.cod_empresa as id_empresa,
-                                    em.emp as empresa,
-                                    e.cod_produto as id_produto,
-                                    p.descricao as produto,
-                                    p.cod_marca as id_marca,
-                                    m.descricao_marca as marca,
-                                    $groupCategoria
 
-                                    e.estoque as qtd_estoque_atual,
-                                    e.custo_medio as custo_medio_estoque_atual,
-                                    e.valor as valor_estoque_atual,
-                                    
-                                    vm0.rol_dia as rol_dia_m0,
-                                    vm0.lb_dia as lb_dia_m0,
-                                    
-                                    vm1.rol_dia as rol_dia_m1,
-                                    vm1.lb_dia as lb_dia_m1,
-                                    
-                                    vac_at.rol_dia as rol_dia_ac_at,
-                                    vac_at.lb_dia as lb_dia_ac_at,
-                                    
-                                    vac_an.rol_dia as rol_dia_ac_an,
-                                    vac_an.lb_dia as lb_dia_ac_an,
-                                    
-                                    v12m.rol_dia AS rol_dia_12m,
-                                    v12m.lb_dia AS lb_dia_12m,
-                                    
-                                    v6m.rol_dia AS rol_dia_6m,
-                                    v6m.lb_dia AS lb_dia_6m,
-                                    
-                                    v3m.rol_dia AS rol_dia_3m,
-                                    v3m.lb_dia AS lb_dia_3m
-                                    
-                                from vm_skestoque e,
-                                     vw_skempresa em,
-                                     vw_skproduto p,
-                                     vw_skmarca m,
-                                     vm0, vm1,
-                                     vac_at, vac_an
-                                     , v12m, v6m, v3m
-                                     $tableCategoria
+                            with
+
+                            vx as (
+                                    select cod_empresa, cod_produto, 
+                                            --du, rol, lb, qtd, rol_dia, lb_dia, qtd_dia,
+                                            
+                                            -- Rol
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then rol end) as rol_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then rol end) as rol_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then rol end) as rol_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then rol end) as rol_m3,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then rol end) as rol_3m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then rol end) as rol_6m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then rol end) as rol_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then rol end) as rol_acat,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then rol end) as rol_acan,
+                                            
+                                            -- Custo
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then cmv end) as cmv_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then cmv end) as cmv_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then cmv end) as cmv_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then cmv end) as cmv_m3,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then cmv end) as cmv_3m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then cmv end) as cmv_6m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then cmv end) as cmv_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then cmv end) as cmv_acat,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then cmv end) as cmv_acan,
+                                            
+                                            -- Lucro bruto              
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then lb end) as lb_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then lb end) as lb_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then lb end) as lb_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then lb end) as lb_m3,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then lb end) as lb_3m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then lb end) as lb_6m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then lb end) as lb_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then lb end) as lb_acat,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then lb end) as lb_acan,
+                                            
+                                            -- Qtd 
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then qtd end) as qtd_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then qtd end) as qtd_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then qtd end) as qtd_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then qtd end) as qtd_m3,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then qtd end) as qtd_3m,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then qtd end) as qtd_6m,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then qtd end) as qtd_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then qtd end) as qtd_acat,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then qtd end) as qtd_acan,
+                                            
+                                            -- Rol Dia
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then rol_dia end) as roldia_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then rol_dia end) as roldia_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then rol_dia end) as roldia_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then rol_dia end) as roldia_m3,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then rol_dia end) as roldia_3m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then rol_dia end) as roldia_6m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then rol_dia end) as roldia_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then rol_dia end) as roldia_acat,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then rol_dia end) as roldia_acan,
+                                            
+                                            -- Custo
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then cmv_dia end) as cmvdia_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then cmv_dia end) as cmvdia_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then cmv_dia end) as cmvdia_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then cmv_dia end) as cmvdia_m3,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then cmv_dia end) as cmvdia_3m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then cmv_dia end) as cmvdia_6m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then cmv_dia end) as cmvdia_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then cmv_dia end) as cmvdia_acat,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then cmv_dia end) as cmvdia_acan,
+                                            
+                                            -- Lucro bruto              
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then lb_dia end) as lbdia_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then lb_dia end) as lbdia_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then lb_dia end) as lbdia_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then lb_dia end) as lbdia_m3,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then lb_dia end) as lbdia_3m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then lb_dia end) as lbdia_6m,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then lb_dia end) as lbdia_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then lb_dia end) as lbdia_acat,
+                                            
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then lb_dia end) as lbdia_acan,
+                                            
+                                            -- Qtd Dia
+                                            sum(case when data = trunc(add_months(sysdate,-0),'MM') then qtd_dia end) as qtddia_m0,
+                                            sum(case when data = trunc(add_months(sysdate,-1),'MM') then qtd_dia end) as qtddia_m1,
+                                            sum(case when data = trunc(add_months(sysdate,-2),'MM') then qtd_dia end) as qtddia_m2,
+                                            sum(case when data = trunc(add_months(sysdate,-3),'MM') then qtd_dia end) as qtddia_m3,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-3),'MM') then qtd_dia end) as qtddia_3m,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-6),'MM') then qtd_dia end) as qtddia_6m,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-1),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'MM') then qtd_dia end) as qtddia_12m,
+                                                        
+                                            sum(case when data <= trunc(add_months(sysdate,-0),'MM') and
+                                                        data >= trunc(add_months(sysdate,-0),'RRRR') then qtd_dia end) as qtddia_acat,
+
+                                            sum(case when data <= trunc(add_months(sysdate,-12),'MM') and
+                                                        data >= trunc(add_months(sysdate,-12),'RRRR') then qtd_dia end) as qtddia_acan
+                                                        
+                                        from vw_skvenda_dia
+                                    where data <= trunc(add_months(sysdate,-0),'MM')
+                                        and trunc(data,'RRRR') >= trunc(add_months(sysdate,-12),'RRRR')
+                                    group by cod_empresa, cod_produto
+                                )
+
+                                select 'REDE' as id_rede,
+                                        'REDE' as rede,  
+                                        e.cod_empresa id_empresa,
+                                        em.emp as empresa,
+                                        e.cod_produto id_produto,
+                                        p.descricao as produto,
+                                        p.cod_marca id_marca,
+                                        m.descricao_marca marca,
+                                        $groupCategoria
+                                        
+                                        e.estoque as qtd_estoque_atual,
+                                        e.custo_medio as custo_medio_estoque_atual,
+                                        e.valor as vlr_estoque_atual,
+                                        
+                                        vx.rol_m0,
+                                        vx.rol_m1,
+                                        vx.rol_m2,
+                                        vx.rol_m3,
+                                        vx.rol_3m,
+                                        vx.rol_6m,
+                                        vx.rol_12m,
+                                        vx.rol_acat,
+                                        vx.rol_acan,
+                                        vx.cmv_m0,
+                                        vx.cmv_m1,
+                                        vx.cmv_m2,
+                                        vx.cmv_m3,
+                                        vx.cmv_3m,
+                                        vx.cmv_6m,
+                                        vx.cmv_12m,
+                                        vx.cmv_acat,
+                                        vx.cmv_acan,
+                                        vx.lb_m0,
+                                        vx.lb_m1,
+                                        vx.lb_m2,
+                                        vx.lb_m3,
+                                        vx.lb_3m,
+                                        vx.lb_6m,
+                                        vx.lb_12m,
+                                        vx.lb_acat,
+                                        vx.lb_acan,
+                                        vx.qtd_m0,
+                                        vx.qtd_m1,
+                                        vx.qtd_m2,
+                                        vx.qtd_m3,
+                                        vx.qtd_3m,
+                                        vx.qtd_6m,
+                                        vx.qtd_12m,
+                                        vx.qtd_acat,
+                                        vx.qtd_acan,
+                                        vx.roldia_m0,
+                                        vx.roldia_m1,
+                                        vx.roldia_m2,
+                                        vx.roldia_m3,
+                                        vx.roldia_3m,
+                                        vx.roldia_6m,
+                                        vx.roldia_12m,
+                                        vx.roldia_acat,
+                                        vx.roldia_acan,
+                                        vx.cmvdia_m0,
+                                        vx.cmvdia_m1,
+                                        vx.cmvdia_m2,
+                                        vx.cmvdia_m3,
+                                        vx.cmvdia_3m,
+                                        vx.cmvdia_6m,
+                                        vx.cmvdia_12m,
+                                        vx.cmvdia_acat,
+                                        vx.cmvdia_acan,
+                                        vx.lbdia_m0,
+                                        vx.lbdia_m1,
+                                        vx.lbdia_m2,
+                                        vx.lbdia_m3,
+                                        vx.lbdia_3m,
+                                        vx.lbdia_6m,
+                                        vx.lbdia_12m,
+                                        vx.lbdia_acat,
+                                        vx.lbdia_acan,
+                                        vx.qtddia_m0,
+                                        vx.qtddia_m1,
+                                        vx.qtddia_m2,
+                                        vx.qtddia_m3,
+                                        vx.qtddia_3m,
+                                        vx.qtddia_6m,
+                                        vx.qtddia_12m,
+                                        vx.qtddia_acat,
+                                        vx.qtddia_acan
+                                        
+                                    from vm_skestoque e,
+                                         vw_skempresa em,
+                                         vw_skproduto p,
+                                         vw_skmarca m, vx
+                                         $tableCategoria
                                 where e.cod_empresa = em.cod_empresa
-                                  and e.cod_produto = p.cod_produto
-                                  and p.cod_marca = m.cod_marca
-                                  
-                                  and e.cod_empresa = vm0.cod_empresa(+)
-                                  and e.cod_produto = vm0.cod_produto(+)
-                                  
-                                  and e.cod_empresa = vm1.cod_empresa(+)
-                                  and e.cod_produto = vm1.cod_produto(+)
-                                  
-                                  and e.cod_empresa = vac_at.cod_empresa(+)
-                                  and e.cod_produto = vac_at.cod_produto(+)
-                                  
-                                  and e.cod_empresa = vac_an.cod_empresa(+)
-                                  and e.cod_produto = vac_an.cod_produto(+)
-                                  
-                                  AND e.cod_empresa = v12m.cod_empresa(+)
-                                  AND e.cod_produto = v12m.cod_produto(+)
-                                  
-                                  AND e.cod_empresa = v6m.cod_empresa(+)
-                                  AND e.cod_produto = v6m.cod_produto(+)
-                                  
-                                  AND e.cod_empresa = v3m.cod_empresa(+)
-                                  AND e.cod_produto = v3m.cod_produto(+)
-                                  $andSqlCategoria
-                                  $andSql
+                                and e.cod_produto = p.cod_produto
+                                and p.cod_marca = m.cod_marca
+                                --nd e.cod_produto = pc.cod_produto(+)
+                                $andSqlCategoria
+                                
+                                and e.cod_empresa = vx.cod_empresa(+)
+                                and e.cod_produto = vx.cod_produto(+)
+                                $andSql
                                 --and e.cod_empresa = 7
                                 --and e.cod_produto = 397
-                        
-                        )
-                        where 1=1
-                        $groupAndWhere
-                        group by $groupBy, $groupId)
+
+                            )
+                            where 1=1
+                            $groupAndWhere
+                            group by $groupBy, $groupId)
                     where 1=1
                     $orderBy";
-
         //   print "$sql";
         //   exit;
 
@@ -453,22 +746,92 @@ class ExploreController extends AbstractRestfulController
             $results = $stmt->fetchAll();
 
             $hydrator = new ObjectProperty;
-            $hydrator->addStrategy('rol_dia_m0', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_m0', new ValueStrategy);
-            $hydrator->addStrategy('mb_m0', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia_m1', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_m1', new ValueStrategy);
-            $hydrator->addStrategy('mb_m1', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia_ac_at', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_ac_at', new ValueStrategy);
-            $hydrator->addStrategy('rol_dia_ac_an', new ValueStrategy);
-            $hydrator->addStrategy('lb_dia_ac_an', new ValueStrategy);
-            $hydrator->addStrategy('mb_ac_an', new ValueStrategy);
-            $hydrator->addStrategy('var_rd_m0_m1', new ValueStrategy);
-            $hydrator->addStrategy('var_ld_m0_m1', new ValueStrategy);
-            $hydrator->addStrategy('var_mb_m0_m1', new ValueStrategy);
-            $hydrator->addStrategy('var_rd_ac_at_an', new ValueStrategy);
-            $hydrator->addStrategy('var_ld_ac_at_an', new ValueStrategy);
+            $hydrator->addStrategy('rol_m0', new ValueStrategy);
+            $hydrator->addStrategy('rol_m1', new ValueStrategy);
+            $hydrator->addStrategy('rol_m2', new ValueStrategy);
+            $hydrator->addStrategy('rol_m3', new ValueStrategy);
+            $hydrator->addStrategy('rol_3m', new ValueStrategy);
+            $hydrator->addStrategy('rol_6m', new ValueStrategy);
+            $hydrator->addStrategy('rol_12m', new ValueStrategy);
+            $hydrator->addStrategy('rol_acat', new ValueStrategy);
+            $hydrator->addStrategy('rol_acan', new ValueStrategy);
+
+            $hydrator->addStrategy('cmv_m0', new ValueStrategy);
+            $hydrator->addStrategy('cmv_m1', new ValueStrategy);
+            $hydrator->addStrategy('cmv_m2', new ValueStrategy);
+            $hydrator->addStrategy('cmv_m3', new ValueStrategy);
+            $hydrator->addStrategy('cmv_3m', new ValueStrategy);
+            $hydrator->addStrategy('cmv_6m', new ValueStrategy);
+            $hydrator->addStrategy('cmv_12m', new ValueStrategy);
+            $hydrator->addStrategy('cmv_acat', new ValueStrategy);
+            $hydrator->addStrategy('cmv_acan', new ValueStrategy);
+            
+            $hydrator->addStrategy('lb_m0', new ValueStrategy);
+            $hydrator->addStrategy('lb_m1', new ValueStrategy);
+            $hydrator->addStrategy('lb_m2', new ValueStrategy);
+            $hydrator->addStrategy('lb_m3', new ValueStrategy);
+            $hydrator->addStrategy('lb_3m', new ValueStrategy);
+            $hydrator->addStrategy('lb_6m', new ValueStrategy);
+            $hydrator->addStrategy('lb_12m', new ValueStrategy);
+            $hydrator->addStrategy('lb_acat', new ValueStrategy);
+            $hydrator->addStrategy('lb_acan', new ValueStrategy);
+            
+            $hydrator->addStrategy('qtd_m0', new ValueStrategy);
+            $hydrator->addStrategy('qtd_m1', new ValueStrategy);
+            $hydrator->addStrategy('qtd_m2', new ValueStrategy);
+            $hydrator->addStrategy('qtd_m3', new ValueStrategy);
+            $hydrator->addStrategy('qtd_3m', new ValueStrategy);
+            $hydrator->addStrategy('qtd_6m', new ValueStrategy);
+            $hydrator->addStrategy('qtd_12m', new ValueStrategy);
+            $hydrator->addStrategy('qtd_acat', new ValueStrategy);
+            $hydrator->addStrategy('qtd_acan', new ValueStrategy);
+            
+            $hydrator->addStrategy('roldia_m0', new ValueStrategy);
+            $hydrator->addStrategy('roldia_m1', new ValueStrategy);
+            $hydrator->addStrategy('roldia_m2', new ValueStrategy);
+            $hydrator->addStrategy('roldia_m3', new ValueStrategy);
+            $hydrator->addStrategy('roldia_3m', new ValueStrategy);
+            $hydrator->addStrategy('roldia_6m', new ValueStrategy);
+            $hydrator->addStrategy('roldia_12m', new ValueStrategy);
+            $hydrator->addStrategy('roldia_acat', new ValueStrategy);
+            $hydrator->addStrategy('roldia_acan', new ValueStrategy);
+            
+            $hydrator->addStrategy('cmvdia_m0', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_m1', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_m2', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_m3', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_3m', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_6m', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_12m', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_acat', new ValueStrategy);
+            $hydrator->addStrategy('cmvdia_acan', new ValueStrategy);
+            
+            $hydrator->addStrategy('lbdia_m0', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_m1', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_m2', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_m3', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_3m', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_6m', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_12m', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_acat', new ValueStrategy);
+            $hydrator->addStrategy('lbdia_acan', new ValueStrategy);
+
+            
+            $hydrator->addStrategy('qtddia_m0', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_m1', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_m2', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_m3', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_3m', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_6m', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_12m', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_acat', new ValueStrategy);
+            $hydrator->addStrategy('qtddia_acan', new ValueStrategy);
+
+            $hydrator->addStrategy('var_rold_m0_m1', new ValueStrategy);
+            $hydrator->addStrategy('var_lbd_m0_m1', new ValueStrategy);
+            $hydrator->addStrategy('var_mbd_m0_m1', new ValueStrategy);
+            $hydrator->addStrategy('var_rold_acat_acan', new ValueStrategy);
+            $hydrator->addStrategy('var_lbd_acat_acan', new ValueStrategy);
             $stdClass = new StdClass;
             $resultSet = new HydratingResultSet($hydrator, $stdClass);
             $resultSet->initialize($results);
@@ -477,6 +840,8 @@ class ExploreController extends AbstractRestfulController
             foreach ($resultSet as $row) {
 
                 $l = $hydrator->extract($row);
+
+                $l['varMbdM0M1'] = (float) $l['varMbdM0M1'];
 
                 $data[] = $l;
             }
